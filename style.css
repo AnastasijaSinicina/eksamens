@@ -1,0 +1,627 @@
+@import url('https://fonts.googleapis.com/css2?family=Goudy+Bookletter+1911&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+:root{
+    --maincolor:  rgb(102, 153, 255);
+    --sniegs: rgb(179, 218, 255, 85%);
+    --text: #454545;
+    --light: #ddecfa;
+	--tumsa:  #053172;
+	
+}
+*{
+	box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    border: 0;
+    outline: none;
+    transition: all 1s ease-out;
+	font-family: 'Roboto';
+}
+
+body{
+    color: var(--text);
+}
+
+header {
+    background-color: var(--light);
+    color: var(--text);
+    width: 100%;
+    height: 5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    box-shadow: 0 0 3rem var(--maincolor);
+    transition: box-shadow 0.4s ease-in-out;
+    z-index: 100;
+}
+h1 span{
+	font-weight: bold;
+	color: var(--tumsa);
+	text-shadow: 2px 2px 2px rgba(255, 255, 255, 0.9);
+	font-size: 3.2rem;
+
+}
+h2{
+    font-weight: bold;
+	color: var(--tumsa);
+	text-shadow: 2px 2px 2px rgba(255, 255, 255, 0.8);
+	font-size: 2.2rem;
+	margin-top: 1rem;
+
+}
+.btn i{
+	color: var(--tumsa);
+}
+.btn{
+	display: inline-block;
+    padding: .5rem 1.5rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--text);
+    background: var(--sniegs);
+    border-radius: var(--radius);
+    box-shadow: var(--box-shadow);
+    position: relative;
+    z-index: 1;
+    font-weight: bold;
+	text-decoration: none;
+	margin-left: 20rem;
+}
+.btn:hover, .btn i:hover{
+	background: var(--maincolor);
+	color: var(--tumsa);
+}
+
+.logo1 img{
+	width: 9rem;
+	height: 9rem;
+	padding: 0.5rem 0 0 0;
+}
+.logo2 img{
+	width: 8rem;
+	height: 8rem;
+	padding-top: 1rem;
+	transform: rotate(20deg);
+	padding: 0.5rem 0 0 0;
+}
+.nav{
+	display: flex;
+	justify-content: space-evenly;
+	flex-direction: row;
+	margin-left: 6rem;
+}
+
+.nav a {
+    background-image: linear-gradient(
+        to right,
+		#0039e6,
+        #0059ff 50%,
+        #000 50%
+    );
+    background-size: 200% 100%;
+    background-position: -100%;
+    display: inline-block;
+	margin: 0 2.5rem;
+    position: relative;
+    -webkit-background-clip: text; /* Safari and Chrome */
+    background-clip: text; /* Standard syntax */
+    -webkit-text-fill-color: transparent; /* Hide text color */
+    transition: background-position 0.6s ease-in-out;
+    text-decoration: none; /* Ensure no underline is added */
+}
+
+.nav a::before {
+    content: '';
+    background: var(--maincolor);
+    display: block;
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    transition: width 0.3s ease-in-out;
+}
+
+.nav a:hover {
+    background-position: 0;
+}
+
+.nav a:hover::before {
+    width: 100%;
+}
+
+.nav i {
+    width: 1.5rem;
+    color: var(--text);
+    transition: color 0.3s ease;
+}
+
+.nav i:hover {
+    color: black;
+}
+#sakums{
+	position: relative;
+
+
+}
+#sakums .box-container{
+	 display: flex;
+	flex-direction: row; 
+	width: 100%;
+	position: relative;
+	
+	
+}
+
+
+#sakums .box-container .text{
+	position: absolute; /* Position it over the images */
+	width: 41%;
+    top: 30%; /* Adjust vertical positioning */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); 
+	background: rgba(185, 199, 228, 0.39);
+    padding: 1.5rem;
+    border-radius: .5rem;
+	
+}
+#sakums .box-container h1{	
+    color: white; /* Text color */
+    font-size: 2.5rem; /* Font size */
+    text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
+	margin-bottom: 2rem;
+	text-align: center;
+
+}
+#sakums .box-container p{
+    color: white; /* Text color */
+    font-size: 1.8rem; /* Font size */
+    text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
+	text-align: justify;
+
+}
+#sakums .box img{
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+#sakums .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.233); /* Red with 50% transparency */
+   
+}
+
+#jaunumi{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-top: 5rem;
+}
+#jaunumi .scroll-container {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px; /* Adjust padding if needed */
+}
+
+#jaunumi .box-container{
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 55%;
+	height: 20%;
+	
+}
+
+#jaunumi .box {
+    display: inline-block;
+    width: 200px; /* Adjust width as needed */
+    margin-right: 10rem; /* Space between boxes */
+}
+
+
+#jaunumi .box-container img{
+	width: 20rem;
+	height: 20rem;
+}
+
+
+
+
+
+#parMums {
+    display: flex;
+    flex-direction: column;
+	left: 5;
+    margin-top: 5rem;
+}
+
+
+#parMums .box-container {
+    display: flex;
+    flex-direction: row;
+	left: 5;
+
+    width: 55%;
+    height: auto; 
+
+}
+
+#parMums .box {
+    display: flex; /* Use flex to control alignment */
+    flex-direction: column; /* Stack image and text vertically */
+    width: 50rem; /* Adjust width as needed */
+}
+
+
+   
+
+#parMums .box p {
+    margin-top: 1rem; /* Space between image and text */
+
+}
+
+
+
+
+
+
+
+/* .text{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 15rem;
+	
+} */
+/* .box {
+    position: relative;
+    width: 100%; 
+    height: 300px;
+	display: flex;
+	justify-content:space-around;
+	align-items: center;
+	
+}
+
+.box2 {
+    position: relative;
+	display: flex;
+	justify-content: center;
+    /* width: 100%;
+    height: 100%; */
+	/* margin: 1rem;
+} */
+
+/* .box2 img {
+    width: 20rem;
+    height: 20rem;
+	border-radius: .2rem;
+}
+.slideshow-container {
+    position: relative;
+    max-width: 100%;
+    margin: auto;
+    overflow: hidden;
+    height: 500px; 
+	display: flex;
+	flex-direction: row;
+}
+
+.slide {
+
+    position: relative;
+    width: 20rem;
+    height: 100%;
+    object-fit: cover;
+	margin: 2.5rem;
+}
+
+.slide img {
+    width: 20rem;
+    height: 20rem;
+	object-fit: cover;
+}
+
+.text {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #f2f2f2;
+    text-align: center;
+    padding: 1rem;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -22px;
+    color: #f2f2f2;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .fa-snowflake {
+	color: var(--sniegs);
+  }
+  
+  .snow {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+  }
+  
+  .snowflake {
+	animation-name: fall, shake;
+	animation-duration: 10s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 200px;
+	z-index: 7;
+	filter: blur(0.5px);
+  }
+  .snowflake1 {
+	animation-name: fall, shake;
+	animation-duration: 10s, 3s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 500px;
+	top: -100px;
+	animation-delay: 1s, 1s;
+	z-index: 7;
+  }
+  
+  .snowflake2 {
+	animation-name: fall, shake;
+	animation-duration: 8s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 20px;
+	top: -100px;
+	animation-delay: 2s, 2s;
+	z-index: 7;
+
+  }
+  
+  .snowflake3 {
+	animation-name: fall, shake;
+	animation-duration: 9s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	right: 170px;
+	top: -100px;
+	animation-delay: 3s, 5s;
+	z-index: 5;
+
+  }
+  
+  .snowflake4 {
+	animation-name: fall, shake;
+	animation-duration: 15s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	right: 430px;
+	top: -100px;
+	animation-delay: 4s, 4s;
+	z-index: 5;
+  }
+  
+  .snowflake5 {
+	animation-name: fall, shake;
+	animation-duration: 15s, 4s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 500px;
+	top: -100px;
+	animation-delay: 6s, 2s;
+	font-size: 2rem;
+	z-index: 6;
+
+  }
+  
+  .snowflake6 {
+	animation-name: fall, shake;
+	animation-duration: 12s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 75px;
+	top: -100px;
+	animation-delay: 3.2s, 2s;
+	font-size: 2rem;
+	z-index: 6;
+  }
+  
+  .snowflake7 {
+	animation-name: fall, shake;
+	animation-duration: 11s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 650px;
+	top: -100px;
+	animation-delay: 7.2s, 1s;
+	z-index: 7;
+  }
+  
+  .snowflake8 {
+	animation-name: fall, shake;
+	animation-duration: 12s, 4s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 820px;
+	top: -100px;
+	animation-delay: 4s, 2s;
+	font-size: 2rem;
+	z-index: 5;
+
+  }
+  
+  .snowflake9 {
+	animation-name: fall, shake;
+	animation-duration: 12s, 4s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 170px;
+	top: -100px;
+	animation-delay: 5s, 2s;
+	font-size: 2rem;
+	z-index: 5;
+
+  }
+  
+  .snowflake10 {
+	animation-name: fall, shake;
+	animation-duration: 15s, 9s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 350px;
+	top: -100px;
+	animation-delay: 2.7s, 2s;
+	font-size: 3rem;
+	z-index: 7;
+  }
+  
+  .snowflake11 {
+	animation-name: fall, shake;
+	animation-duration: 12s, 7s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	right: 400px;
+	top: -100px;
+	animation-delay: 0.5s, 2s;
+	font-size: 3rem;
+	z-index: 7;
+  }
+  
+  .snowflake12 {
+	/*small*/
+	animation-name: fall, shake;
+	animation-duration: 12s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	left: 470px;
+	top: -100px;
+	animation-delay: 5s, 2s;
+	z-index: 7;
+
+  }
+  
+  .snowflake13 {
+	/*small*/
+	animation-name: fall, shake;
+	animation-duration: 10s, 5s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	right: 220px;
+	top: -100px;
+	animation-delay: 1s, 2s;
+	z-index: 7;
+
+  }
+  
+  .snowflake14 {
+	/*small*/
+	animation-name: fall, shake;
+	animation-duration: 9s, 4s;
+	animation-timing-function: linear, ease-in-out;
+	animation-iteration-count: infinite, infinite;
+	position: absolute;
+	right: 140px;
+	top: -100px;
+	animation-delay: 2s, 2s;
+	z-index: 7;
+
+  } 
+  
+  @keyframes fall {
+	0% {
+	  top: -10%;
+	}
+	100% {
+	  top: 100%;
+	}
+  }
+  
+  @keyframes shake {
+	0% {
+	  transform: translateX(0);
+	}
+	50% {
+	  transform: translateX(50px);
+	}
+	100% {
+	  transform: translateX(0);
+	}
+  }
+  
