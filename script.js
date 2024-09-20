@@ -1,16 +1,48 @@
-// let slideIndex = 0;
+let currentIndex = 0;
 
-// function showSlides() {
-//   let slides = document.getElementsByClassName("slide");
-//   console.log(slides.length); // Check if slides are being fetched correctly
-//   for (let i = 0; i < slides.length; i++) {
-//       slides[i].style.display = "none";
-//   }
-//   slideIndex++;
-//   if (slideIndex > slides.length) { slideIndex = 1 }
-//   slides[slideIndex - 1].style.display = "block";
-// //   setTimeout(showSlides, 5000);
-//  }
+function updateButtons() {
+    const prevButton = document.querySelector('.prev');
+    const nextButton = document.querySelector('.next');
+    const totalBoxes = document.querySelectorAll('#parMums .box').length;
+
+    // Hide prev button on first box
+    if (currentIndex === 0) {
+        prevButton.style.display = 'none';
+    } else {
+        prevButton.style.display = 'block';
+    }
+
+    // Hide next button on last box
+    if (currentIndex === totalBoxes - 1) {
+        nextButton.style.display = 'none';
+    } else {
+        nextButton.style.display = 'block';
+    }
+}
+
+function nextSlide() {
+    const boxContainer = document.querySelector('#parMums .box-container');
+    const totalBoxes = document.querySelectorAll('#parMums .box').length;
+    if (currentIndex < totalBoxes - 1) {
+        currentIndex++;
+        boxContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+    updateButtons();
+}
+
+function prevSlide() {
+    const boxContainer = document.querySelector('#parMums .box-container');
+    if (currentIndex > 0) {
+        currentIndex--;
+        boxContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+    updateButtons();
+}
+
+// Call updateButtons after the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    updateButtons();
+});
 
 
 
