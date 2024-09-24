@@ -45,6 +45,46 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+  document.addEventListener('DOMContentLoaded', function() {
+    const changes = document.querySelectorAll('.change');
+    let currentIndex = 0;
+
+    function changeContent() {
+        // Remove 'active' class from the current element
+        changes[currentIndex].classList.remove('active');
+
+        // Increment the index, looping back if necessary
+        currentIndex = (currentIndex + 1) % changes.length;
+
+        // Add 'active' class to the next element
+        changes[currentIndex].classList.add('active');
+    }
+
+    // Initially show the first element
+    changes[currentIndex].classList.add('active');
+
+    // Change content every 3 seconds
+    setInterval(changeContent, 3000);
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

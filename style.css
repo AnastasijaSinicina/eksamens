@@ -58,8 +58,9 @@ p{
 }
 
 span{
-	color: var(--tumsa);
-	text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
+	color: var(--sniegs);
+	text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
+	text-align: center;
 } 
 
 
@@ -72,16 +73,24 @@ span{
     font-size: 1.1rem;
     cursor: pointer;
     color: var(--text);
-    background: var(--sniegs);
+    background: var(--light);
     position: relative;
     z-index: 1;
     font-weight: bold;
 	text-decoration: none;
+	border-radius: .5rem;
+}
+.navBtn{
+	background: var(--sniegs);
 	margin-left: 20rem;
 }
 .btn:hover, .btn i:hover{
-	background: var(--maincolor);
+	background: var(--sniegs);
 	color: var(--tumsa);
+}
+
+.navBtn:hover{
+	background-color: var(--maincolor);
 }
 
 .logo1 img{
@@ -158,6 +167,7 @@ span{
 
 
 
+/*----------------------------------------------------------------------------Sakums-----------------------------------------------------------------------------------------------*/
 #sakums{
 	position: relative;
 
@@ -176,19 +186,19 @@ span{
 }
 #sakums .box-container .text{
 	position: absolute; 
-	width: 41%;
+	width: 40%;
     top: 30%; /* Adjust vertical positioning */
     left: 50%; /* Center horizontally */
     transform: translateX(-50%); 
 	background: rgba(137, 139, 143, 0.39);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: .5rem;
 	}
 #sakums .box-container h1{	
     color: white; /* Text color */
     font-size: 2.5rem; /* Font size */
     text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
-	margin-bottom: 2rem;
+	margin-bottom: 1rem;
 	text-align: center;
 
 }
@@ -197,6 +207,7 @@ span{
     font-size: 1.8rem; /* Font size */
     text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
 	text-align: justify;
+	padding-top: 1rem ;
 
 }
 #sakums  img{
@@ -214,51 +225,64 @@ span{
 }
 
 
-#jaunumi{
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	margin-top: 5rem;
-}
+/*---------------------------------------------------------------------------Jaunumi-----------------------------------------------------------------------------------------------*/
 
-#jaunumi .scroll-container {
+#jaunumi {
     display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px; /* Adjust padding if needed */
+    justify-content: center; /* Centers the container horizontally */
+    align-items: center;
+	flex-direction: column; /* Centers the container vertically (if the section has height) */
+   
+}
+#jaunumi h1{
+	margin: 2rem 0;
 }
 
-#jaunumi .box-container{
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	width: 55%;
-	height: 20%;
-	
+#jaunumi .box-container {
+    position: relative;
+    width: 55%; /* Set the container to 70% width */
+    height: 200px; /* Set a height to ensure content fits */
+    display: flex;
+    justify-content: center; /* Centers the content inside */
+    align-items: center;
+}
+
+.change {
+    position: absolute;
+    top: 0;
+    width: 100%; /* Occupy the full width of the parent */
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.change.active {
+    opacity: 1;
 }
 
 #jaunumi .box {
     display: inline-block;
-    width: 200px; 
-    margin-right: 10rem; 
-	
+    margin-right: 10px;
+    text-align: center; /* Center text inside the boxes */
+}
+
+#jaunumi .box img {
+    width: 20rem;
+   
 }
 
 
-#jaunumi .box-container img{
+
+/* #jaunumi .box-container img{
 	width: 20rem;
 	height: 20rem;
-}
+} */
 
 
 /*--------------------------------------------------------Par Mums------------------------------------------------------------------------------------------------------------*/
 
 
 #parMums {
-    margin-top: 5rem;
+    margin-top: 10rem;
     text-align: center;
 	display: flex;
 	justify-content: center;
@@ -280,13 +304,14 @@ span{
 }
 
 #parMums .box {
-    flex: 0 0 100%; /* Each box takes up 100% of the container width */
+    flex: 0 0 100%; 
     padding: 2rem;
     box-sizing: border-box;
     background-color: var(--light);
+	border-radius: 1rem;
     display: flex;
     align-items: center;
-    height: 28rem; /* Original height */
+    height: 28rem;
 }
 
 #parMums .box img {
@@ -297,7 +322,7 @@ span{
 }
 
 #parMums .box p {
-    font-size: 1.6rem; /* Original text size */
+    font-size: 1.6rem;
     margin: 0;
 	text-align: justify;
 }
@@ -305,6 +330,8 @@ span{
 .button-container {
     display: flex;
     justify-content: center;
+	place-content: center;
+	align-items: center;
     margin-top: 1rem;
 }
 
@@ -317,10 +344,26 @@ button.prev, button.next {
     margin: 0 1rem;
     opacity: 0.8;
     font-size: 1.2rem;
+	border-radius: .5rem;
 }
 
 button.prev:hover, button.next:hover {
     background-color: var(--maincolor);
+}
+
+#parMums .video {
+    position: relative; 
+
+	width: 100vw; /* Full viewport width */
+    height: 100vh;
+    overflow: hidden; 
+    z-index: -1;
+}
+
+#parMums .video video {
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    object-fit: cover; /* Cover the container without distortion */
 }
 
 #parMums .box-darbinieki{
@@ -333,11 +376,12 @@ button.prev:hover, button.next:hover {
 	align-items: center;
 	justify-content: space-evenly;
 	width: 30rem;
-	height: 30rem;
+	height: auto;
 	text-align: center;
 	margin: 1rem;
 	border-radius: 1rem;
 	border: solid 2px var(--maincolor);
+	padding: 1rem;
 }
 #parMums h3{
 	font-size: 2rem;
@@ -345,9 +389,14 @@ button.prev:hover, button.next:hover {
 }
 #parMums p{
 	font-size: 1.5rem;
-	color: black;
+	color: var(--tumsa);
+	padding: 0 1rem;
 }
-#parMums img{
+#parMums .box-darbinieki p{
+	margin-bottom: 2rem;
+}
+#parMums .darbinieks img{
+	margin: 1rem;
 	border-radius: 10rem;
 	width: 18rem;
 	height: 18rem;
@@ -357,109 +406,69 @@ button.prev:hover, button.next:hover {
 	text-align: center;
 }
 
-#parMus p{
-	font-size: 2rem;
-	color: var(--tumsa);
-	
-}
 #parMums .citats{
-	margin-top: 2rem;
-	padding: 4rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: 1rem;
+	padding: 1rem;
 	border-radius: 1rem;
 	border: solid 2px var(--maincolor);
 }
-
-/* .text{
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 15rem;
-	
-} */
-/* .box {
-    position: relative;
-    width: 100%; 
-    height: 300px;
-	display: flex;
-	justify-content:space-around;
-	align-items: center;
-	
+#parMums .citats p{
+	color: var(--text);
+}
+#parMums .citats img{
+	margin: .8rem;
+	width: 18rem;
+	border-radius: 1rem;
 }
 
-.box2 {
-    position: relative;
-	display: flex;
-	justify-content: center;
-    /* width: 100%;
-    height: 100%; */
-	/* margin: 1rem;
-} */
 
-/* .box2 img {
-    width: 20rem;
-    height: 20rem;
-	border-radius: .2rem;
+
+/*-----------------------------------------------------------Footer----------------------------------------------------------------------------------------------------------*/
+footer{
+	background: var(--light);
+	padding: 1rem;
+	margin-top: 2rem;
 }
-.slideshow-container {
-    position: relative;
-    max-width: 100%;
-    margin: auto;
-    overflow: hidden;
-    height: 500px; 
+
+footer .box-container{
 	display: flex;
 	flex-direction: row;
+	text-align: center;
+	justify-content: space-around;
+
+}
+footer .box1{
+	display: flex;
+	flex-direction: row;
+	place-content: center;
+}
+footer .box1{
+	
+	border-left: solid 2px var(--maincolor);
+	border-right: solid 2px var(--maincolor);
+}
+footer p{
+	padding: .5rem 4rem;
+	color: var(--tumsa);
+	font-size: 1.2rem;
+	line-height: 2rem;
+}
+footer .box a{
+	padding: .5rem 0;
+	color: var(--tumsa);
+	font-size: 1.2rem;
+	line-height: 2rem;
 }
 
-.slide {
-
-    position: relative;
-    width: 20rem;
-    height: 100%;
-    object-fit: cover;
-	margin: 2.5rem;
+footer img{
+	width: 16rem;
+	margin: 0 8rem;
 }
 
-.slide img {
-    width: 20rem;
-    height: 20rem;
-	object-fit: cover;
-}
-
-.text {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #f2f2f2;
-    text-align: center;
-    padding: 1rem;
-}
-
-.prev, .next {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    width: auto;
-    padding: 16px;
-    margin-top: -22px;
-    color: #f2f2f2;
-    font-weight: bold;
-    font-size: 18px;
-    border-radius: 0 3px 3px 0;
-    user-select: none;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.next {
-    right: 0;
-    border-radius: 3px 0 0 3px;
-}
-
-.prev:hover, .next:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-  */
 
 
 
@@ -474,21 +483,7 @@ button.prev:hover, button.next:hover {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*-------------------------------------------------------------------------------------Sniegs-------------------------------------------------------------------------------------*/
 
 
   .fa-snowflake {
