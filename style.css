@@ -110,7 +110,7 @@ span{
 }
 .nav{
 	display: flex;
-	justify-content: space-evenly;
+	justify-content: flex-end;
 	flex-direction: row;
 	margin-left: 6rem;
 }
@@ -232,7 +232,7 @@ span{
     justify-content: center; /* Centers the container horizontally */
     align-items: center;
 	flex-direction: column; /* Centers the container vertically (if the section has height) */
-   
+   margin-bottom: 10rem;
 }
 #jaunumi h1{
 	margin: 2rem 0;
@@ -282,7 +282,7 @@ span{
 
 
 #parMums {
-    margin-top: 10rem;
+
     text-align: center;
 	display: flex;
 	justify-content: center;
