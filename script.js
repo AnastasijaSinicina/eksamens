@@ -1,3 +1,5 @@
+
+
 let currentIndex = 0;
 
 function updateButtons() {

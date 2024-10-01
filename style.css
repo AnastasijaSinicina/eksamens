@@ -3,7 +3,7 @@
     --maincolor:  #6699ff;
     --sniegs: rgb(179, 218, 255, 85%);
     --text: #454545;
-    --light: #ddecfa;
+    --light: #d6ebff;
 	--tumsa:  #053172;
 	
 }
@@ -21,7 +21,13 @@
 
 body{
     color: var(--text);
+	background-image: url(images/background.png);
+	background-size: cover;     
+    background-repeat: no-repeat; 
+	
 }
+
+
 
 header {
     background-color: var(--light);
@@ -36,12 +42,14 @@ header {
     flex-direction: row;
     box-shadow: 0 0 3rem var(--maincolor);
     transition: box-shadow 0.4s ease-in-out;
-    z-index: 100;
+    z-index: 9999;
+
 }
 h1{
 	font-size: 3.2rem;
 	color: var(--tumsa);
 	text-shadow: 2px 1px 2px rgb(113, 149, 255);
+	text-align: center;
 }
 h2{
 	font-size: 2.3rem;
@@ -59,7 +67,7 @@ p{
 
 span{
 	color: var(--sniegs);
-	text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
+	text-shadow: 2px 2px 2px rgb(73, 103, 194);
 	text-align: center;
 } 
 
@@ -108,11 +116,12 @@ span{
 .logo2 img:hover{
 	transform: rotate(-20deg);
 }
+
 .nav{
 	display: flex;
 	justify-content: flex-end;
 	flex-direction: row;
-	margin-left: 6rem;
+	margin-left: 6rem; 
 }
 
 .nav a {
@@ -178,12 +187,6 @@ span{
 	color: var(--tumsa);
 	text-shadow: 2px 2px 2px 2px rgba(145, 183, 240, 0.801);
 }
-#sakums .box-container{
-	display: flex;
-	flex-direction: row; 
-	width: 100%;
-	position: relative;	
-}
 #sakums .box-container .text{
 	position: absolute; 
 	width: 40%;
@@ -229,28 +232,28 @@ span{
 
 #jaunumi {
     display: flex;
-    justify-content: center; /* Centers the container horizontally */
+    justify-content: space-between; 
     align-items: center;
-	flex-direction: column; /* Centers the container vertically (if the section has height) */
-   margin-bottom: 10rem;
+	flex-direction: column; 
+   	margin-bottom: 30rem;
 }
+
 #jaunumi h1{
-	margin: 2rem 0;
+	margin: 3rem 0;
 }
 
 #jaunumi .box-container {
     position: relative;
-    width: 55%; /* Set the container to 70% width */
-    height: 200px; /* Set a height to ensure content fits */
+    width: 80%; 
     display: flex;
-    justify-content: center; /* Centers the content inside */
+    justify-content: center; 
     align-items: center;
 }
 
 .change {
     position: absolute;
     top: 0;
-    width: 100%; /* Occupy the full width of the parent */
+    width: 100%; 
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
 }
@@ -261,28 +264,140 @@ span{
 
 #jaunumi .box {
     display: inline-block;
-    margin-right: 10px;
-    text-align: center; /* Center text inside the boxes */
+    margin-right: .6rem;
+	padding:  1rem;
+    text-align: center; 
+	box-shadow: 0 0 3rem #4747473d;
+	background: #fafafa;
 }
 
 #jaunumi .box img {
-    width: 20rem;
-   
+    width: 23rem;
+}
+#jaunumi p{
+	margin: .5rem;
+	font-size: 1.2rem;
+}
+
+.arrow {
+		position: absolute;
+		right: 10px; 
+		margin-top: 30rem; 
+		transform: translateY(-50%); 
+}
+
+/*---------------------------------- */
+#jaunumiNew {
+    display: flex;
+    justify-content: space-between; /* Centers the container horizontally */
+	height: 200px;
+    align-items: center;
+	flex-direction: column; /* Centers the container vertically (if the section has height) */
+   	margin-top: 10rem;
+	margin-bottom: 20rem;
+}
+
+#jaunumiNew h1{
+	margin: 2rem 0;
+}
+
+#jaunumiNew .box-container {
+    position: relative;
+    width: 80%; /* Set the container to 70% width */
+    display: flex;
+    justify-content: center; /* Centers the content inside */
+    align-items: center;
+}
+#jaunumiNew .box {
+    display: inline-block;
+    margin-right: .6rem;
+	padding:  1rem;
+    text-align: center; /* Center text inside the boxes */
+	box-shadow: 0 0 3rem #4747473d;
+	background: #fafafa;
+}
+
+#jaunumiNew .box img {
+    width: 23rem;
+}
+#jaunumiNew p{
+	margin: .5rem;
+	font-size: 1.2rem;
 }
 
 
+/*---------------------------------------------------------------------Atsauksmes---------------------------------------------------------------------------------------------*/
 
-/* #jaunumi .box-container img{
+#atsauksmes {
+	position: relative;
+    overflow: hidden;
+    width: 100%;
+	padding-top: 4rem;
+    margin-top: 40rem;
+    text-align: center;
+    background: var(--tumsa);
+    color: var(--light);
+	height: 40rem;
+		box-shadow: 0 0 3rem #4747473d;
+}
+
+#atsauksmes .box-container{
+	display: flex;
+	flex-direction: row;
+	margin: 2rem;
+	animation: slide 20s linear infinite;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(-80%);
+    }
+    100% {
+        transform: translateX(10%);
+    }
+}
+#atsauksmes .box {
+	min-width: 33.33%; 
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    width: 35rem; 
+    border: solid 2px var(--maincolor);
+	box-shadow: 0 0 .3rem #6699ff;
+	border-radius: .2rem;
+    text-align: center;
+	margin: 0 2rem;
+
+}
+#atsauksmes .text{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	height: 15rem;
 	width: 20rem;
-	height: 20rem;
-} */
+	padding: 0;
+	margin: 0;
+}
 
-
-/*--------------------------------------------------------Par Mums------------------------------------------------------------------------------------------------------------*/
+#atsauksmes img {
+    width: 15rem;
+    margin: 1.2rem;
+}
+#atsauksmes .btn{
+	width: 50%;
+}
+#atsauksmes i{
+	color: yellow;
+	margin: 0 .2rem;
+}
+/*--------------------------------------------------------------Par Mums------------------------------------------------------------------------------------------------------------*/
 
 
 #parMums {
-
+	margin-top: 5rem;
     text-align: center;
 	display: flex;
 	justify-content: center;
@@ -312,6 +427,7 @@ span{
     display: flex;
     align-items: center;
     height: 28rem;
+	
 }
 
 #parMums .box img {
@@ -352,8 +468,7 @@ button.prev:hover, button.next:hover {
 }
 
 #parMums .video {
-    position: relative; 
-
+    position: relative;
 	width: 100vw; /* Full viewport width */
     height: 100vh;
     overflow: hidden; 
@@ -369,6 +484,7 @@ button.prev:hover, button.next:hover {
 #parMums .box-darbinieki{
 	display: flex;
 	flex-direction: row;
+	
 }
 #parMums .darbinieks{
 	display: flex;
@@ -382,6 +498,8 @@ button.prev:hover, button.next:hover {
 	border-radius: 1rem;
 	border: solid 2px var(--maincolor);
 	padding: 1rem;
+	box-shadow: 0 0 1rem #4747473d;
+	background: #fafafa;
 }
 #parMums h3{
 	font-size: 2rem;
@@ -415,6 +533,7 @@ button.prev:hover, button.next:hover {
 	padding: 1rem;
 	border-radius: 1rem;
 	border: solid 2px var(--maincolor);
+	box-shadow: 0 0 3rem #4747473d;
 }
 #parMums .citats p{
 	color: var(--text);
