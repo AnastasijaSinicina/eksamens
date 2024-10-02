@@ -17,35 +17,15 @@
             <img src="images/bumba.png" alt="">       
     </div>
     <nav class="nav">
-        <a href="index.html" target="_blank"><i class="fa fa-home"></i>Sākums</a>
-        <a href="jaunumi.html" target="_blank"><i class="fa-solid fa-lightbulb"></i>Jaunumi</a>
-        <a href="produkcijas.html" target="_blank"><i class="fa-solid fa-gift"></i>Produkcija</a>
-        <a href="atsauksmes.html" target="_blank"><i class="fa-solid fa-book-open-reader"></i>Atsauksmes</a>
-        <a href="parMums.html" target="_blank" ><i class="fa-solid fa-shop"></i>Par mums</a>
-        <a href="kontakti.html" target="_blank"><i class="fa-solid fa-phone"></i>Kontakti</a>
+        <a href="index.html"     ><i class="fa fa-home"></i>Sākums</a>
+        <a href="jaunumi.html"     ><i class="fa-solid fa-lightbulb"></i>Jaunumi</a>
+        <a href="produkcijas.html"     ><i class="fa-solid fa-gift"></i>Produkcija</a>
+        <a href="atsauksmes.html" ><i class="fa-solid fa-book-open-reader"></i>Atsauksmes</a>
+        <a href="parMums.html" ><i class="fa-solid fa-shop"></i>Par mums</a>
+        <a href="kontakti.html"><i class="fa-solid fa-phone"></i>Kontakti</a>
     </nav>
     <a href="" class="btn navBtn"><i class="fa-solid fa-cart-shopping"></i></a>
 </header>
-<section class="snow" id="snow-container">
-        <div class="snowflake"><i class="fa-solid fa-snowflake"></i></div>
-        <div class="snowflake1"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake2"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake"><i class="fa-solid fa-snowflake"></i></div>
-        <div class="snowflake1"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake2"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake3"><i class="fa-solid fa-snowflake"></i></div>
-        <div class="snowflake4"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake5"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake6"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake7"><i class="fa-solid fa-snowflake"></i></div>
-        <div class="snowflake8"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake9"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake10"><i class="fa-solid fa-snowflake"></i></div>
-        <div class="snowflake11"><i class="fa-solid fa-snowflake"></i></div>
-        <div class="snowflake12"><i class="fa-regular fa-snowflake"></i></div>
-        <div class="snowflake13"><i class="fa-solid fa-snowflake"></i></div>
-        <div class="snowflake14"><i class="fa-regular fa-snowflake"></i></div>
-    </section>
     <section id="sakums">
         <div class="box-container">
             <div class="box">
@@ -80,7 +60,6 @@
                 </div>
           
             </div>
-            <!-- Second set of images -->
             <div class="change">
                 <div class="box">
                     <img src="images/igruwka7.jpg" alt="">
@@ -88,7 +67,7 @@
                     <h3>12€</h3>
                 </div>
                 <div class="box">
-                    <img src="images/igruwka.14.jpg" alt="">
+                    <img src="images/igruwka14.jpg" alt="">
                     <p>Caurspīdīga rotaļlieta ar zelta un baltiem elementiem.</p>
                     <h3>8€</h3>
                 </div>
@@ -103,8 +82,56 @@
     
     <section id="produkcija">
         <h1>Produkcija</h1>
+        <div class="box-container">
+            <div class="box" onclick="openModal('Product 1', 'images/igruwka1.jpg', 'images/igruwka3.jpg','8€', 'Rotaļlieta ir pārklāta ar baltu samta audumu, satur zelta un baltus akmentiņus un baltā lente.')">
+                <img src="images/igruwka1.jpg" alt="">
+                <h3>Balta rotaļlieta</h3>
+                <h3>8€</h3>
+            </div>
+            <div class="box" onclick="openModal('Komplekts no 2 rotaļlietām', 'images/igruwka7.jpg', 'images/igruwka7.jpg', '15€', 'Rotaļas ir nokrāsotas gaiši pēlēkā krāsā, vidū atrodas mālas rāmis, ar enģeli un lāča figūru.')">
+                <img src="images/igruwka7.jpg" alt="">
+                <h3>Komplekts no 2 rotaļlietām</h3>
+                <h3>15€</h3>
+            </div>
+            <div class="box" onclick="openModal('Caurspīdīga rotaļlieta', 'images/igruwka11.jpg', 'images/igruwka11.jpg', '10€', 'Rotaļa ir pārklāta ar caurspīdīgo audumu ar mirdzumiem. Dekorējums sastāv no zelta/sudraba detaļām, kā arī balta lente.')">
+                <img src="images/igruwka11.jpg" alt="">
+                <h3>Caurspīdīga rotaļlieta</h3>
+                <h3>10€</h3>
+            </div>
+            <div class="box" onclick="openModal('Caurspīdīga rotaļlieta', 'images/igruwka14.jpg', 'images/igruwka14.jpg', '9€', 'Rotaļa ir pārklāta ar caurspīdīgo audumu ar mirdzumiem. Augšā ir baltā lente, zieda elementi un zelta/sudraba akmentiņi.')">
+                <img src="images/igruwka14.jpg" alt="">
+                <h3>Caurspīdīga rotaļlieta</h3>
+                <h3>9€</h3>
+            </div>
+            <div class="box" onclick="openModal('Balta rotāļlieta', 'images/igruwka12.jpg', 'images/igruwka12.jpg', '8€', 'Rotaļa ir pārklāta ar baltu samta audumu. Tā satur balto mālu rāmīti un dažadas balta un zelta detaļas')">
+                <img src="images/igruwka12.jpg" alt="">
+                <h3>Balta rotaļlieta</h3>
+                <h3>8€</h3>
+            </div>
+            <div class="box" onclick="openModal('Balta rotaļlieta', 'images/igruwka13.jpg', 'images/igruwka13.jpg', '8€', 'This is more info about Product 3.')">
+                <img src="images/igruwka13.jpg" alt="">
+                <h3>Balta rotaļlieta</h3>
+                <h3>8€</h3>
+            </div>
+        </div>
     </section>
-
+    
+    <!-- Modal Structure -->
+    <div id="overlay" class="overlay" onclick="closeModal()"></div>
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-images">
+                <img id="modalImage1" src="" alt="">
+                <img id="modalImage2" src="" alt="">
+            </div>
+            <h2 id="modalTitle"></h2>
+            <h3 id="modalPrice"></h3>
+            <p id="modalDescription"></p>
+            <a href="produkcija.html" id="modalButton" class="btn">Pievienot grozam</a>
+        </div>
+    </div>
+    
     <section id="atsauksmes">
         <h1><span>Atsauksmes</span></h1>     
         <div class="box-container">  
@@ -117,7 +144,7 @@
             </div>
         </div>
                 <div class="img">
-                    <img src="images/igruwka.14.jpg" alt="">
+                    <img src="images/igruwka14.jpg" alt="">
                 </div>
                
             </div>
@@ -130,7 +157,7 @@
             </div>
         </div>
                 <div class="img">
-                    <img src="images/igruwka.14.jpg" alt="">
+                    <img src="images/igruwka14.jpg" alt="">
                 </div>
                
             </div>
@@ -143,7 +170,7 @@
             </div>
         </div>
                 <div class="img">
-                    <img src="images/igruwka.14.jpg" alt="">
+                    <img src="images/igruwka14.jpg" alt="">
                 </div>
                
             </div>
@@ -163,7 +190,7 @@
         </div>
     </div>
     <div class="button-container">
-        <a href="parMums.html" class="btn"  target="_blank">&#10095</a>
+        <a href="parMums.html" class="btn"      >&#10095</a>
     </div>
 </div>
 <h2><p>&#10053</p>Darbinieki<p>&#10053</p></h2>

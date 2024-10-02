@@ -1,3 +1,25 @@
+function openModal(title, image1, image2, price, description) {
+  document.getElementById("modalTitle").innerText = title;
+  document.getElementById("modalImage1").src = image1; // First image
+  document.getElementById("modalImage2").src = image2; // Second image
+  document.getElementById("modalPrice").innerText = price;
+  document.getElementById("modalDescription").innerText = description;
+
+  // Show the modal and overlay
+  document.getElementById("productModal").style.display = "block";
+  document.getElementById("overlay").style.display = "block"; // Show overlay
+
+  // Prevent background scrolling
+  document.body.classList.add("no-scroll");
+}
+
+function closeModal() {
+  document.getElementById("productModal").style.display = "none"; // Hide modal
+  document.getElementById("overlay").style.display = "none"; // Hide overlay
+
+  // Enable background scrolling
+  document.body.classList.remove("no-scroll");
+}
 
 
 let currentIndex = 0;
@@ -70,70 +92,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const snowContainer = document.getElementById("snow-container");
-const snowContent = ['&#10052', '&#10053', '&#10054']
-
-const random = (num) => {
-  return Math.floor(Math.random() * num);
-}
-
-const getRandomStyles = () => {
-  const top = random(100);
-  const left = random(100);
-  const dur = random(10) + 10;
-  const size = random(25) + 25;
-  return `
-    top: -${top}%;
-    left: ${left}%;
-    font-size: ${size}px;
-    animation-duration: ${dur}s;
-  `;
-}
-
-const createSnow = (num) => {
-  for (var i = num; i > 0; i--) {
-    var snow = document.createElement("div");
-    snow.className = "snow";
-    snow.style.cssText = getRandomStyles();
-    snow.innerHTML = snowContent[random(3)]
-    snowContainer.append(snow);
-  }
-}
-
-const removeSnow = () => {
-  snowContainer.style.opacity = "0";
-  setTimeout(() => {
-    snowContainer.remove()
-  }, 500)
-}
-
-window.addEventListener("load", () => {
-  createSnow(30)
-  setTimeout(removeSnow, (1000 * 60))
-});
-
-window.addEventListener("click", () => {
-  removeSnow()
-});
 
