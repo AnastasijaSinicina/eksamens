@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Document</title>
+    <title>Sparkly Dream</title>
 </head>
 <body>
     <header>
@@ -17,14 +17,21 @@
             <img src="images/bumba.png" alt="">       
     </div>
     <nav class="nav">
-        <a href="index.html"   ><i class="fa fa-home"></i>Sākums</a>
-        <a href="jaunumi.html"   ><i class="fa-solid fa-lightbulb"></i>Jaunumi</a>
-        <a href="produkcijas.html"   ><i class="fa-solid fa-gift"></i>Produkcija</a>
-        <a href="atsauksmes.html"   ><i class="fa-solid fa-book-open-reader"></i>Atsauksmes</a>
-        <a href="parMums.html"    ><i class="fa-solid fa-shop"></i>Par mums</a>
-        <a href="kontakti.html"   ><i class="fa-solid fa-phone"></i>Kontakti</a>
+        <a href="index.html"><i class="fa fa-home"></i>Sākums</a>
+        <a href="jaunumi.html"><i class="fa-solid fa-lightbulb"></i>Jaunumi</a>
+        <div class="dropdown">
+            <a href="produkcija.html" class="dropdown-toggle"><i class="fa-solid fa-gift"></i>Produkcija</a>
+            <div class="dropdown-content">
+                <a href="produkcija.html">Produkcijas</a>
+                <a href="materiali.html">Materiali</a>
+            </div>
+        </div>
+        <a href="atsauksmes.html"><i class="fa-solid fa-book-open-reader"></i>Atsauksmes</a>
+        <a href="parMums.html"><i class="fa-solid fa-shop"></i>Par mums</a>
+        <a href="kontakti.html"><i class="fa-solid fa-phone"></i>Kontakti</a>
     </nav>
-    <a href="" class="btn navBtn">Iel<i class="fa-solid fa-snowflake"></i>g<i class="fa-solid fa-snowflake"></i>ties</a>
+    <a href="" class="btn navBtn"><i class="fa-solid fa-cart-shopping"></i></a>
+    <div id="menu-btn" class="fas fa-bars"></div>
 </header>
     <section id="parMums">
 

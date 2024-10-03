@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Goudy+Bookletter+1911&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 :root{
     --maincolor:  #6699ff;
-    --sniegs: rgb(179, 218, 255, 85%);
+    --sniegs: #b3daffd9;
     --text: #454545;
-    --light: #d6ebff;
+    --light: #afdbff;
 	--tumsa:  #053172;
-	
+	--box-shadow: 0 0 3rem #4747473d;
 }
 *{
 	box-sizing: border-box;
@@ -18,13 +18,27 @@
 	font-family: 'Roboto';
 	transition: all 2s ease-out;
 }
+html{
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+}
+.animate {
+    opacity: 0;
+    transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+    will-change: opacity, transform;
+}
+
+.animate.visible {
+    opacity: 1;
+    animation: slideInUp 0.9s forwards;
+}
 
 body{
     color: var(--text);
-	background-image: url(images/background.png);
+	background-image: url(images/background2.webp);
 	background-size: cover;     
     background-repeat: no-repeat; 
-	
+    background-attachment: fixed;
 }
 
 
@@ -44,6 +58,43 @@ header {
     transition: box-shadow 0.4s ease-in-out;
     z-index: 9999;
 	
+/* Style the dropdown container */
+/* .dropdown {
+    position: relative;
+    display: inline-block;
+} */
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none; /* Hidden by default */
+    position: absolute;
+    background-color: var(--light);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Show the dropdown on hover */
+.dropdown:hover .dropdown-content {
+    display: block; /* Ensure it displays */
+    opacity: 1; /* Fade in */
+    transform: translateY(0); /* Move into position */
+}
+
+/* Dropdown link styles */
+.dropdown-content a:hover {
+    background-color: #ddd; /* Change background on hover */
+}
+
+
 
 }
 h1{
@@ -176,6 +227,77 @@ span{
 
 
 
+.overlay {
+    display: none; /* Hidden by default */
+    position: fixed; /* Sit on top */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(211, 211, 211, 0.7); /* Light gray background with transparency */
+    z-index: 0; /* Behind the modal */
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 50%; /* Center horizontally */
+    top: 45%; /* Center vertically */
+    width: 95rem; /* Increased width of the modal */
+    height: 60rem; /* Increased height of the modal */
+    overflow: hidden;
+    transform: translate(-50%, -50%); /* Adjust position to center */
+}
+
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+	box-shadow: 0 0 1rem #4b4b4bc2;
+    width: 80%; /* Could be more or less, depending on screen size */
+	height: 100%;
+    text-align: center;
+
+}
+.modal p{
+	margin: 1rem;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-images {
+    display: flex; /* Use flexbox to arrange images in a row */
+    justify-content: center; /* Center images horizontally */
+    margin-bottom: 1rem; /* Space between images and text */
+}
+
+.modal-images img {
+    max-width: 28rem; /* Set maximum width for images */
+    height: auto; /* Maintain aspect ratio */
+    margin: 0 1rem; /* Add margin between the two images */
+	box-shadow: 0 .5rem .5rem #4747473d;
+    transition: transform 0.3s ease-in-out; 
+}
+
+body.no-scroll {
+	overflow: hidden; /* Prevent scrolling */
+}
+
+
 
 /*----------------------------------------------------------------------------Sakums-----------------------------------------------------------------------------------------------*/
 #sakums{
@@ -190,7 +312,7 @@ span{
 }
 #sakums .box-container .text{
 	position: absolute; 
-	width: 40%;
+	width: 50%;
     top: 30%; /* Adjust vertical positioning */
     left: 50%; /* Center horizontally */
     transform: translateX(-50%); 
@@ -216,7 +338,7 @@ span{
 }
 #sakums  img{
 	display: block;
-	width: 99vw;
+	width: 99.1vw;
 	height: 100%;
 }
 #sakums .overlay {
@@ -226,6 +348,7 @@ span{
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.233); 
+    overflow: hidden;
 }
 
 
@@ -237,6 +360,7 @@ span{
     align-items: center;
 	flex-direction: column; 
    	margin-bottom: 30rem;
+    text-align: center;
 	
 }
 
@@ -269,7 +393,7 @@ span{
     margin-right: .6rem;
 	padding:  1rem;
     text-align: center; 
-	box-shadow: 0 0 3rem #4747473d;
+	box-shadow: var(--box-shadow);
 	background: #fafafa;
 }
 
@@ -315,7 +439,7 @@ span{
     margin-right: .6rem;
 	padding:  1rem;
     text-align: center; /* Center text inside the boxes */
-	box-shadow: 0 0 3rem #4747473d;
+	box-shadow: var(--box-shadow);
 	background: #fafafa;
 }
 
@@ -353,88 +477,63 @@ span{
     background-color: #fff;
     overflow: hidden;
     transition: background-color 0.3s ease;
+    transition: transform .8s ease;
     cursor: pointer;
 }
 
 #produkcija .box:hover {
     background-color: #f0f0f0; /* Grey background on hover */
+    transform: scale(1.03);
 }
 
 #produkcija img {
-	padding: 1rem;
+	padding: 1.5rem 1.5rem .5rem 1.5rem;
     width: 25rem;
     height: auto;
-    object-fit: cover;
+    object-fit: cover; 
 }
 
 
-.overlay {
-    display: none; /* Hidden by default */
-    position: fixed; /* Sit on top */
-    top: 0;
-    left: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgba(211, 211, 211, 0.7); /* Light gray background with transparency */
-    z-index: 0; /* Behind the modal */
+/*-----------------------ProdukcijaNew-----------------*/
+#materiali {
+    display: flex;
+    justify-content: center;
 }
 
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1; /* Sit on top */
-    left: 50%; /* Center horizontally */
-    top: 45%; /* Center vertically */
-    width: 70rem; /* Increased width of the modal */
-    height: 55rem; /* Increased height of the modal */
-    overflow: hidden;
-    transform: translate(-50%, -50%); /* Adjust position to center */
+#materiali .box-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
+#materiali .box {
+    width: 40rem;
+    height: 30rem;
     padding: 20px;
-	box-shadow: 0 0 1rem #4b4b4bc2;
-    width: 80%; /* Could be more or less, depending on screen size */
-	height: 100%;
-    text-align: center;
-
-}
-.modal p{
-	margin: 1rem;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
 }
 
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+#materiali .box img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
 }
 
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+#materiali h3 {
+    margin-top: 10px;
+    font-size: 1.5em;
 }
 
-.modal-images {
-    display: flex; /* Use flexbox to arrange images in a row */
-    justify-content: center; /* Center images horizontally */
-    margin-bottom: 1rem; /* Space between images and text */
+#materiali p {
+    margin-top: 10px;
+    font-size: 1em;
+    color: #666;
 }
 
-.modal-images img {
-    max-width: 45%; /* Set maximum width for images */
-    height: auto; /* Maintain aspect ratio */
-    margin: 0 1rem; /* Add margin between the two images */
-	box-shadow: 0 .5rem .5rem #4747473d;
-}
-body.no-scroll {
-	overflow: hidden; /* Prevent scrolling */
-}
+
 
 /*----------------------------------------------------------------Atsauksmes---------------------------------------------------------------------------------------------*/
 
@@ -448,7 +547,7 @@ body.no-scroll {
     background: var(--tumsa);
     color: var(--light);
 	height: 40rem;
-	box-shadow: 0 0 3rem #4747473d;
+
 }
 
 #atsauksmes .box-container{
@@ -501,7 +600,7 @@ body.no-scroll {
 }
 #atsauksmes i{
 	color: yellow;
-	margin: 0 .2rem;
+	margin: 0 .3rem;
 }
 /*--------------------------------------------------------------Par Mums------------------------------------------------------------------------------------------------------------*/
 
@@ -526,17 +625,19 @@ body.no-scroll {
     display: flex;
 	flex-direction: row;
     transition: transform 1.8s ease-in-out;
+    
 }
 
 #parMums .box {
     flex: 0 0 100%; 
     padding: 2rem;
     box-sizing: border-box;
-    background-color: var(--light);
+    background-color: #afdbff;
 	border-radius: 1rem;
     display: flex;
     align-items: center;
     height: 28rem;
+    /* box-shadow: var(--box-shadow); */
 	
 }
 
@@ -609,7 +710,7 @@ button.prev:hover, button.next:hover {
 	border: solid 2px var(--maincolor);
 	padding: 1rem;
 	box-shadow: 0 0 1rem #4747473d;
-	background: #fafafa;
+	/* background: #fafafa; */
 }
 #parMums h3{
 	font-size: 2rem;
@@ -643,7 +744,7 @@ button.prev:hover, button.next:hover {
 	padding: 1rem;
 	border-radius: 1rem;
 	border: solid 2px var(--maincolor);
-	box-shadow: 0 0 3rem #4747473d;
+	box-shadow: var(--box-shadow);
 }
 #parMums .citats p{
 	color: var(--text);
@@ -699,12 +800,73 @@ footer img{
 }
 
 
+/*--------------------------------------------1400px----------------------------------------------------------*/
+
+@media (max-width: 1400px){
+    h1{
+        font-size: 2rem;
+    }
+    p{
+        font-size: 1.4rem;
+    }
+    #sakums .box-container .text{
+        width: 70%;
+        height: 20rem;
+    }
+
+#sakums .box-container p{
+    font-size: 1.4rem;
+}
+
+#sakums .box-container h1{
+    font-size: 2rem;
+}
+}
 
 
+/*--------------------------------900px--------------------------------------*/
+
+@media (max-width: 900px){
+ 
+
+#sakums .box-container .text{
+        width: 70%;
+        height: 8rem;
+    }
+#sakums .box-container p{
+    font-size: .8rem;
+    margin: 0;
+    padding: 0;
+}
+
+#sakums .box-container h1, h2{
+    font-size: 1rem;
+    margin: .2rem;
+} 
 
 
+#jaunumi{
+    margin-bottom: 555rem;
+}
 
+#jaunumi h1{
+    margin-bottom: .4rem;
+}
 
-
-
-
+#jaunumi .box img {
+    width: 10rem;
+}
+#jaunumi .box{
+    margin: .3rem;
+    padding: .5rem 0;
+    width: 15rem;
+}
+#jaunumi .box p{
+    font-size: .7rem;
+}
+.arrow {
+    position: relative;
+    margin: 50rem;
+    text-align: center;
+}
+}
