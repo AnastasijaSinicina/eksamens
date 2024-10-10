@@ -134,3 +134,20 @@ x = () => {
     alert.style.display = "none"
 }
 
+/*-----------------------------------------dropdown--------------------------------------------------- */
+const krasaContainer = document.querySelector('.krasa-container');
+const krasaItems = document.querySelectorAll('.krasa');
+let currentSlide = 0;
+const itemsPerSlide = 4;
+
+document.getElementById('nextBtn').addEventListener('click', function() {
+    currentSlide++;
+    const totalSlides = Math.ceil(krasaItems.length / itemsPerSlide);
+
+    if (currentSlide >= totalSlides) {
+        currentSlide = 0; // Reset to the first set
+    }
+
+    const offset = -currentSlide * 100;
+    krasaContainer.style.transform = `translateX(${offset}%)`;
+});
