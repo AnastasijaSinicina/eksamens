@@ -33,92 +33,95 @@
     <a href="" class="btn navBtn"><i class="fa-solid fa-cart-shopping"></i></a>
     <!-- <div id="menu-btn" class="fas fa-bars"></div> -->
 </header>
-    <section id="sakums" class="animate">
+    <section id="sakums">
         <div class="box-container">
-            <div class="box">
-                <img src="images/vse.jpg" alt="">         
-                <div class="overlay"></div>
+
+            <div class="video">
+                <video autoplay muted loop id="myVideo">
+                    <source src=".\images\process.MOV">
+                </video>
             </div>
+<!-- 
             <div class="text">
             <h1>Esi sveicināts mūsu internet veikalā -<span class="nosaukums">"Sparkly Dream"!</span></h1>
-            <p>Mēs piedāvājam Jums unikālus eglītes rotājumus. Kā arī, Jūs varas izvēlēties savu dizainu, un mēs to izstrādāsim!</p>
+            <p>Mēs piedāvājam Jums unikālus eglītes rotājumus. Kā arī, Jūs varas izvēlēties savu dizainu, ko mēs izstrādāsim!</p>
             <h2><span>Kopā, mēs padarīsim Jūsu svētkus skaistāk!</span><h2>
-        </div> 
+        </div>  -->
         </div>
     </section>
-    <section id="jaunumi" class="animate">
+    <section id="jaunumi">
         <h1>Jaunumi</h1>
         <div class="box-container">
             <div class="change">
                 <div class="box">
-                    <img src="images/igruwka10.jpg" alt="">
-                    <p>Baltā apaļa rotaļlieta, ar zelta elementiem.</p>
-                    <h3>8€</h3>
+                    <img src="images/igruwka1.jpg" alt="">
+                    <p>Baltā rotaļlieta.</p>
+                    <h3>18€</h3>
                 </div>
                 <div class="box">
-                    <img src="images/igruwka11.jpg" alt="">
-                    <p>Caurspīdīga rotaļlieta ar zelta un baltiem elementiem.</p>
-                    <h3>8€</h3>
+                    <img src="images/igruwka2.jpg" alt="">
+                    <p>Balta - rozā rotaļlieta.</p>
+                    <h3>20€</h3>
                 </div>
                 <div class="box">
-                    <img src="images/igruwka12.jpg" alt="">
-                    <p>Baltā apaļa rotaļlieta ar lielo balto rāmīti.</p>
+                    <img src="images/igruwkaa7.jpg" alt="">
+                    <p>Lietussargs</p>
                     <h3>10€</h3>
                 </div>
           
             </div>
             <div class="change">
                 <div class="box">
-                    <img src="images/igruwka7.jpg" alt="">
-                    <p>Pēlēkas rotaļlietas komplekts.</p>
-                    <h3>12€</h3>
-                </div>
-                <div class="box">
-                    <img src="images/igruwka14.jpg" alt="">
-                    <p>Caurspīdīga rotaļlieta ar zelta un baltiem elementiem.</p>
-                    <h3>8€</h3>
+                    <img src="images/igruwka4.jpg" alt="">
+                    <p>Caurspīdīga rotaļlieta</p>
+                    <h3>15€</h3>
                 </div>
                 <div class="box">
                     <img src="images/igruwka5.jpg" alt="">
-                    <p>Rozās rotaļlietas komplekts</p>
-                    <h3>14€</h3>
+                    <p>Caurspīdīga rotaļlieta.</p>
+                    <h3>12€</h3>
+                </div>
+                <div class="box">
+                    <img src="images/igruwka6.jpg" alt="">
+                    <p>Caurspīdīga rotaļlieta.</p>
+                    <h3>15€</h3>
                 </div>       
             </div>
             <a href="jaunumi.html" class="btn arrow"><i class="fa-solid fa-arrow-right"></i></a>
     </section>
     
-    <section id="produkcija" class="animate">
+    <section id="produkcija" >
         <h1>Produkcija</h1>
         <div class="box-container">
-            <div class="box" onclick="openModal('Balta rotaļlieta', 'images/igruwka1.jpg', 'images/igruwka3.jpg','8€', 'Rotaļlieta ir pārklāta ar baltu samta audumu, satur zelta/baltus elementus, baltu lenti un dekoratīvu ziedu.')">
+            <div class="box" onclick="openModal('Balta rotāļlieta', 'images/igruwka1.jpg', 'images/igruwka1.2.jpg','15€', 'Rotaļa ir pārklāta ar baltu samta audumu. Tā satur balto mālu rāmīti un dažadas balta un zelta detaļas.')">
                 <img src="images/igruwka1.jpg" alt="">
-                <h3>Balta rotaļlieta</h3>
-                <h3>8€</h3>
+                <h3>Balta rotāļlieta</h3>
+                <h3>18€</h3>
             </div>
-            <div class="box" onclick="openModal('Komplekts no 2 rotaļlietām', 'images/igruwka7.jpg', 'images/igruwka7.jpg', '15€', 'Rotaļas ir nokrāsotas gaiši pēlēkā krāsā, vidū atrodas mālas rāmis, ar enģeli un lāča figūru, kā arī balta/sudraba elementi.')">
-                <img src="images/igruwka7.jpg" alt="">
-                <h3>Komplekts no 2 rotaļlietām</h3>
+            <div class="box" onclick="openModal('Caurspīdīga rotaļlieta', 'images/igruwka4.jpg', 'images/igruwka4.1.jpg', '9€', 'Rotaļa ir pārklāta ar caurspīdīgo audumu ar mirdzumiem. Augšā ir baltā lente, dekoratīva zieda elementi un zelta/sudraba akmentiņi.')">
+                <img src="images/igruwka4.jpg" alt="">
+                <h3>Caurspīdīga rotaļlieta</h3>
                 <h3>15€</h3>
             </div>
-            <div class="box" onclick="openModal('Caurspīdīga rotaļlieta', 'images/igruwka11.jpg', 'images/igruwka11.jpg', '10€', 'Rotaļa ir pārklāta ar caurspīdīgo audumu ar mirdzumiem. Dekorējums sastāv no zelta/sudraba detaļām, kā arī balta lente.')">
-                <img src="images/igruwka11.jpg" alt="">
-                <h3>Caurspīdīga rotaļlieta</h3>
+            <div class="box" onclick="openModal('Balta - rozā rotaļlieta', 'images/igruwka2.jpg', 'images/igruwka2.1.jpg', '20€', 'Rotaļa ir pārklāta ar baltu samta audumu. Satur balto dekoratīvo rozi, rozo lenti, rozā &quot;svārkus&quot;.')">
+                <img src="images/igruwka2.jpg" alt="">
+                <h3>Balta - rozā rotaļlieta</h3>
+                <h3>20€</h3>
+            </div>
+            <div class="box" onclick="openModal('Caurspīdīga rotāļlieta', 'images/igruwka5.jpg', 'images/igruwka5.1.jpg', '12€', 'Rotaļa ir pārklāta ar caurspīdīgo audumu ar mirdzumiem. Tā satur balta/zelta elementus un pērles. ')">
+                <img src="images/igruwka5.jpg" alt="">
+                <h3>Caurspīdīga rotāļlieta</h3>
+                <h3>12€</h3>
+            </div>
+            <div class="box" onclick="openModal('Balta rotaļlieta', 'images/igruwka3.jpg', 'images/igruwka3.1.jpg', '10€', 'Rotaļlieta ir pārklāta ar baltu samta audumu, satur zelta/baltus elementus, baltu lenti un dekoratīvu ziedu.')">
+                <img src="images/igruwka3.jpg" alt="">
+                <h3>Balta rotaļlieta</h3>
                 <h3>10€</h3>
             </div>
-            <div class="box" onclick="openModal('Caurspīdīga rotaļlieta', 'images/igruwka14.jpg', 'images/igruwka14.jpg', '9€', 'Rotaļa ir pārklāta ar caurspīdīgo audumu ar mirdzumiem. Augšā ir baltā lente, dekoratīva zieda elementi un zelta/sudraba akmentiņi.')">
-                <img src="images/igruwka14.jpg" alt="">
+            <div class="box" onclick="openModal('Caurspīdīga rotaļlieta', 'images/igruwka6.jpg', 'images/igruwka6.1.jpg', '15€', 'Rotaļa ir pārklāta ar caurspīdīgo audumu ar mirdzumiem. Augšā ir baltā lente, dekoratīva zieda elementi un zelta/sudraba akmentiņi.')">
+                <img src="images/igruwka6.jpg" alt="">
                 <h3>Caurspīdīga rotaļlieta</h3>
-                <h3>9€</h3>
-            </div>
-            <div class="box" onclick="openModal('Balta rotāļlieta', 'images/igruwka12.jpg', 'images/igruwka12.jpg', '8€', 'Rotaļa ir pārklāta ar baltu samta audumu. Tā satur balto mālu rāmīti un dažadas balta un zelta detaļas')">
-                <img src="images/igruwka12.jpg" alt="">
-                <h3>Balta rotaļlieta</h3>
-                <h3>8€</h3>
-            </div>
-            <div class="box" onclick="openModal('Komplekts no 4 rotaļlietām', 'images/igruwka4.jpg', 'images/igruwka4.jpg', '22€', 'Komplektā ir: 1 apaļas vidēja izmēra, 1 apaļa lielā izmērā, 1 medāļas formā, 1 lāsteka formā. Rotaļlietas ir pārklātas ar baltu samta audumu. Dekorējums sastāv no baltām mālas figūram un balta/zeltiem elementiem.')">
-                <img src="images/igruwka4.jpg" alt="">
-                <h3>Komplekts no 4 rotaļlietām</h3>
-                <h3>22€</h3>
+                <h3>15€</h3>
             </div>
         </div>
     </section>
@@ -139,8 +142,8 @@
         </div>
     </div>
     
-    <section id="atsauksmes" class="animate">
-        <h1><span>Atsauksmes</span></h1>     
+    <section id="atsauksmes">
+        <h1>Atsauksmes</h1>     
         <div class="box-container">  
             <div class="box">
                 <div class="text">
@@ -151,20 +154,20 @@
             </div>
         </div>
                 <div class="img">
-                    <img src="images/igruwka14.jpg" alt="">
+                    <img src="images/igruwka1.jpg" alt="">
                 </div>
                
             </div>
             <div class="box">
                 <div class="text">
-                <p>Esmu ļoti apmierināts ar šo Ziemassvētku bumbiņu. Tā ir izturīga, skaisti izkrāsota un lieliski pieskaņojas manai svētku tēmai. </p>
+                <p>Esmu ļoti apmierināts ar šo Ziemassvētku rotājumu, lietussarga formā. Tā ir izturīga, skaisti izkrāsota un lieliski pieskaņojas manai svētku tēmai. </p>
                 <div class="username">
                 <p>Nora Kalniņa</p>
                 <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
             </div>
         </div>
                 <div class="img">
-                    <img src="images/igruwka14.jpg" alt="">
+                    <img src="images/igruwkaa7.jpg" alt="">
                 </div>
                
             </div>
@@ -177,7 +180,7 @@
             </div>
         </div>
                 <div class="img">
-                    <img src="images/igruwka14.jpg" alt="">
+                    <img src="images/igruwka3.jpg" alt="">
                 </div>
                
             </div>
@@ -186,13 +189,13 @@
     </section>
     
 
-    <section id="parMums" class="animate">
+    <section id="parMums">
         <h1>Par mums</h1>
         <h2><p>&#10053</p>Mūsu ceļš<p>&#10053</p></h2>
         <div class="slider-container">
         <div class="box-container">
          <div class="box">
-            <img src="images/igruwki.jpg" alt="">
+            <img src="images/igruwka6.jpg" alt="">
             <p>Mēs esam neliels mājas uzņēmums, kas ar mīlestību izgatavo egles rotājumus, lai priecētu Jūs un padarītu Jūsu svētkus īpašus. Mūsu mērķis ir radīt unikālus un skaistus rotājumus, kas atspoguļo svētku noskaņu un rada siltumu Jūsu mājās. </p>
         </div>
     </div>

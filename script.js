@@ -135,19 +135,30 @@ x = () => {
 }
 
 /*-----------------------------------------dropdown--------------------------------------------------- */
-const krasaContainer = document.querySelector('.krasa-container');
-const krasaItems = document.querySelectorAll('.krasa');
-let currentSlide = 0;
-const itemsPerSlide = 4;
+function showDropdowns() {
+    // Get selected radio value
+    const selectedValue = document.querySelector('input[name="color1"]:checked').value;
 
-document.getElementById('nextBtn').addEventListener('click', function() {
-    currentSlide++;
-    const totalSlides = Math.ceil(krasaItems.length / itemsPerSlide);
+    // Dropdown divs
+    const allDropdowns = document.querySelectorAll('.all');
+    const bigDropdown = document.querySelector('.big');
 
-    if (currentSlide >= totalSlides) {
-        currentSlide = 0; // Reset to the first set
+    // Hide all dropdowns initially
+    allDropdowns.forEach(dropdown => dropdown.style.display = 'none');
+    bigDropdown.style.display = 'none';
+
+    // Show relevant dropdowns based on the selected value
+    if (['apala1', 'apala2', 'medaljons'].includes(selectedValue)) {
+        // Show all dropdowns (including the small and big)
+        allDropdowns.forEach(dropdown => dropdown.style.display = 'block');
+        bigDropdown.style.display = 'block'; // Ensuring big dropdown is shown
+    } else if (['lasteka', 'ramis', 'lietussargs'].includes(selectedValue)) {
+        // Show only the small dropdowns, hide the big one
+        allDropdowns.forEach(dropdown => {
+            if (dropdown.classList.contains('all')) {
+                dropdown.style.display = 'block';
+            }
+        });
+        // The big dropdown remains hidden
     }
-
-    const offset = -currentSlide * 100;
-    krasaContainer.style.transform = `translateX(${offset}%)`;
-});
+}

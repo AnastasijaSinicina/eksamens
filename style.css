@@ -22,16 +22,6 @@ html{
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
 }
-.animate {
-    opacity: 0;
-    transition: opacity 0.9s ease-out, transform 0.9s ease-out;
-    will-change: opacity, transform;
-}
-
-.animate.visible {
-    opacity: 1;
-    animation: slideInUp 0.9s forwards;
-}
 
 body{
     color: var(--text);
@@ -39,6 +29,7 @@ body{
 	background-size: cover;     
     background-repeat: no-repeat; 
     background-attachment: fixed;
+    cursor: url('images/logo2.png') 16 16, auto;
 }
 
 
@@ -58,12 +49,6 @@ header {
     transition: box-shadow 0.4s ease-in-out;
     z-index: 9999;
 	
-/* Style the dropdown container */
-/* .dropdown {
-    position: relative;
-    display: inline-block;
-} */
-
 /* Dropdown content (hidden by default) */
 .dropdown-content {
     display: none; /* Hidden by default */
@@ -118,7 +103,7 @@ p{
 }
 
 span{
-	color: var(--sniegs);
+	color: var(--tumsa);
 	text-shadow: 2px 2px 2px rgb(73, 103, 194);
 	text-align: center;
 } 
@@ -132,17 +117,17 @@ span{
     padding: .5rem 1.5rem;
     font-size: 1.1rem;
     cursor: pointer;
-    color: var(--text);
-    background: var(--light);
+    color: var(--tumsa);
+    background: var(--sniegs);
     position: relative;
     z-index: 1;
     font-weight: bold;
 	text-decoration: none;
 	border-radius: .5rem;
 }
-.navBtn{
-	background: var(--sniegs);
-	margin-left: 20rem;
+.full{
+    width: 90%;
+    margin: 1rem;
 }
 .btn:hover, .btn i:hover{
 	background: var(--sniegs);
@@ -243,9 +228,9 @@ span{
     position: fixed;
     z-index: 1; /* Sit on top */
     left: 50%; /* Center horizontally */
-    top: 45%; /* Center vertically */
-    width: 95rem; /* Increased width of the modal */
-    height: 60rem; /* Increased height of the modal */
+    top: 40%; /* Center vertically */
+    width: 110rem; /* Increased width of the modal */
+    height: 65rem; /* Increased height of the modal */
     overflow: hidden;
     transform: translate(-50%, -50%); /* Adjust position to center */
 }
@@ -286,7 +271,7 @@ span{
 }
 
 .modal-images img {
-    max-width: 28rem; /* Set maximum width for images */
+    max-width: 29rem; /* Set maximum width for images */
     height: auto; /* Maintain aspect ratio */
     margin: 0 1rem; /* Add margin between the two images */
 	box-shadow: 0 .5rem .5rem #4747473d;
@@ -305,24 +290,25 @@ body.no-scroll {
 
 
 }
-#sakums h1{
-	font-size: 3.2rem;
+/* #sakums h1{
+	font-size: rem;
 	color: var(--tumsa);
 	text-shadow: 2px 2px 2px 2px rgba(145, 183, 240, 0.801);
-}
+} */
 #sakums .box-container .text{
 	position: absolute; 
-	width: 50%;
-    top: 30%; /* Adjust vertical positioning */
-    left: 50%; /* Center horizontally */
+	width: 45%;
+    top: 60%; /* Adjust vertical positioning */
+    left: 25%; /* Center horizontally */
     transform: translateX(-50%); 
-	background: rgba(137, 139, 143, 0.39);
-    padding: 1rem;
+	background: rgba(87, 87, 87, 0.39);
+    padding: 1.5rem;
     border-radius: .5rem;
+    height: auto;
 	}
 #sakums .box-container h1{	
     color: white; /* Text color */
-    font-size: 2.5rem; /* Font size */
+    font-size: 2rem; /* Font size */
     text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
 	margin-bottom: 1rem;
 	text-align: center;
@@ -330,7 +316,7 @@ body.no-scroll {
 }
 #sakums .box-container p{
     color: white; /* Text color */
-    font-size: 1.8rem; /* Font size */
+    font-size: 1.6rem; /* Font size */
     text-shadow: 2px 2px 2px rgba(0, 57, 230, 0.7);
 	text-align: justify;
 	padding-top: 1rem ;
@@ -496,7 +482,9 @@ body.no-scroll {
 
 
 /*----------------------------------------------------------------Atsauksmes---------------------------------------------------------------------------------------------*/
-
+#atsauksmes h1, #atsauksmesNew h1{
+    color: var(--sniegs);
+}
 #atsauksmes {
 	position: relative;
     overflow: hidden;
@@ -509,28 +497,36 @@ body.no-scroll {
 	height: 40rem;
 
 }
+#atsauksmesNew {
+    width: 90%;
+    height: auto;
+    text-align: center;
+    background: var(--tumsa);
+    color: var(--light);
+}
 
 #atsauksmes .box-container{
 	display: flex;
 	flex-direction: row;
 	margin: 2rem;
 	animation: slide 20s linear infinite;
+    max-height: 60rem;
+    overflow-y: auto;
+}
+#atsauksmesNew .box-container{
+    display: flex;
+	flex-direction: column;
+    align-items: center;
+    justify-content: center;
+	margin: 2rem;
 }
 
-@keyframes slide {
-    0% {
-        transform: translateX(-80%);
-    }
-    100% {
-        transform: translateX(10%);
-    }
-}
-#atsauksmes .box {
+#atsauksmes .box, #atsauksmesNew .box, .box2{
 	min-width: 33.33%; 
-    padding: 20px;
+    padding: 1rem;
     box-sizing: border-box;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     flex-direction: row;
     width: 35rem; 
@@ -541,7 +537,20 @@ body.no-scroll {
 	margin: 0 2rem;
 
 }
-#atsauksmes .text{
+#atsauksmesNew .box, .box2{
+    width: 55rem;
+    margin: 1rem;
+}
+#atsauksmesNew .box2{
+   margin-left: 25rem;
+}
+#atsauksmesNew .box{
+    margin-right: 25rem;
+}
+#atsauksmesNew p{
+    font-size: 1.1rem;
+}
+#atsauksmes .text, #atsauksmesNew .text{
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;
@@ -550,17 +559,31 @@ body.no-scroll {
 	padding: 0;
 	margin: 0;
 }
+#atsauksmesNew .text{
+    width: 30rem;
+}
 
-#atsauksmes img {
+#atsauksmes img{
     width: 15rem;
     margin: 1.2rem;
 }
-#atsauksmes .btn{
-	width: 50%;
+#atsauksmesNew img {
+    width: 17rem;
 }
-#atsauksmes i{
+
+#atsauksmes i, #atsauksmesNew i{
 	color: yellow;
 	margin: 0 .3rem;
+}
+
+
+@keyframes slide {
+    0% {
+        transform: translateX(-80%);
+    }
+    100% {
+        transform: translateX(10%);
+    }
 }
 /*--------------------------------------------------------------Par Mums------------------------------------------------------------------------------------------------------------*/
 
@@ -638,7 +661,7 @@ button.prev:hover, button.next:hover {
     background-color: var(--maincolor);
 }
 
-#parMums .video {
+ video {
     position: relative;
 	width: 100vw; /* Full viewport width */
     height: 100vh;
@@ -646,10 +669,11 @@ button.prev:hover, button.next:hover {
     z-index: -1;
 }
 
-#parMums .video video {
-    width: 100vw; /* Full viewport width */
+ .video video {
+    width: 99.1vw; /* Full viewport width */
     height: 100vh; /* Full viewport height */
     object-fit: cover; /* Cover the container without distortion */
+    overflow: hidden; 
 }
 
 #parMums .box-darbinieki{
@@ -795,7 +819,7 @@ footer img{
     margin: 1rem;
 }
 #materiali .krasa img{
-    width: 15rem;
+    width: 16rem;
     box-shadow: 0 0 2rem #4747473d;
     transition: transform .8s ease;
     
@@ -817,7 +841,7 @@ footer img{
     border-radius: .5rem;
 }
 
-#materiali .drop {
+#materiali #drop {
     display: flex;
     flex-direction: column;
     margin: 2rem 0;
@@ -827,10 +851,27 @@ footer img{
     font-weight: bold;
     color: var(--tumsa);
     margin-bottom: 0.5rem;
+    padding: .5rem;
 }
+
+#radio {
+    display: flex;
+    justify-content: space-between; /* Adjusts spacing between columns */
+    flex-wrap: nowrap; /* Ensures all items stay in one row */
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Aligns input and label in the center of the column */
+    margin-right: 20px; /* Adjusts spacing between columns */
+}
+
+
 
 #materiali select {
     padding: 0.5rem;
+    margin: 1rem;
     font-size: 1rem;
     border: 2px solid var(--maincolor);
     background-color: var(--light);
@@ -846,6 +887,13 @@ footer img{
     box-shadow: 0 0 5px var(--tumsa);
 }
 
+#materiali h3{
+    text-align: center;
+    color: var(--tumsa);
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+
+}
 
 /*--------------------------------------------1400px----------------------------------------------------------*/
 
