@@ -12,17 +12,17 @@
 </head>
 <body>
 <div class="wrapper">
-    <h1>Login</h1>
+    <h1>Ielogošanās</h1>
     <div class="input-box">
         <input type="text" required>
-        <label>Username</label>
+        <label>Lietotājvārds vai e-pasts</label>
     </div>
     <div class="input-box">
         <input type="password" required>
-        <label>Password</label>
+        <label>Parole</label>
     </div>
-    <button class="button">Login</button>
-    <p>Don't have an account? <a href="register.php">Register</a></p>
+    <button class="button">Ielogoties</button>
+    <p>Nav konta? <a href="register.php">Reģistrēties</a></p>
     <a href="./" class="button">Atgriezties uz sākumlapu</a>
 </div>
 </body>

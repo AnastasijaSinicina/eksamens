@@ -8,16 +8,12 @@
                 <h2>Laiks svinēt!</h2>
                 <p>Esi sveicināts mūsu internet veikalā -<strong>"Sparkly Dream"!</strong><br>
             Mēs piedāvājam Jums unikālus eglītes rotājumus. Kā arī, Jūs varas izvēlēties savu dizainu, ko mēs izstrādāsim!</p>
-            <a href="" class="btn">Iepirkties</a>
+            <a href="produkcija.php" class="btn">Iepirkties</a>
             </div>
             <div class="box">
                 <img src="images/bezfona.png" alt="">
             </div>
-            <div class="video">
-                <!-- <video autoplay muted loop id="myVideo">
-                    <img src="images/oboji.jpg" alt="">
-                </video> -->
-            </div>
+          
 
         
     </section>

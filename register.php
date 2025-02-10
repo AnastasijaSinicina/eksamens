@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="wrapper">
-    <h1>Login</h1>
+    <h1>Reģistrācija</h1>
     <div class="input-box">
         <input type="email" required>
         <label>E-pasts</label>
@@ -34,7 +34,7 @@
         <input type="password" required>
         <label>Parole atkārtoti</label>
     </div>
-    <button class="button">Login</button>
+    <button class="button">Reģistrēties</button>
     <p>Jau reģistrēts? <a href="login.php">Ielogoties</a></p>
     <a href="./" class="button">Atgriezties uz sākumlapu</a>
 </div>

@@ -876,9 +876,7 @@ footer img{
 
 
 /*------------------------------------------------------------------Materiali----------------------------------------------------------------------------------------*/
-#materiali{
-    margin-top: 8rem;
-}
+
 #materiali .box-container{
     margin-top: 3rem;
     text-align: center;
@@ -889,13 +887,14 @@ footer img{
 }
 #materiali .box{
     width: auto;
-    /* background-color: #fff; */
     padding: 3rem;
     border-radius: .5rem;
     box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: row;
-    margin: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 2rem 0;
 }
 #materiali .krasa{
     display: flex;
