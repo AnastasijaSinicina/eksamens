@@ -2,7 +2,7 @@
     require 'header.php'
 ?>
     <section id="sakums">
-        <div class="box-container">
+  
             
             <div class="box text">
                 <h2>Laiks svinēt!</h2>
@@ -10,13 +10,33 @@
             Mēs piedāvājam Jums unikālus eglītes rotājumus. Kā arī, Jūs varas izvēlēties savu dizainu, ko mēs izstrādāsim!</p>
             <a href="produkcija.php" class="btn">Iepirkties</a>
             </div>
-            <div class="box">
+            <!-- <div class="box">
                 <img src="images/bezfona.png" alt="">
-            </div>
+            </div> -->
           
 
         
     </section>
+    <section id="custom-design">
+    <div class="container">
+        <h1>Izveidojiet savu unikālo rotaļlietu!</h1>
+        <p>Mēs dodam jums iespēju īstenot savu ideju! Jūs varat izvēlēties krāsu, formu un papildu detaļas savai rotaļlietai, lai padarītu to patiesi unikālu.</p>
+        <div class="custom-design-box">
+            <img src="images/custom-toy.jpg" alt="Rotaļlietas izveide">
+            <div class="custom-text">
+                <h2>Kā tas darbojas?</h2>
+                <ul>
+                    <li>Izvēlieties rotaļlietas pamatformu</li>
+                    <li>Nosakiet krāsu un materiālus</li>
+                    <li>Pievienojiet unikālas detaļas</li>
+                    <li>Mēs izveidosim rotaļlietu pēc jūsu dizaina!</li>
+                </ul>
+                <a href="materiali.php" class="btn">Izveidot</a>
+            </div>
+        </div>
+    </div>
+</section>
+
     <section id="parmums">
         <h1>Par mums</h1>
         <div class="box-container">
@@ -42,46 +62,8 @@
             </div>
         </div>
     </section>
-    <!-- <section id="jaunumi">
-        <h1>Jaunumi</h1> -->
-        <!-- <div class="box-container">
-            <div class="change">
-                <div class="box">
-                    <img src="images/igruwka1.jpg" alt="">
-                    <p>Baltā rotaļlieta.</p>
-                    <h3>18€</h3>
-                </div>
-                <div class="box">
-                    <img src="images/igruwka2.jpg" alt="">
-                    <p>Balta - rozā rotaļlieta.</p>
-                    <h3>20€</h3>
-                </div>
-                <div class="box">
-                    <img src="images/igruwkaa7.jpg" alt="">
-                    <p>Lietussargs</p>
-                    <h3>10€</h3>
-                </div>
-          
-            </div>
-            <div class="change">
-                <div class="box">
-                    <img src="images/igruwka4.jpg" alt="">
-                    <p>Caurspīdīga rotaļlieta</p>
-                    <h3>15€</h3>
-                </div>
-                <div class="box">
-                    <img src="images/igruwka5.jpg" alt="">
-                    <p>Caurspīdīga rotaļlieta.</p>
-                    <h3>12€</h3>
-                </div>
-                <div class="box">
-                    <img src="images/igruwka6.jpg" alt="">
-                    <p>Caurspīdīga rotaļlieta.</p>
-                    <h3>15€</h3>
-                </div>        -->
-            <!-- </div>
-            <a href="jaunumi.php" class="btn arrow"><i class="fa-solid fa-arrow-right"></i></a>
-    </section> -->
+
+
     
     <section id="produkcija">
     <h1>Produkcija</h1>
@@ -89,7 +71,7 @@
     <?php
 require "db/con_db.php";
 
-$produkcijaSQL = "SELECT * FROM produkcija_sprarkly LIMIT 6";
+$produkcijaSQL = "SELECT * FROM produkcija_sprarkly LIMIT 4";
 $atlasaProdukcija = mysqli_query($savienojums, $produkcijaSQL);
 
 if (mysqli_num_rows($atlasaProdukcija) > 0) {
@@ -106,7 +88,7 @@ if (mysqli_num_rows($atlasaProdukcija) > 0) {
 
          <img src='{$attels1Src}' alt='Image'>
             <h3>{$bumba['nosaukums']}</h3>
-            <h3>{$bumba['cena']}€</h3>
+            <h4>{$bumba['cena']}€</h4>
            
         </a>
         ";
@@ -115,7 +97,9 @@ if (mysqli_num_rows($atlasaProdukcija) > 0) {
     echo "Nav nevienu piedāvājumu";
 }
 ?>  
+
     </div>
+    <a href="produkcija.php" class="btn">Skatīt vairāk</a>
 </section>
 
     

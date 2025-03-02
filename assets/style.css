@@ -122,7 +122,7 @@ span{
     padding: .5rem 1.5rem;
     font-size: 1.1rem;
     text-align: center;
-    color: var(--light1);
+    color: var(--light3);
     background: var(--tumsa);
     /* position: relative; */
     z-index: 1;
@@ -221,18 +221,21 @@ span{
 
 
 section{
-    padding: 4rem 12%;
+    padding: 4rem 6%;
 }
 /*--------------------------------------------------produkt---------------------------------------------------*/
+#produkts{
+    padding: 0;
+}
+
 #produkts .box-container {
     display: flex;
     flex-direction: row;
     gap: 1rem;
     justify-content: flex-start;
     align-items: center;
-    max-width: 100%;
+    width: 100%;
     margin: auto;
-    height: 100%;
     border: 0.0625rem solid #ddd;
     border-radius: 0.625rem;
     box-shadow: 0.125rem 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
@@ -306,26 +309,34 @@ section{
 
 
 /*----------------------------------------------------------------------------Sakums-----------------------------------------------------------------------------------------------*/
-#sakums{
-	position: relative;
-    background-color: var(--light3);
+#sakums {
+    position: relative;
+    background-image: url(../images/sakums.jpg);
+    background-size: cover; /* Ensures the image covers the whole element */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
 }
 
-#sakums .box-container{
-    display: flex;
-    flex-direction: row;
-    color: var(--tumsa);
-}
+
 #sakums .box{
     display: flex;
     flex-direction: column;
-    width: 70%;
+    align-items: center;
+    width: 50%;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px var(--tumsa);
+    border-radius: 50px;
+    color: var(--light2);
+    padding: 3rem;
     /* margin: 3rem; */
 }
-#sakums .text{
-    width: 60%;
-    justify-content: center;
-}
+
 #sakums .text p{
     font-size: 1.5rem;
     margin: 3rem 0;
@@ -333,14 +344,25 @@ section{
 }
 #sakums .text h2{
     text-align: left;
+    color: var(--light1);
+    
 }
 
 #sakums .box-container .box img{
     width: 35rem;
 }
-#sakums .nosaukums{
-    color: var(--light1);
+#sakums .btn{
+    width: 40%;
+    background: transparent;
+    border: 2px solid white;
+    border-radius: 50px;
+    font-size: 1.3rem;
 }
+#sakums .btn:hover{
+    background-color: rgba(202, 213, 255, 0.256);
+    color: var(--tumsa);
+}
+
 /* #sakums h1{
 	font-size: rem;
 	color: var(--tumsa);
@@ -390,11 +412,9 @@ section{
 
 
 /*---------------------------------------------------------------------------Jaunumi-----------------------------------------------------------------------------------------------*/
-#parmums{
-    background-color: var(--tumsa);
-}
+
 #parmums h1{
-    color: var(--light1);
+    color: var(--tumsa);
 }
 
 #parmums .box-container{
@@ -430,115 +450,103 @@ section{
     border-radius: 50%;
 }
 #parmums h2{
-    color: var(--light1);
+    color: var(--tumsa);
     font-size: 1.5rem;
     margin: 1rem 0;
 }
 #parmums p{
-    color: var(--light1);
+    color: var(--text);
 }
 
-/* 
-#jaunumi {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-	flex-direction: column; 
-   	margin-bottom: 30rem;
+#custom-design {
+    background-color: var(--light2);
     text-align: center;
-	
+    padding: 4rem 6%;
 }
 
-#jaunumi h1{
-	margin: 3rem 0;
+#custom-design .container {
+    max-width: 80%;
+    margin: auto;
 }
 
-#jaunumi .box-container {
-    position: relative;
-    width: 80%; 
+#custom-design h1 {
+    font-size: 2.5rem;
+    color: var(--tumsa);
+    margin-bottom: 1rem;
+}
+
+#custom-design p {
+    font-size: 1.4rem;
+    color: var(--text);
+    margin-bottom: 2rem;
+}
+
+.custom-design-box {
     display: flex;
-    justify-content: center; 
     align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
 }
 
-.change {
+.custom-design-box img {
+    width: 20rem;
+    border-radius: 1rem;
+    box-shadow: var(--box-shadow2);
+}
+
+.custom-text {
+    max-width: 50%;
+    text-align: left;
+}
+
+.custom-text h2 {
+    color: var(--tumsa);
+    margin-bottom: 1rem;
+}
+
+.custom-text ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.custom-text ul li {
+    font-size: 1.2rem;
+    color: var(--text);
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.custom-text ul li::before {
+    content: "✔";
     position: absolute;
-    top: 0;
-    width: 100%; 
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
+    left: 0;
+    color: var(--maincolor);
 }
 
-.change.active {
-    opacity: 1;
-}
-
-#jaunumi .box {
+#custom-design .btn {
     display: inline-block;
-    margin-right: .6rem;
-	padding:  1rem;
-    text-align: center; 
-	box-shadow: var(--box-shadow);
-	background: #fafafa;
+    margin-top: 1rem;
+    padding: .8rem 2rem;
+    font-size: 1.2rem;
+    color: var(--light3);
+    background: var(--tumsa);
+    border-radius: .5rem;
+    text-decoration: none;
 }
 
-#jaunumi .box img {
-    width: 23rem;
-}
-#jaunumi p{
-	margin: .5rem;
-	font-size: 1.2rem;
+#custom-design .btn:hover {
+    background: var(--maincolor);
+    color: white;
 }
 
-.arrow {
-		position: absolute;
-		right: -20px; 
-		margin-top: 30rem; 
-		transform: translateY(-50%); 
-}
-
-
-#jaunumiNew {
-    display: flex;
-    justify-content: space-between; 
-	height: 200px;
-    align-items: center;
-	flex-direction: column; 
-   	margin-top: 10rem;
-	margin-bottom: 20rem;
-}
-
-#jaunumiNew h1{
-	margin: 2rem 0;
-}
-
-#jaunumiNew .box-container {
-    position: relative;
-    width: 80%; 
-    display: flex;
-    justify-content: center; 
-    align-items: center;
-}
-#jaunumiNew .box {
-    display: inline-block;
-    margin-right: .6rem;
-	padding:  1rem;
-    text-align: center; 
-	box-shadow: var(--box-shadow);
-	background: #fafafa;
-}
-
-#jaunumiNew .box img {
-    width: 23rem;
-}
-#jaunumiNew p{
-	margin: .5rem;
-	font-size: 1.2rem;
-} */
 
 /*---------------------------------------------------------------------Produkcija-----------------------------------------------------------------------------------------------*/
 
-
+#produkcija{
+    text-align: center;
+}
 
 #produkcija .box-container {
     display: flex;
@@ -546,11 +554,9 @@ section{
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: center;
+    align-items: center;
     margin: 0 auto;
-    padding: 1.5rem 0;
-}
-#produkcija a{
-    color: var(--text);
+
 }
 
 
@@ -564,6 +570,8 @@ section{
     transition: background-color 0.3s ease;
     transition: transform .8s ease;
     cursor: pointer;
+    padding: .5rem;
+    border-radius: .5rem;
 }
 
 #produkcija .box:hover {
@@ -575,9 +583,19 @@ section{
 
 #produkcija img {
 	padding: 1.5rem 1.5rem .5rem 1.5rem;
-    width: 28rem;
+    width: 20rem;
     height: auto;
     object-fit: cover; 
+    margin-bottom: .5rem;
+    border-radius: 1rem;
+}
+#produkcija h3{
+    color: var(--tumsa);
+    font-size: 1.5rem;
+}
+#produkcija h4{
+    color: var(--tumsa);
+    font-size: 1.3rem;
 }
 
 
