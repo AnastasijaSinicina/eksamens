@@ -1,3 +1,13 @@
+
+<?php
+session_start();
+if (!isset($_SESSION['lietotajvardsSIN']) || ($_SESSION['loma'] !== 'admin' && $_SESSION['loma'] !== 'moder')) {
+    header("Location: ../login.php"); // Redirect to login page if not authenticated
+    exit();
+}
+ require 'header.php'
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +16,7 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>sxdfcgvhbjj</h1>
+
 </body>
 </html>
+

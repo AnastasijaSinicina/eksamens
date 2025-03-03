@@ -17,25 +17,7 @@
 
         
     </section>
-    <section id="custom-design">
-    <div class="container">
-        <h1>Izveidojiet savu unikālo rotaļlietu!</h1>
-        <p>Mēs dodam jums iespēju īstenot savu ideju! Jūs varat izvēlēties krāsu, formu un papildu detaļas savai rotaļlietai, lai padarītu to patiesi unikālu.</p>
-        <div class="custom-design-box">
-            <img src="images/custom-toy.jpg" alt="Rotaļlietas izveide">
-            <div class="custom-text">
-                <h2>Kā tas darbojas?</h2>
-                <ul>
-                    <li>Izvēlieties rotaļlietas pamatformu</li>
-                    <li>Nosakiet krāsu un materiālus</li>
-                    <li>Pievienojiet unikālas detaļas</li>
-                    <li>Mēs izveidosim rotaļlietu pēc jūsu dizaina!</li>
-                </ul>
-                <a href="materiali.php" class="btn">Izveidot</a>
-            </div>
-        </div>
-    </div>
-</section>
+
 
     <section id="parmums">
         <h1>Par mums</h1>
@@ -63,7 +45,25 @@
         </div>
     </section>
 
-
+    <section id="custom-design">
+    <div class="container">
+        <h1>Izveidojiet savu unikālo rotaļlietu!</h1>
+        <p>Mēs dodam jums iespēju īstenot savu ideju! Jūs varat izvēlēties krāsu, formu un papildu detaļas savai rotaļlietai, lai padarītu to patiesi unikālu.</p>
+        <div class="custom-design-box">
+            <img src="images/custom-toy.jpg" alt="Rotaļlietas izveide">
+            <div class="custom-text">
+                <h2>Kā tas darbojas?</h2>
+                <ul>
+                    <li>Izvēlieties rotaļlietas pamatformu</li>
+                    <li>Nosakiet krāsu un materiālus</li>
+                    <li>Pievienojiet unikālas detaļas</li>
+                    <li>Mēs izveidosim rotaļlietu pēc jūsu dizaina!</li>
+                </ul>
+                <a href="materiali.php" class="btn">Izveidot</a>
+            </div>
+        </div>
+    </div>
+</section>
     
     <section id="produkcija">
     <h1>Produkcija</h1>
