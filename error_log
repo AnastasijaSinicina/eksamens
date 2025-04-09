@@ -1,0 +1,33 @@
+[01-Apr-2025 09:56:04 Europe/Riga] PHP Notice:  Undefined index: audums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 61
+[06-Apr-2025 19:09:46 Europe/Riga] PHP Notice:  Undefined index: audums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 61
+[06-Apr-2025 19:19:04 Europe/Riga] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/grobina1/public_html/3pt2/sinicina/eksamens/index.php on line 77
+[06-Apr-2025 19:19:40 Europe/Riga] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/grobina1/public_html/3pt2/sinicina/eksamens/index.php on line 77
+[06-Apr-2025 19:26:33 Europe/Riga] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/grobina1/public_html/3pt2/sinicina/eksamens/index.php on line 77
+[06-Apr-2025 19:27:48 Europe/Riga] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/grobina1/public_html/3pt2/sinicina/eksamens/index.php on line 77
+[06-Apr-2025 20:17:00 Europe/Riga] PHP Notice:  Undefined index: audums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 61
+[08-Apr-2025 19:27:06 Europe/Riga] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php:122
+Stack trace:
+#0 {main}
+  thrown in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php on line 122
+[08-Apr-2025 19:27:19 Europe/Riga] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php:122
+Stack trace:
+#0 {main}
+  thrown in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php on line 122
+[08-Apr-2025 19:27:25 Europe/Riga] PHP Notice:  Undefined index: audums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 61
+[08-Apr-2025 19:30:54 Europe/Riga] PHP Notice:  Undefined index: audums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 61
+[08-Apr-2025 19:38:39 Europe/Riga] PHP Notice:  Undefined index: audums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 61
+[08-Apr-2025 19:38:39 Europe/Riga] PHP Notice:  Undefined index: malu_figura in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 62
+[08-Apr-2025 19:38:39 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 63
+[08-Apr-2025 19:40:17 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[08-Apr-2025 20:22:27 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[08-Apr-2025 20:22:31 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[08-Apr-2025 20:45:10 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[08-Apr-2025 20:45:31 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[08-Apr-2025 20:45:34 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[09-Apr-2025 12:23:50 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[09-Apr-2025 12:24:05 Europe/Riga] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php:122
+Stack trace:
+#0 {main}
+  thrown in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php on line 122
+[09-Apr-2025 12:24:14 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+[09-Apr-2025 12:24:17 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108

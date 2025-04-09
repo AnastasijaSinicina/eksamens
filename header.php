@@ -1,3 +1,8 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="lv">
 <head>
@@ -14,6 +19,15 @@
     <title>Sparkly Dream</title>
 </head>
 <body>
+        <!-- Notification Container -->
+        <div class="notification-container" id="notification-container">
+        <div class="notification" id="notification">
+            <i class="fa-solid fa-circle-check success" id="notification-icon"></i>
+            <h3 id="notification-title">Paziņojums</h3>
+            <p id="notification-message"></p>
+        </div>
+    </div>
+
     <header>
         <div class="logo1">
             <a href="index.php"><img src="images/logo.png" alt=""></a>
@@ -24,18 +38,25 @@
     <nav class="nav">
         <a href="index.php">Sākums</a>
         <a href="jaunumi.php">Jaunumi</a>
-        <div class="dropdown">
-            <a href="" class="dropdown-toggle">Produkcija</a>
-            <div class="dropdown-content">
-                <a href="produkcija.php">Produkcija</a>
-                <a href="materiali.php">Izveido pats</a>
-            </div>
-        </div>
+        <a href="produkcija.php">Produkcija</a>
+        <a href="materiali.php">Izveido pats</a>
         <a href="atsauksmes.php">Atsauksmes</a>
         <a href="parMums.php">Par mums</a>
         <a href="kontakti.php">Kontakti</a>
     </nav>
-    <a href="" class="btn navBtn"><i class="fa-solid fa-cart-shopping"></i></a>
-    <a href="login.php" class="btn navBtn"><i class="fas fa-user"></i></a>
+    <a href="grozs.php" class="btn navBtn"><i class="fa-solid fa-cart-shopping"></i></a>
+    
+    <?php if(isset($_SESSION['lietotajvardsSIN'])): ?>
+        <a href="profils.php" class="btn navBtn user-btn">
+            <i class="fas fa-user"></i>
+            <span class="username"><?php echo $_SESSION['lietotajvardsSIN']; ?></span>
+        </a>
+        <a href="logout.php" class="btn navBtn"><i class="fa-solid fa-right-from-bracket"></i></a>
+    <?php else: ?>
+        <a href="login.php" class="btn navBtn">
+            <i class="fas fa-user"></i>
+        </a>
+    <?php endif; ?>
+    
     <!-- <div id="menu-btn" class="fas fa-bars"></div> -->
 </header>

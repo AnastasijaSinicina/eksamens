@@ -1,0 +1,2 @@
+[06-Apr-2025 19:44:16 Europe/Riga] PHP Warning:  require(footer.php): failed to open stream: No such file or directory in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/audums.php on line 219
+[06-Apr-2025 19:44:16 Europe/Riga] PHP Fatal error:  require(): Failed opening required 'footer.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/audums.php on line 219
