@@ -2,6 +2,7 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+<<<<<<< HEAD
 // Inside header.php
 $cartCount = 0;
 if (isset($_SESSION['lietotajvardsSIN'])) {
@@ -28,6 +29,8 @@ if (isset($_SESSION['lietotajvardsSIN'])) {
 // Make sure $cartCount is a valid number
 $cartCount = $cartCount ?: 0;
 
+=======
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
 ?>
 <!DOCTYPE html>
 <html lang="lv">
@@ -70,12 +73,16 @@ $cartCount = $cartCount ?: 0;
         <a href="parMums.php">Par mums</a>
         <a href="kontakti.php">Kontakti</a>
     </nav>
+<<<<<<< HEAD
     <a href="grozs.php" class="btn navBtn cart-btn">
     <i class="fa-solid fa-cart-shopping"></i>
     <?php if ($cartCount > 0): ?>
     <span class="cart-count"><?php echo $cartCount; ?></span>
     <?php endif; ?>
 </a>
+=======
+    <a href="grozs.php" class="btn navBtn"><i class="fa-solid fa-cart-shopping"></i></a>
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
     
     <?php if(isset($_SESSION['lietotajvardsSIN'])): ?>
         <a href="profils.php" class="btn navBtn user-btn">
@@ -89,7 +96,11 @@ $cartCount = $cartCount ?: 0;
         </a>
     <?php endif; ?>
     
+<<<<<<< HEAD
     <button id="menu-btn" class="btn navBtn">
     <i class="fa-solid fa-bars"></i>
 </button>
+=======
+    <!-- <div id="menu-btn" class="fas fa-bars"></div> -->
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
 </header>

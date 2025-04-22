@@ -327,6 +327,7 @@ Stack trace:
 [09-Apr-2025 12:24:30 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 55
 [09-Apr-2025 12:24:30 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 55
 [09-Apr-2025 12:24:30 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 55
+<<<<<<< HEAD
 [09-Apr-2025 15:07:29 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 55
 [09-Apr-2025 15:07:29 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 55
 [09-Apr-2025 15:07:29 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 55
@@ -417,3 +418,5 @@ Stack trace:
 [09-Apr-2025 16:15:06 Europe/Riga] PHP Notice:  Undefined index: malu_figura in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 17
 [09-Apr-2025 16:15:06 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 18
 [09-Apr-2025 16:15:06 Europe/Riga] PHP Notice:  Undefined index: dekorejums2 in /home/grobina1/public_html/3pt2/sinicina/eksamens/admin/db/produkcija_list.php on line 19
+=======
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183

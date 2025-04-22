@@ -31,6 +31,7 @@ Stack trace:
   thrown in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php on line 122
 [09-Apr-2025 12:24:14 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
 [09-Apr-2025 12:24:17 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
+<<<<<<< HEAD
 [09-Apr-2025 16:04:00 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
 [09-Apr-2025 16:04:00 Europe/Riga] PHP Notice:  Undefined index: dekorejums2 in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 109
 [09-Apr-2025 16:15:47 Europe/Riga] PHP Notice:  Undefined index: dekorejums in /home/grobina1/public_html/3pt2/sinicina/eksamens/produkts.php on line 108
@@ -55,3 +56,5 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in /home/grobina1/public_html/3pt2/sinicina/eksamens/profils.php on line 122
+=======
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183

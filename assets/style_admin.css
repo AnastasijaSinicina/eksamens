@@ -252,6 +252,59 @@ body{
     margin: 0 auto;
 }
 
+<<<<<<< HEAD
+=======
+/* Additional styles for admin products page */
+
+.admin-content {
+    margin-left: 290px;
+    padding: 20px;
+    transition: margin-left 0.5s ease, width 0.5s ease;
+    width: calc(100% - 290px);
+}
+
+
+.sidebar.collapsed + main .admin-content {
+    margin-left: 105px;
+    width: calc(100% - 105px);
+}
+
+@media (max-width: 1024px) {
+    .admin-content {
+        margin-left: 15px;
+        margin-top: 70px;
+        padding: 15px;
+        width: calc(100% - 30px);
+    }
+    
+    .sidebar.collapsed + main .admin-content,
+    .sidebar.menu-active + main .admin-content {
+        margin-left: 15px;
+        width: calc(100% - 30px);
+    }
+}
+
+.admin-content h1 {
+    color: var(--tumsa);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Product form styles */
+.custom-form-container {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
+
+.custom-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
 .custom-form .dropdown {
     padding: 1.5rem;
     background-color: var(--light3);
@@ -274,8 +327,11 @@ body{
 }
 
 .custom-form input[type="text"],
+<<<<<<< HEAD
 .custom-form input[type="email"],
 .custom-form input[type="password"],
+=======
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
 .custom-form input[type="number"],
 .custom-form textarea,
 .custom-form select {
@@ -285,7 +341,11 @@ body{
     border-radius: 0.3rem;
     font-size: 1rem;
     color: var(--text);
+<<<<<<< HEAD
     background-color: var(--light3);
+=======
+    background-color: var(--light2);
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -426,9 +486,14 @@ body{
 
 .action-buttons {
     display: flex;
+<<<<<<< HEAD
     flex-direction: row;
     gap: 0.5rem;
     justify-content: center;
+=======
+    gap: 0.5rem;
+    flex-wrap: wrap;
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
 }
 
 .edit-btn,
@@ -482,9 +547,14 @@ body{
 
 .notification-container {
     position: fixed;
+<<<<<<< HEAD
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+=======
+    top: 20px;
+    right: 20px;
+>>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
     z-index: 9999;
     display: none;
 }
