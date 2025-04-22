@@ -1,88 +1,104 @@
 <?php
     require 'header.php'
 ?>
-<!-- <section id="atsauksmesNew">
-    <h1>Atsauksmes</h1>     
-    <div class="box-container">  
-        <div class="box">
-            <div class="text">
-                <p>Šie Ziemassvētku eglītes bumbas ir patiešām skaistas! Kvalitāte ir izcila, un krāsas ir ļoti spilgtas. Esmu ļoti apmierināta ar pirkumu un noteikti iegādāšos vēl nākamgad!</p>
-                <div class="username">
-                    <p>Nora Kalniņa</p>
-                    <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
-             </div>
-            </div>
-            <div class="img">
-                <img src="images/igruwka1.jpg" alt="">
-            </div>
-        </div>
-        <div class="box2">
-            <div class="text">
-                <p>Es biju pārsteigts par to, cik labi izskatās šīs eglītes bumbas. Tām ir skaistas detaļas un tās ir izturīgas. Cena bija ļoti pieņemama, tāpēc noteikti ieteiktu draugiem.</p>
-                <div class="username">
-                    <p>Nora Kalniņa</p>
-                    <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
-             </div>
-            </div>
-            <div class="img">
-                <img src="images/igruwka2.jpg" alt="">
-            </div>
-        </div>
-        <div class="box">
-            <div class="text">
-                <p>Šīs eglītes bumbas ir ideālas manai Ziemassvētku dekorācijai! Tās piešķir eglītei burvīgu izskatu, un krāsas lieliski saskan. Noteikti iegādāšos vēl vairāk!</p>
-                <div class="username">
-                    <p>Nora Kalniņa</p>
-                    <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
-             </div>
-            </div>
-            <div class="img">
-                <img src="images/igruwkaa7.jpg" alt="">
-            </div>
-        </div>
-        <div class="box2">
-            <div class="text">
-                <p>Man patīk šīs Ziemassvētku bumbas! Tās ir ļoti stilīgas un piešķir eglītei elegantu izskatu. Esmu ļoti apmierināta ar pirkumu un iesaku visiem!</p>
-                <div class="username">
-                    <p>Nora Kalniņa</p>
-                    <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
-             </div>
-            </div>
-            <div class="img">
-                <img src="images/igruwka4.jpg" alt="">
-            </div>
-        </div>
-        <div class="box">
-            <div class="text">
-                <p>Šīs eglītes bumbas ir tieši tas, ko meklēju! Tās ir izgatavotas no kvalitatīviem materiāliem un izskatās lieliski. Manuprāt, tās ir labākais pirkums šajos svētkos!
-                </p>
-                <div class="username">
-                    <p>Nora Kalniņa</p>
-                    <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
-             </div>
-            </div>
-            <div class="img">
-                <img src="images/igruwka8.jpg" alt="">
-            </div>
-        </div>
-        <div class="box2">
-            <div class="text">
-                <p>Šīs Ziemassvētku eglītes bumbas ir vienkārši brīnišķīgas! Tās piešķir manai eglītei košumu un svētku noskaņu. Man patīk, ka tās ir vieglas, bet tomēr izturīgas. Vēl jo vairāk, tās lieliski saskan ar citiem rotājumiem. Es noteikti plānoju iegādāties vēl vairāk nākamgad!</p>
-                <div class="username">
-                    <p>Nora Kalniņa</p>
-                    <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
-             </div>
-            </div>
-            <div class="img">
-                <img src="images/igruwka6.jpg" alt="">
-            </div>
-        </div>
 
+<section id="atsauksmesNew">
+    <h1>Klientu atsauksmes</h1>
+    
+    <div class="box-container">
+        <div class="box">
+            <img src="images/user.png" alt="Klients 1">
+            <div class="text">
+                <h3>Anna K.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p>"Patiešām skaisti eglītes rotājumi! Pasūtīju personalizēto rotaļlietu ar mūsu ģimenes vārdu, un rezultāts pārspēja visas cerības. Ieteiktu visiem!"</p>
+            </div>
+        </div>
         
-</div> 
-
-</section> -->
-
+        <div class="box">
+            <img src="images/user.png" alt="Klients 2">
+            <div class="text">
+                <h3>Mārtiņš B.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star-half-stroke"></i>
+                </div>
+                <p>"Kvalitāte ir lieliska! Jau otro gadu pasūtu rotājumus no Sparkly Dream, un tie vienmēr ir ideāli. Piegāde ātra, apkalpošana izcila."</p>
+            </div>
+        </div>
+        
+        <div class="box">
+            <img src="images/user.png" alt="Klients 3">
+            <div class="text">
+                <h3>Laura Z.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p>"Apbrīnojami skaisti rotājumi! Pasūtīju komplektu jaunajai dzīvoklī, un visi viesi jautā, kur tos iegādājos. Noteikti pasūtīšu vēl!"</p>
+            </div>
+        </div>
+        
+        <div class="box">
+            <img src="images/user.png" alt="Klients 4">
+            <div class="text">
+                <h3>Jānis O.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p>"Sākotnēji biju skeptisks par personalizētajiem rotājumiem, bet rezultāts ir fantastiski labs. Mana sieva ir sajūsmā par viņas vārda rotājumu. Paldies Sparkly Dream komandai!"</p>
+            </div>
+        </div>
+        
+        <div class="box">
+            <img src="images/user.png" alt="Klients 5">
+            <div class="text">
+                <h3>Elīna P.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p>"Šie rotājumi piešķīra mūsu Ziemassvētku eglītei īpašu burvību! Krāsas ir spilgtas, materiāli kvalitatīvi. Mūsu bērniem ļoti patika personalizētie rotājumi ar viņu vārdiem."</p>
+            </div>
+        </div>
+        
+        <div class="box">
+            <img src="images/user.png" alt="Klients 6">
+            <div class="text">
+                <h3>Rihards K.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                </div>
+                <p>"Ļoti skaisti un oriģināli rotājumi. Pasūtīju tos kā dāvanu draugiem, un viņi bija sajūsmā. Vienīgais - gribētos vēl vairāk krāsu un dizaina variantu. Tomēr kopumā esmu ļoti apmierināts!"</p>
+            </div>
+        </div>
+    </div>
+    
+    <a href="index.php#produkcija" class="btn">Atgriezties uz sākumlapu</a>
+</section>
 
 <?php
     require 'footer.php'

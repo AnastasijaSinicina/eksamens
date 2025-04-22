@@ -22,12 +22,11 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     width: 30rem;
     background: transparent;
     color: white;
     border-radius: 10px;
-    padding: 30px 40px;
+    padding: 4rem 6.5rem;
     border: 2px solid rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(35px);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
