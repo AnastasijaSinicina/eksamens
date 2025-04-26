@@ -79,9 +79,11 @@ include 'header.php';
                         <div class="cart-item-quantity">
                             <form action="admin/db/update_cart.php" method="post" class="quantity-form">
                                 <input type="hidden" name="id" value="<?= $item['id_grozs'] ?>">
-                                <button type="submit" name="increase" class="quantity-btn">+</button>
-                                <span><?= $item['daudzums'] ?></span>
                                 <button type="submit" name="decrease" class="quantity-btn">-</button>
+                                <span><?= $item['daudzums'] ?></span>
+                                <button type="submit" name="increase" class="quantity-btn">+</button>
+                                
+                                
                             </form>
                         </div>
                         
@@ -107,13 +109,8 @@ include 'header.php';
                     <span>Kopā:</span>
                     <span><?= number_format($totalPrice, 2) ?>€</span>
                 </div>
-                
-<<<<<<< HEAD
                 <a href="pasutisana.php" class="btn full">Pasūtīt</a>
-=======
-                <a href="checkout.php" class="btn full">Pasūtīt</a>
->>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
-                <a href="produkcija.php" class="btn">Turpināt iepirkties</a>
+                <a href="produkcija.php" class="btn full">Turpināt iepirkties</a>
                 
                 <form action="admin/db/update_cart.php" method="post">
                     <input type="hidden" name="user" value="<?= $username ?>">

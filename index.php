@@ -59,7 +59,7 @@
                     <li>Pievienojiet unikālas detaļas</li>
                     <li>Mēs izveidosim rotaļlietu pēc jūsu dizaina!</li>
                 </ul>
-                <a href="materiali.php" class="btn">Izveidot</a>
+                <a href="materiali.php" class="btn full">Izveidot</a>
             </div>
         </div>
     </div>

@@ -3,7 +3,7 @@
         <div class="box">
             <p><b>&#10053 Tālrunis (Natālija):</b><br>(+371) 26789983</p>
             <p><b>&#10053 Tālrunis (Anastasija):</b><br>(+371) 20514011</p>
-            <a href="kontakti.php"><b>&#10053 E-pasts:</b> <br>sparklydream@gmail.com</a>
+            <a href="kontakti.php"><b>&#10053 E-pasts:</b> <br>sparkly.dream.shop@gmail.com</a>
             </div>
             <div class="box1">
             <img src="images/logo.png" alt="">

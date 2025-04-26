@@ -50,6 +50,15 @@ try {
             <a onclick='x()'><i class='fas fa-times'></i></a>
         </p>
     </div>";
+    echo "<script>
+        setTimeout(function() {
+            document.getElementById('pazinojums').style.display = 'none';
+        }, 3000); // 
+        
+        function x() {
+            document.getElementById('pazinojums').style.display = 'none';
+        }
+    </script>";
 } catch (Exception $e) {
     echo "Ziņu nevar nosūtīt! Sistēmas kļūda: {$mail->ErrorInfo}";
     echo "<br>Детали ошибки: " . $e->getMessage();
