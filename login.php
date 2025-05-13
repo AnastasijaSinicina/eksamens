@@ -31,7 +31,7 @@
                 <div class="input-box">    
 
                    <input type="text" name="lietotajvards" required autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
-                    <label>Lietotājvārds vai e-pasts:</label>
+                    <label>Lietotājvārds:</label>
                 </div>
                 <div class="input-box"> 
                     <input type="password" name="parole" required autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
@@ -39,7 +39,7 @@
                 </div>
                 
                 <button class="button" name="ielogoties">Ielogoties</button>
-                <p>Nav konta? <a href="register.php">Reģistrēties</a></p>
+                <p>Nav konta? <a href="register.php"> Reģistrēties</a></p>
                 <a href="./" class="button">Atgriezties uz sākumlapu</a>
                 </form>
 

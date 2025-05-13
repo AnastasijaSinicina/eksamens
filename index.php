@@ -50,7 +50,7 @@
         <h1>Izveidojiet savu unikālo rotaļlietu!</h1>
         <p>Mēs dodam jums iespēju īstenot savu ideju! Jūs varat izvēlēties krāsu, formu un papildu detaļas savai rotaļlietai, lai padarītu to patiesi unikālu.</p>
         <div class="custom-design-box">
-            <img src="images/custom-toy.jpg" alt="Rotaļlietas izveide">
+            <img src="images/izdeide.jpg" alt="Rotaļlietas izveide">
             <div class="custom-text">
                 <h2>Kā tas darbojas?</h2>
                 <ul>
@@ -59,7 +59,7 @@
                     <li>Pievienojiet unikālas detaļas</li>
                     <li>Mēs izveidosim rotaļlietu pēc jūsu dizaina!</li>
                 </ul>
-                <a href="materiali.php" class="btn">Izveidot</a>
+                <a href="materiali.php" class="btn full">Izveidot</a>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@
     <h1>Produkcija</h1>
     <div class="box-container">
     <?php
-require "db/con_db.php";
+require "admin/db/con_db.php";
 
 $produkcijaSQL = "SELECT * FROM produkcija_sprarkly LIMIT 4";
 $atlasaProdukcija = mysqli_query($savienojums, $produkcijaSQL);
@@ -102,52 +102,56 @@ if (mysqli_num_rows($atlasaProdukcija) > 0) {
     <a href="produkcija.php" class="btn">Skatīt vairāk</a>
 </section>
 
-    
-    <!-- <section id="atsauksmes">
-        <h1>Atsauksmes</h1>     
-        <div class="box-container">  
-            <div class="box">
-                <div class="text">
-                <p>Es iegādājos Ziemassvētku bumbiņu, kas patiesi papildināja manu svētku dekorācijas. Tā ir skaisti izgatavota, ar spīdīgu un kvalitatīvu apdari, kas izskatās ļoti eleganti uz eglītes. Krāsa ir koša un neizbalē pat pēc vairākām svētku sezonām.</p>
-                <div class="username">
-                <p>Nora Kalniņa</p>
-                <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
+<section id="atsauksmes">
+    <h1>Klientu atsauksmes</h1>
+    <div class="box-container">
+        <div class="box">
+            <img src="images/user.png" alt="Klients 1">
+            <div class="text">
+                <h3>Anna K.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p>"Patiešām skaisti eglītes rotājumi! Pasūtīju personalizēto rotaļlietu ar mūsu ģimenes vārdu, un rezultāts pārspēja visas cerības. Ieteiktu visiem!"</p>
             </div>
         </div>
-                <div class="img">
-                    <img src="images/igruwka1.jpg" alt="">
+        
+        <div class="box">
+            <img src="images/user.png" alt="Klients 2">
+            <div class="text">
+                <h3>Mārtiņš B.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star-half-stroke"></i>
                 </div>
-               
-            </div>
-            <div class="box">
-                <div class="text">
-                <p>Esmu ļoti apmierināts ar šo Ziemassvētku rotājumu, lietussarga formā. Tā ir izturīga, skaisti izkrāsota un lieliski pieskaņojas manai svētku tēmai. </p>
-                <div class="username">
-                <p>Nora Kalniņa</p>
-                <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
+                <p>"Kvalitāte ir lieliska! Jau otro gadu pasūtu rotājumus no Sparkly Dream, un tie vienmēr ir ideāli. Piegāde ātra, apkalpošana izcila."</p>
             </div>
         </div>
-                <div class="img">
-                    <img src="images/igruwkaa7.jpg" alt="">
+        
+        <div class="box">
+            <img src="images/user.png" alt="Klients 3">
+            <div class="text">
+                <h3>Laura Z.</h3>
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
                 </div>
-               
-            </div>
-            <div class="box">
-                <div class="text">
-                <p>Šī Ziemassvētku bumbiņa bija patīkams pārsteigums – tās dizains ir izsmalcināts, un kvalitāte pārsniedza manas cerības.</p>
-                <div class="username">
-                <p>Nora Kalniņa</p>
-                <p><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
+                <p>"Apbrīnojami skaisti rotājumi! Pasūtīju komplektu jaunajai dzīvoklī, un visi viesi jautā, kur tos iegādājos. Noteikti pasūtīšu vēl!"</p>
             </div>
         </div>
-                <div class="img">
-                    <img src="images/igruwka3.jpg" alt="">
-                </div>
-               
-            </div>
-    </div> 
-    <a href="atsauksmes.php" class="btn">Lasīt vairāk</a>
-    </section> -->
+    </div>
+    <a href="atsauksmes.php" class="btn">Skatīt visas atsauksmes</a>
+</section>
 
 <?php
     require 'footer.php'
