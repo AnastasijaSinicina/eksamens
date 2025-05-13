@@ -39,7 +39,7 @@ include 'header.php';
     $query = "SELECT g.*, p.nosaukums, p.cena, p.attels1 
               FROM grozs_sparkly g 
               JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
-              WHERE g.lietotajvards = ? AND g.statuss = 'active'";
+              WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
     $stmt = $savienojums->prepare($query);
     $stmt->bind_param("s", $username);
     $stmt->execute();

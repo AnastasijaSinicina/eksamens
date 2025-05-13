@@ -8,10 +8,9 @@ if (isset($_SESSION['lietotajvardsSIN'])) {
     // Include database connection
     require_once "admin/db/con_db.php";
     
-    // Get user's cart count - only count active items with quantity > 0
     $username = $_SESSION['lietotajvardsSIN'];
     $query = "SELECT SUM(daudzums) as total FROM grozs_sparkly 
-              WHERE lietotajvards = ? AND statuss = 'active' AND daudzums > 0";
+              WHERE lietotajvards = ? AND statuss = 'aktīvs' AND daudzums > 0";
     $stmt = $savienojums->prepare($query);
     $stmt->bind_param("s", $username);
     $stmt->execute();

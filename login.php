@@ -34,9 +34,6 @@
                    <input type="text" name="lietotajvards" required autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
                     <label>Lietotājvārds:</label>
 
-                   <input type="text" name="lietotajvards" required autocomplete="off" autofocus>
-                    <label>Lietotājvārds vai e-pasts:</label>
-
                 </div>
                 <div class="input-box"> 
                     <input type="password" name="parole" required autocomplete="off">

@@ -22,7 +22,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['id']) && isset($_POST['nosauku
     $id = $_POST['id'];
     
     // Check if product already exists in user's cart
-    $checkQuery = "SELECT * FROM grozs_sparkly WHERE lietotajvards = ? AND bumba_id = ? AND statuss = 'active'";
+    $checkQuery = "SELECT * FROM grozs_sparkly WHERE lietotajvards = ? AND bumba_id = ? AND statuss = 'aktīvs'";
     $stmt = $savienojums->prepare($checkQuery);
     $stmt->bind_param("si", $username, $id);
     $stmt->execute();
@@ -39,7 +39,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['id']) && isset($_POST['nosauku
         $stmt->execute();
     } else {
         // Product not in cart, add it
-        $insertQuery = "INSERT INTO grozs_sparkly (lietotajvards, bumba_id, daudzums, statuss) VALUES (?, ?, 1, 'active')";
+        $insertQuery = "INSERT INTO grozs_sparkly (lietotajvards, bumba_id, daudzums, statuss) VALUES (?, ?, 1, 'aktīvs')";
         $stmt = $savienojums->prepare($insertQuery);
         $stmt->bind_param("si", $username, $id);
         $stmt->execute();

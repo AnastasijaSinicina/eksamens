@@ -9,7 +9,7 @@ if (isset($_POST['ielogoties'])) {
     $parole = $_POST['parole'];
 
     // Prepare query to find the user
-    $vaicajums = $savienojums->prepare("SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?");
+    $vaicajums = $savienojums->prepare("SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ? AND dzests = 0");
     $vaicajums->bind_param("s", $lietotajvards);
     $vaicajums->execute();
     $rezultats = $vaicajums->get_result();

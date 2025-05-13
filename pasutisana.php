@@ -1,22 +1,16 @@
 <?php
-// Start session
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if user is logged in
 if (!isset($_SESSION['lietotajvardsSIN'])) {
-    // Set message and redirect to login
     $_SESSION['pazinojums'] = "Lūdzu ielogojieties, lai pabeigtu pasūtījumu";
     $_SESSION['redirect_after_login'] = "pasutisana.php";
     header("Location: login.php");
     exit();
 }
-
-// Include database connection
 require "admin/db/con_db.php";
 
-// Get current user's username and information
 $username = $_SESSION['lietotajvardsSIN'];
 $query = "SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?";
 $stmt = $savienojums->prepare($query);
@@ -25,8 +19,7 @@ $stmt->execute();
 $user_result = $stmt->get_result();
 $user = $user_result->fetch_assoc();
 
-// Check if cart is empty
-$cart_query = "SELECT COUNT(*) as count FROM grozs_sparkly WHERE lietotajvards = ? AND statuss = 'active'";
+$cart_query = "SELECT COUNT(*) as count FROM grozs_sparkly WHERE lietotajvards = ? AND statuss = 'aktīvs'";
 $cart_stmt = $savienojums->prepare($cart_query);
 $cart_stmt->bind_param("s", $username);
 $cart_stmt->execute();
@@ -39,9 +32,7 @@ if ($cart_count == 0) {
     exit();
 }
 
-// Process form submission
 if (isset($_POST['submit_order'])) {
-    // Get form data
     $vards = htmlspecialchars($_POST['vards']);
     $uzvards = htmlspecialchars($_POST['uzvards']);
     $epasts = htmlspecialchars($_POST['epasts']);
@@ -50,14 +41,14 @@ if (isset($_POST['submit_order'])) {
     $pilseta = htmlspecialchars($_POST['pilseta']);
     $pasta_indekss = htmlspecialchars($_POST['pasta_indekss']);
     $apmaksas_veids = htmlspecialchars($_POST['apmaksas_veids']);
-    $piegades_veids = htmlspecialchars($_POST['piegades_veids']); // NEW: Get delivery method
+    $piegades_veids = htmlspecialchars($_POST['piegades_veids']); 
     $piezimes = htmlspecialchars($_POST['piezimes']);
     
-    // Get cart items and total
+
     $items_query = "SELECT g.*, p.nosaukums, p.cena 
                   FROM grozs_sparkly g 
                   JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
-                  WHERE g.lietotajvards = ? AND g.statuss = 'active'";
+                  WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
     $items_stmt = $savienojums->prepare($items_query);
     $items_stmt->bind_param("s", $username);
     $items_stmt->execute();
@@ -73,15 +64,14 @@ if (isset($_POST['submit_order'])) {
         $product_count += $item['daudzums'];
     }
     
-    // Create new order - UPDATED: Added piegades_veids
-    $status = 'Iesniegt'; // Initial status
+    $status = 'Iesniegts'; 
     
     $insert_order = $savienojums->prepare("INSERT INTO sparkly_pasutijumi (lietotajs_id, kopeja_cena, apmaksas_veids, piegades_veids, produktu_skaits, vards, uzvards, epasts, talrunis, pilseta, adrese, pasta_indeks, statuss) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $insert_order->bind_param("idssissssssss", 
         $user['id_lietotajs'],
         $total,
         $apmaksas_veids,
-        $piegades_veids,  // NEW: Include delivery method
+        $piegades_veids,
         $product_count,
         $vards,
         $uzvards,
@@ -95,11 +85,9 @@ if (isset($_POST['submit_order'])) {
     
     if ($insert_order->execute()) {
         $pasutijums_id = $savienojums->insert_id;
-        
-        // Add order items
+
         foreach ($cart_items as $item) {
             
-            // Use prepared statement instead of direct query for better security
             $insert_items = $savienojums->prepare("INSERT INTO sparkly_pasutijuma_vienumi 
                             (pasutijuma_id, produkta_id, daudzums_no_groza, cena) 
                             VALUES (?, ?, ?, ?)");
@@ -117,12 +105,10 @@ if (isset($_POST['submit_order'])) {
             }
         }
         
-        // Update cart status to 'ordered'
-        $update_cart = $savienojums->prepare("UPDATE grozs_sparkly SET statuss = 'ordered' WHERE lietotajvards = ? AND statuss = 'active'");
+        $update_cart = $savienojums->prepare("UPDATE grozs_sparkly SET statuss = 'pasūtīts' WHERE lietotajvards = ? AND statuss = 'aktīvs'");
         $update_cart->bind_param("s", $username);
         $update_cart->execute();
         
-        // Success message and redirect
         $_SESSION['pazinojums'] = "Pasūtījums veiksmīgi noformēts!";
         header("Location: pasutijums_apstiprinats.php?id=" . $pasutijums_id);
         exit();
@@ -131,11 +117,10 @@ if (isset($_POST['submit_order'])) {
     }
 }
 
-// Get cart items for display
 $items_query = "SELECT g.*, p.nosaukums, p.cena, p.attels1 
               FROM grozs_sparkly g 
               JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
-              WHERE g.lietotajvards = ? AND g.statuss = 'active'";
+              WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
 $items_stmt = $savienojums->prepare($items_query);
 $items_stmt->bind_param("s", $username);
 $items_stmt->execute();
@@ -149,7 +134,6 @@ while ($item = $items_result->fetch_assoc()) {
     $subtotal += $item['cena'] * $item['daudzums'];
 }
 
-// Include header
 include 'header.php';
 ?>
 
@@ -163,7 +147,6 @@ include 'header.php';
     <?php endif; ?>
     
     <div class="checkout-container">
-        <!-- Order Summary Column -->
         <div class="order-summary">
             <h2>Pasūtījuma kopsavilkums</h2>
             
@@ -191,8 +174,7 @@ include 'header.php';
             
             <a href="grozs.php" class="btn">Atgriezties grozā</a>
         </div>
-        
-        <!-- Checkout Form Column -->
+
         <div class="checkout-form">
             <h2>Piegādes informācija</h2>
             
@@ -246,7 +228,6 @@ include 'header.php';
                     </label>
                 </div>
                 
-                <!-- NEW: Delivery Method Section -->
                 <h2>Piegāde</h2>
                 <div class="form-group radio-group">
                     <label class="radio-container">
@@ -475,6 +456,5 @@ include 'header.php';
 </style>
 
 <?php
-// Include footer
 include 'footer.php';
 ?>
