@@ -1,140 +1,166 @@
-// Notification function
-function showNotification(message, type = 'success', title = 'Paziņojums', duration = 5000) {
-    const container = document.getElementById('notification-container');
-    const notification = document.getElementById('notification');
-    const notificationIcon = document.getElementById('notification-icon');
-    const notificationTitle = document.getElementById('notification-title');
-    const notificationMessage = document.getElementById('notification-message');
-
-    // Set the message and type
-    notificationMessage.textContent = message;
-    notificationTitle.textContent = title;
-
-    // Reset classes
-    notification.className = 'notification';
-    notificationIcon.className = '';
-
-    // Set type-specific styles
-    if (type === 'success') {
-        notification.classList.add('success');
-        notificationIcon.className = 'fa-solid fa-circle-check success';
-        notificationTitle.textContent = 'Veiksmīgi!';
-    } else if (type === 'error') {
-        notification.classList.add('error');
-        notificationIcon.className = 'fa-solid fa-circle-xmark error';
-        notificationTitle.textContent = 'Kļūda!';
-    }
-
-    // Show the notification
-    container.style.display = 'block';
-
-    // Hide after duration
-    setTimeout(() => {
-        container.style.display = 'none';
-    }, duration);
-}
-
-// Check if there's a notification in URL parameters when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const notification = urlParams.get('notification');
-    const notificationType = urlParams.get('type') || 'success';
-    
-    if (notification) {
-        showNotification(decodeURIComponent(notification), notificationType);
-        
-        // Remove notification params from URL without reloading page
-        const url = new URL(window.location);
-        url.searchParams.delete('notification');
-        url.searchParams.delete('type');
-        window.history.replaceState({}, '', url);
+    const changes = document.querySelectorAll('.change');
+    let currentIndex = 0;
+
+    function changeContent() {
+        // Remove 'active' class from the current element
+        changes[currentIndex].classList.remove('active');
+
+        // Increment the index, looping back if necessary
+        currentIndex = (currentIndex + 1) % changes.length;
+
+        // Add 'active' class to the next element
+        changes[currentIndex].classList.add('active');
     }
-});
 
+    // Initially show the first element
+    changes[currentIndex].classList.add('active');
 
-document.addEventListener('DOMContentLoaded', function () {
-    var mainSlider = new Splide('#main-slider', {
-        type: 'fade',
-        rewind: true,
-        pagination: false,
-        arrows: false,
-    });
-
-    var thumbnailSlider = new Splide('#thumbnail-slider', {
-        fixedWidth: 100,
-        fixedHeight: 60,
-        gap: 10,
-        rewind: true,
-        pagination: false,
-        cover: true,
-        isNavigation: true,
-        focus: 'center',
-        breakpoints: {
-            600: {
-                fixedWidth: 60,
-                fixedHeight: 44,
-            },
-        },
-    });
-
-    mainSlider.sync(thumbnailSlider);
-    mainSlider.mount();
-    thumbnailSlider.mount();
-});
-
-
-
-
-
-$(document).ready(function() {
-
-    fetchProdukcija();
-
-    // Function to fetch product details from the server
-    function fetchProdukcija() {
-        $.ajax({
-            url: 'admin/db/produkcija_list.php', // PHP script that fetches product data
-            type: 'GET',
-            success: function(response) {
-                const bumbas = JSON.parse(response);
-                let template = "";
-    
-                bumbas.forEach(bumba => {
-                    template += `
-                         <a href="produkts.php?id=${bumba.id_bumba}" class="box">
-                            <img src="data:image/jpeg;base64,${bumba.attels1}" alt="${bumba.nosaukums}">
-                            <h3>${bumba.nosaukums}</h3>
-                            <h3>${bumba.cena}€</h3>
-                        </a>
-                    `;
-                });
-    
-                $('#bumbas-container').html(template);
-            },
-            error: function() {
-                alert("Neizdevās ielādēt datus!");
-            }
-        });
-    }
-    
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const menuBtn = document.getElementById('menu-btn');
-    const nav = document.querySelector('header .nav');
-    
-    menuBtn.addEventListener('click', function() {
-        nav.classList.toggle('active');
-        this.querySelector('i').classList.toggle('fa-bars');
-        this.querySelector('i').classList.toggle('fa-times');
-    });
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!nav.contains(event.target) && !menuBtn.contains(event.target) && nav.classList.contains('active')) {
-            nav.classList.remove('active');
-            menuBtn.querySelector('i').classList.add('fa-bars');
-            menuBtn.querySelector('i').classList.remove('fa-times');
-        }
-    });
-});
+    // Change content every 3 seconds
+    setInterval(changeContent, 3000);
+  });
+  function openModal(title, image1, image2, price, description) {
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalImage1").src = image1; // First image
+    document.getElementById("modalImage2").src = image2; // Second image
+    document.getElementById("modalPrice").innerText = price;
+    document.getElementById("modalDescription").innerText = description;
+  
+    // Show the modal and overlay
+    document.getElementById("productModal").style.display = "block";
+    document.getElementById("overlay").style.display = "block"; // Show overlay
+  
+    // Prevent background scrolling
+    document.body.classList.add("no-scroll");
+  }
+  
+  function closeModal() {
+    document.getElementById("productModal").style.display = "none"; // Hide modal
+    document.getElementById("overlay").style.display = "none"; // Hide overlay
+  
+    // Enable background scrolling
+    document.body.classList.remove("no-scroll");
+  }
+  
+  
+  let currentIndex = 0;
+  
+  function updateButtons() {
+      const prevButton = document.querySelector('.prev');
+      const nextButton = document.querySelector('.next');
+      const totalBoxes = document.querySelectorAll('#parMums .box').length;
+  
+      // Hide prev button on first box
+      if (currentIndex === 0) {
+          prevButton.style.display = 'none';
+      } else {
+          prevButton.style.display = 'block';
+      }
+  
+      // Hide next button on last box
+      if (currentIndex === totalBoxes - 1) {
+          nextButton.style.display = 'none';
+      } else {
+          nextButton.style.display = 'block';
+      }
+  }
+  
+  function nextSlide() {
+      const boxContainer = document.querySelector('#parMums .box-container');
+      const totalBoxes = document.querySelectorAll('#parMums .box').length;
+      if (currentIndex < totalBoxes - 1) {
+          currentIndex++;
+          boxContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+      }
+      updateButtons();
+  }
+  
+  function prevSlide() {
+      const boxContainer = document.querySelector('#parMums .box-container');
+      if (currentIndex > 0) {
+          currentIndex--;
+          boxContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+      }
+      updateButtons();
+  }
+  
+  // Call updateButtons after the DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+      updateButtons();
+  });
+  
+  
+  
+  
+  
+  let lastScrollTop = 0;
+  const header = document.querySelector("header");
+  
+  window.addEventListener("scroll", function () {
+      let scrollTop = window.scrollY;
+  
+      if (scrollTop > lastScrollTop) {
+          // Scrolling down
+          header.style.transform = "translateY(-100%)";
+      } else {
+          // Scrolling up
+          header.style.transform = "translateY(0)";
+      }
+      
+      lastScrollTop = scrollTop;
+  });
+  
+  
+  
+  // let menu = document.querySelector('#menu-btn')
+  // let navbar = document.querySelector('nav')
+  
+  // menu.onclick = () => {
+  //     navbar.classList.toggle('active')
+  //     menu.classList.toggle('fa-times') //pieliek ikonu - krustinu
+  // }
+  // window.onscroll = () =>{
+  //     navbar.classList.remove('active')
+  //     menu.classList.remove('fa-times')
+  // }
+  
+  // if ( window.history.replaceState ) {
+  //     window.history.replaceState( null, null, window.location.href );
+  // }
+  
+  // x = () => {
+  //     let alert = document.getElementById("pazinojums")
+  //     alert.style.display = "none"
+  // }
+  
+  /*-----------------------------------------dropdown--------------------------------------------------- */
+  // function showDropdowns() {
+  //     // Get selected radio value
+  //     const selectedValue = document.querySelector('input[name="color1"]:checked').value;
+  
+  //     // Dropdown divs
+  //     const allDropdowns = document.querySelectorAll('.all');
+  //     const bigDropdown = document.querySelector('.big');
+  
+  //     // Hide all dropdowns initially
+  //     allDropdowns.forEach(dropdown => dropdown.style.display = 'none');
+  //     bigDropdown.style.display = 'none';
+  
+  //     // Show relevant dropdowns based on the selected value
+  //     if (['apala1', 'apala2', 'medaljons'].includes(selectedValue)) {
+  //         // Show all dropdowns (including the small and big)
+  //         allDropdowns.forEach(dropdown => dropdown.style.display = 'block');
+  //         bigDropdown.style.display = 'block'; // Ensuring big dropdown is shown
+  //     } else if (['lasteka', 'ramis', 'lietussargs'].includes(selectedValue)) {
+  //         // Show only the small dropdowns, hide the big one
+  //         allDropdowns.forEach(dropdown => {
+  //             if (dropdown.classList.contains('all')) {
+  //                 dropdown.style.display = 'block';
+  //             }
+  //         });
+  //         // The big dropdown remains hidden
+  //     }
+  // }
+  
+  
+  

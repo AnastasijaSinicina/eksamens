@@ -2263,6 +2263,393 @@ footer img{
     }
 }
 
+
+/*------------------------------------------------------profils---------------------------------------------------------------------------------------*/
+.user-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.user-btn i {
+    font-size: 1.2rem;
+}
+.username {
+    color: var(--light3);
+    font-size: 0.9rem;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#profils {
+    padding: 4rem 6%;
+}
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.profile-container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.profile-notification {
+    background-color: var(--light1);
+    color: var(--tumsa);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.profile-card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+}
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 2rem;
+    background-color: var(--tumsa2);
+    color: var(--light3);
+}
+.profile-avatar {
+    margin-right: 1.5rem;
+}
+.profile-avatar i {
+    font-size: 4rem;
+    color: var(--light1);
+}
+.profile-title h2 {
+    margin: 0;
+    color: var(--light1);
+    font-size: 3rem;
+}
+.profile-email {
+    color: var(--light3);
+    margin: 0.5rem 0 0 0;
+    font-size: 1rem;
+}
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--light3);
+    background-color: var(--light2);
+}
+.tab-button {
+    padding: 1rem 2rem;
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    position: relative;
+}
+.tab-button:hover {
+    color: var(--tumsa);
+}
+.tab-button.active {
+    color: var(--tumsa);
+    font-weight: 600;
+}
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--maincolor);
+}
+.tab-content {
+    padding: 2rem;
+}
+.tab-pane {
+    display: none;
+}
+.tab-pane.active {
+    display: block;
+}
+.profile-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.form-group {
+    margin-bottom: 1.5rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--tumsa);
+    margin-bottom: 0.5rem;
+}
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--light3);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: var(--text);
+    background-color: white;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--maincolor);
+    box-shadow: 0 0 0.5rem rgba(3, 135, 206, 0.3);
+    outline: none;
+}
+.form-group input[readonly] {
+    background-color: var(--light3);
+    cursor: not-allowed;
+}
+.form-group textarea {
+    height: 100px;
+    resize: vertical;
+}
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.order-item {
+    background-color: var(--light2);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--light3);
+    border-bottom: 1px solid #e0e0e0;
+}
+.order-id h3 {
+    margin: 0;
+    color: var(--tumsa);
+    font-size: 1.2rem;
+}
+.order-date {
+    font-size: 0.9rem;
+    color: var(--text);
+}
+.order-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+.order-status.jauns {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+.order-status.procesā {
+    background-color: #fff8e1;
+    color: #ffa000;
+}
+.order-status.piegādāts {
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+.order-status.atcelts {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+.order-details {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.order-details p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+.btn.small {
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+}
+.empty-orders {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text);
+    background-color: var(--light3);
+    border-radius: 0.5rem;
+}
+.profile-form h3 {
+    color: var(--tumsa);
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+}
+.delete-account {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--light3);
+}
+.delete-account h3 {
+    color: #d32f2f;
+}
+.delete-account p {
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+.btn.danger {
+    background-color: #d32f2f;
+    color: white;
+}
+.btn.danger:hover {
+    background-color: #b71c1c;
+}
+.confirmation-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: white;
+    width: 90%;
+    max-width: 500px;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.modal-content h3 {
+    color: #d32f2f;
+    margin-bottom: 1rem;
+}
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.profile-avatar {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.default-avatar {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.default-avatar i {
+    font-size: 1.2rem;
+    color: #888;
+}
+.profile-title {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.profile-title .profile-email {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+/* Notification styles */
+.notification-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    display: none;
+}
+.notification {
+    background-color: white;
+    color: var(--tumsa);
+    padding: 1.5rem 2.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeInOut 5s ease-in-out forwards;
+}
+.notification.success {
+    border-left: 5px solid #28a745;
+}
+.notification.error {
+    border-left: 5px solid #dc3545;
+}
+.notification i {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.notification i.success {
+    color: #28a745;
+}
+.notification i.error {
+    color: #dc3545;
+}
+.notification h3 {
+    margin: 0.5rem 0;
+    font-size: 1.3rem;
+}
+.notification p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+/*------------------------------------------------------------------------------------------1530px-------------------------------------------------------------------------*/
+@media (max-width: 1530px) {
+    .nav a {
+        font-size: .8rem;
+        text-wrap: nowrap;
+        margin: 0 .3rem;
+    }
+    .navBtn {
+        margin: .2rem;
+    }
+    .logo1 img {
+        width: 5rem;
+        height: 5rem;
+    }
+    .logo2 img {
+       display: none;
+    }
+}
+
+
 /* ------------------------------------------------------------------------------------------------------1400px------------------------------------------------------------------------ */
 @media (max-width: 1400px) {
     h1 {

@@ -208,7 +208,13 @@
                 
                 <div class="form-group">
                     <label for="epasts">E-pasts:</label>
+
                     <input type="email" id="epasts" name="epasts" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" value="<?php echo $editData ? $editData['epasts'] : ''; ?>" required>
+
+                    <input type="email" id="epasts" name="epasts" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" value="<?php echo $editData ? $editData['epasts'] : ''; ?>" required>
+
+                    <input type="email" id="epasts" name="epasts" value="<?php echo $editData ? $editData['epasts'] : ''; ?>" required>
+
                 </div>
                 
                 <div class="form-group">

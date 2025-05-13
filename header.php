@@ -70,6 +70,7 @@ $cartCount = $cartCount ?: 0;
         <a href="parMums.php">Par mums</a>
         <a href="kontakti.php">Kontakti</a>
     </nav>
+
     <a href="grozs.php" class="btn navBtn cart-btn">
     <i class="fa-solid fa-cart-shopping"></i>
     <?php if ($cartCount > 0): ?>
@@ -92,4 +93,11 @@ $cartCount = $cartCount ?: 0;
     <button id="menu-btn" class="btn navBtn">
     <i class="fa-solid fa-bars"></i>
 </button>
+
+    <button id="menu-btn" class="btn navBtn">
+    <i class="fa-solid fa-bars"></i>
+</button>
+
+    <!-- <div id="menu-btn" class="fas fa-bars"></div> -->
+
 </header>
