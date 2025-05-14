@@ -93,9 +93,6 @@ $cartCount = $cartCount ?: 0;
     <i class="fa-solid fa-bars"></i>
 </button>
 
-    <button id="menu-btn" class="btn navBtn">
-    <i class="fa-solid fa-bars"></i>
-</button>
 
     <!-- <div id="menu-btn" class="fas fa-bars"></div> -->
 

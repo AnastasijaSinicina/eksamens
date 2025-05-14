@@ -33,6 +33,9 @@ if ($cart_count == 0) {
 }
 
 if (isset($_POST['submit_order'])) {
+    error_log("Order submission started");
+    error_log("POST data: " . print_r($_POST, true));
+    
     $vards = htmlspecialchars($_POST['vards']);
     $uzvards = htmlspecialchars($_POST['uzvards']);
     $epasts = htmlspecialchars($_POST['epasts']);
@@ -40,10 +43,17 @@ if (isset($_POST['submit_order'])) {
     $adrese = htmlspecialchars($_POST['adrese']);
     $pilseta = htmlspecialchars($_POST['pilseta']);
     $pasta_indekss = htmlspecialchars($_POST['pasta_indekss']);
-    $apmaksas_veids = htmlspecialchars($_POST['apmaksas_veids']);
     $piegades_veids = htmlspecialchars($_POST['piegades_veids']); 
     $piezimes = htmlspecialchars($_POST['piezimes']);
     
+    // Set payment method based on delivery method
+    if ($piegades_veids == 'Pats') {
+        $apmaksas_veids = htmlspecialchars($_POST['apmaksas_veids']);
+    } else {
+        $apmaksas_veids = 'Bankas karte';
+    }
+    
+    error_log("Payment method set to: " . $apmaksas_veids);
 
     $items_query = "SELECT g.*, p.nosaukums, p.cena 
                   FROM grozs_sparkly g 
@@ -85,6 +95,7 @@ if (isset($_POST['submit_order'])) {
     
     if ($insert_order->execute()) {
         $pasutijums_id = $savienojums->insert_id;
+        error_log("Order created with ID: " . $pasutijums_id);
 
         foreach ($cart_items as $item) {
             
@@ -107,12 +118,19 @@ if (isset($_POST['submit_order'])) {
         
         $update_cart = $savienojums->prepare("UPDATE grozs_sparkly SET statuss = 'pasūtīts' WHERE lietotajvards = ? AND statuss = 'aktīvs'");
         $update_cart->bind_param("s", $username);
-        $update_cart->execute();
+        
+        if ($update_cart->execute()) {
+            error_log("Cart updated to 'pasūtīts' status");
+        } else {
+            error_log("Error updating cart: " . $update_cart->error);
+        }
         
         $_SESSION['pazinojums'] = "Pasūtījums veiksmīgi noformēts!";
+        error_log("Redirecting to confirmation page");
         header("Location: pasutijums_apstiprinats.php?id=" . $pasutijums_id);
         exit();
     } else {
+        error_log("Error inserting order: " . $insert_order->error);
         $error_message = "Kļūda veidojot pasūtījumu. Lūdzu, mēģiniet vēlreiz.";
     }
 }
@@ -178,7 +196,7 @@ include 'header.php';
         <div class="checkout-form">
             <h2>Piegādes informācija</h2>
             
-            <form method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">
+            <form id="checkout-form" method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">
                 <div class="form-group">
                     <label for="vards">Vārds*</label>
                     <input type="text" id="vards" name="vards" value="<?= htmlspecialchars($user['vards'] ?? '') ?>" required>
@@ -198,36 +216,7 @@ include 'header.php';
                     <label for="telefons">Telefons*</label>
                     <input type="text" id="telefons" name="telefons" value="<?= htmlspecialchars($user['telefons'] ?? '') ?>" required>
                 </div>
-                
-                <div class="form-group">
-                    <label for="adrese">Adrese*</label>
-                    <input type="text" id="adrese" name="adrese" value="<?= htmlspecialchars($user['adrese'] ?? '') ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="pilseta">Pilsēta*</label>
-                    <input type="text" id="pilseta" name="pilseta" value="<?= htmlspecialchars($user['pilseta'] ?? '') ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="pasta_indekss">Pasta indekss*</label>
-                    <input type="text" id="pasta_indekss" name="pasta_indekss" value="<?= htmlspecialchars($user['pasta_indeks'] ?? '') ?>" required>
-                </div>
-                
-                <h2>Maksājuma metode</h2>
-                
-                <div class="form-group radio-group">
-                    <label class="radio-container">
-                        <input type="radio" name="apmaksas_veids" value="Bankas karte" checked>
-                        <span class="radio-label">Bankas karte</span>
-                    </label>
-                    
-                    <label class="radio-container">
-                        <input type="radio" name="apmaksas_veids" value="Skaidra nauda">
-                        <span class="radio-label">Skaidra nauda</span>
-                    </label>
-                </div>
-                
+
                 <h2>Piegāde</h2>
                 <div class="form-group radio-group">
                     <label class="radio-container">
@@ -241,219 +230,77 @@ include 'header.php';
                     </label>
                 </div>
                 
+                <div class="form-group" id="address-group">
+                    <label for="adrese">Adrese*</label>
+                    <input type="text" id="adrese" name="adrese" value="<?= htmlspecialchars($user['adrese'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group" id="city-group">
+                    <label for="pilseta">Pilsēta*</label>
+                    <input type="text" id="pilseta" name="pilseta" value="<?= htmlspecialchars($user['pilseta'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group" id="postal-group">
+                    <label for="pasta_indekss">Pasta indekss*</label>
+                    <input type="text" id="pasta_indekss" name="pasta_indekss" value="<?= htmlspecialchars($user['pasta_indeks'] ?? '') ?>" required>
+                </div>
+                
+                
                 <div class="form-group">
                     <label for="piezimes">Piezīmes par pasūtījumu</label>
                     <textarea id="piezimes" name="piezimes" rows="4"></textarea>
                 </div>
+
+                <div class="form-group" id="payment-method-display" style="display: none;">
+                    <label for="selected-payment-method">Izvēlētais maksājuma veids</label>
+                    <input type="text" id="selected-payment-method" value="" readonly class="readonly-field">
+                </div>
+
+                <input type="hidden" id="apmaksas-veids-input" name="apmaksas_veids" value="">
                 
-                <button type="submit" name="submit_order" class="btn full">Apstiprināt pasūtījumu</button>
+                <button type="button" id="payment-btn" class="btn full">Izvēlēties maksājuma veidu</button>
+                <button type="submit" name="submit_order" id="confirm-order-btn" class="btn full" style="display: none;">Apstiprināt pasūtījumu</button>
             </form>
         </div>
     </div>
+
+
+<!--Modālas logs maksājuma veidam-->
+<div id="payment-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Izvēlieties maksājuma veidu</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="payment-options">
+                <label class="payment-option">
+                    <input type="radio" name="modal_payment" value="Bankas karte" checked>
+                    <span class="payment-label">
+                        <i class="fas fa-credit-card"></i>
+                        Bankas karte
+                    </span>
+                </label>
+                
+                <label class="payment-option">
+                    <input type="radio" name="modal_payment" value="Skaidra nauda">
+                    <span class="payment-label">
+                        <i class="fas fa-money-bill"></i>
+                        Skaidra nauda
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="cancel-payment" class="btn btn-secondary">Atcelt</button>
+            <button type="button" id="confirm-payment" class="btn">Apstiprināt</button>
+        </div>
+    </div>
+</div>
 </section>
+<script>
 
-<style>
-#pasutisana {
-    padding: 4rem 6%;
-}
-
-#pasutisana h1 {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.error-message {
-    background-color: #ffebee;
-    color: #d32f2f;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.checkout-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    margin-bottom: 2rem;
-}
-
-.order-summary {
-    flex: 1 1 30%;
-    background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 1.5rem;
-    height: fit-content;
-}
-
-.checkout-form {
-    flex: 1 1 60%;
-    background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 1.5rem;
-}
-
-.order-summary h2,
-.checkout-form h2 {
-    color: var(--tumsa);
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    text-align: left;
-    border-bottom: 1px solid var(--light3);
-    padding-bottom: 0.5rem;
-}
-
-.summary-items {
-    max-height: 400px;
-    overflow-y: auto;
-    margin-bottom: 1.5rem;
-    padding-right: 0.5rem;
-}
-
-.summary-item {
-    display: flex;
-    padding: 0.8rem 0;
-    border-bottom: 1px solid var(--light3);
-}
-
-.summary-item:last-child {
-    border-bottom: none;
-}
-
-.item-image {
-    width: 5rem;
-    margin-right: 1rem;
-}
-
-.item-image img {
-    width: 100%;
-    border-radius: 0.3rem;
-}
-
-.item-details {
-    flex: 1;
-}
-
-.item-details h3 {
-    color: var(--tumsa);
-    font-size: 1.1rem;
-    margin-bottom: 0.3rem;
-}
-
-.item-details p {
-    color: var(--text);
-    font-size: 0.9rem;
-    margin: 0.2rem 0;
-}
-
-.item-price {
-    font-weight: bold;
-    color: var(--tumsa);
-}
-
-.summary-totals {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 2px solid var(--light3);
-}
-
-.total-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.8rem;
-    font-size: 1.1rem;
-}
-
-.total-row span:last-child {
-    font-weight: 600;
-    color: var(--tumsa);
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 500;
-    color: var(--tumsa);
-    margin-bottom: 0.5rem;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 0.8rem;
-    border: 2px solid var(--light3);
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    color: var(--text);
-    background-color: white;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: var(--maincolor);
-    box-shadow: 0 0 0.5rem rgba(3, 135, 206, 0.3);
-    outline: none;
-}
-
-.radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.radio-container {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.radio-container input[type="radio"] {
-    width: auto;
-    margin-right: 0.8rem;
-}
-
-.radio-label {
-    font-size: 1.1rem;
-    color: var(--text);
-}
-
-.checkout-btn {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.2rem;
-    background-color: var(--tumsa);
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 1rem;
-}
-
-.checkout-btn:hover {
-    background-color: var(--maincolor);
-}
-
-@media (max-width: 992px) {
-    .checkout-container {
-        flex-direction: column;
-    }
-    
-    .order-summary,
-    .checkout-form {
-        flex-basis: 100%;
-    }
-}
-</style>
+</script>
 
 <?php
 include 'footer.php';
