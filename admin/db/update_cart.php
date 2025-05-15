@@ -30,7 +30,7 @@ if (isset($_POST['increase']) && isset($_POST['id'])) {
         $newQuantity = $row['daudzums'] + 1;
         
         // Update quantity
-        $updateQuery = "UPDATE grozs_sparkly SET daudzums = ? WHERE id_grozs = ?";
+        $updateQuery = "UPDATE grozs_sparkly SET daudzums = ? AND statuss = 'aktīvs' WHERE id_grozs = ?";
         $stmt = $savienojums->prepare($updateQuery);
         $stmt->bind_param("ii", $newQuantity, $id);
         $stmt->execute();

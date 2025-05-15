@@ -3,7 +3,6 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Novirza uz login, ja nav pieslēdzies
 if (!isset($_SESSION['lietotajvardsSIN'])) {
     $_SESSION['pazinojums'] = "Lūdzu, ielogojieties, lai piekļūtu profilam!";
     header("Location: login.php");
@@ -13,6 +12,9 @@ if (!isset($_SESSION['lietotajvardsSIN'])) {
 // Iekļauj datubāzes savienojumu
 require_once "admin/db/con_db.php";
 
+// Iekļauj pasūtījumu vestures funkcionalitāti
+require_once "admin/db/pasutijuma_vesture.php";
+
 // Iegūst lietotāja informāciju
 $lietotajvards = $_SESSION['lietotajvardsSIN'];
 $vaicajums = $savienojums->prepare("SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?");
@@ -21,19 +23,21 @@ $vaicajums->execute();
 $rezultats = $vaicajums->get_result();
 $lietotajs = $rezultats->fetch_assoc();
 
-// Iegūst lietotāja pasūtījumus
-$order_query = "SELECT p.*, COUNT(pv.vienums_id) as total_items
-                FROM sparkly_pasutijumi p
-                LEFT JOIN sparkly_pasutijuma_vienumi pv ON p.id_pasutijums = pv.pasutijuma_id
-                WHERE p.lietotajs_id = ?
-                GROUP BY p.id_pasutijums
-                ORDER BY p.pas_datums DESC";
-$order_stmt = $savienojums->prepare($order_query);
-$order_stmt->bind_param("i", $lietotajs['id_lietotajs']);
-$order_stmt->execute();
-$orders_result = $order_stmt->get_result();
+// Check if user was found
+if (!$lietotajs) {
+    error_log("User not found: " . $lietotajvards);
+    $_SESSION['pazinojums'] = "Lietotājs nav atrasts!";
+    header("Location: login.php");
+    exit();
+}
 
-// Iekļauj header
+// Iegūst visus pasūtījumus
+$all_orders = getUserOrders($savienojums, $lietotajs['id_lietotajs']);
+
+// Close prepared statements
+$vaicajums->close();
+
+// Include header
 include 'header.php';
 ?>
 
@@ -145,87 +149,117 @@ include 'header.php';
                 
                 <!-- Pasūtījumu cilne -->
                 <div class="tab-pane" id="orders">
+                    <!-- Debug info -->
+                    <?php if (isset($_GET['debug'])): ?>
+                    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px; border: 1px solid #ccc;">
+                        <strong>Debug Info:</strong><br>
+                        User ID: <?php echo $lietotajs['id_lietotajs']; ?><br>
+                        Total orders: <?php echo count($all_orders); ?><br>
+                        Regular orders: <?php echo count(array_filter($all_orders, function($o) { return $o['order_type'] == 'regular'; })); ?><br>
+                        Custom orders: <?php echo count(array_filter($all_orders, function($o) { return $o['order_type'] == 'custom'; })); ?>
+                    </div>
+                    <?php endif; ?>
+                    
                     <!-- Order Filter Buttons -->
                     <div class="order-filters">
-                        <button class="filter-button active" data-status="all">Visi pasūtījumi</button>
+                        <button class="filter-button active" data-status="all">Visi pasūtījumi (<?php echo count($all_orders); ?>)</button>
+                        <button class="filter-button" data-type="regular">Regulārie (<?php echo count(array_filter($all_orders, function($o) { return $o['order_type'] == 'regular'; })); ?>)</button>
+                        <button class="filter-button" data-type="custom">Pielāgotie (<?php echo count(array_filter($all_orders, function($o) { return $o['order_type'] == 'custom'; })); ?>)</button>
                         <button class="filter-button order-status iesniegts" data-status="Iesniegts">Iesniegts</button>
                         <button class="filter-button order-status apstiprināts" data-status="Apstiprināts">Apstiprināts</button>
-                        <button class="filter-button order-status aizsūtīts" data-status="Aizsūtīts">Aizsūtīts</button>
+                        <button class="filter-button order-status nosūtīts" data-status="Nosūtīts">Nosūtīts</button>
                         <button class="filter-button order-status saņemts" data-status="Saņemts">Saņemts</button>
                     </div>
                     
                     <div class="orders-list">
-                        <?php if ($orders_result->num_rows > 0): ?>
-                            <?php while ($order = $orders_result->fetch_assoc()): ?>
-                                <div class="order-item" data-status="<?php echo $order['statuss']; ?>">
+                        <?php if (count($all_orders) > 0): ?>
+                            <?php $order_counter = 0; foreach ($all_orders as $order): $order_counter++; ?>
+                                <div class="order-item" data-status="<?php echo $order['statuss']; ?>" data-type="<?php echo $order['order_type']; ?>">
                                     <div class="order-header">
                                         <div class="order-id">
-                                            <h3>Pasūtījums #<?php echo $order['id_pasutijums']; ?></h3>
+                                            <h3>
+                                                <?php if ($order['order_type'] == 'custom'): ?>
+                                                    <span class="custom-badge">PIELĀGOTS</span>
+                                                    Pasūtījums #C<?php echo $order['id_pasutijums']; ?>
+                                                <?php else: ?>
+                                                    Pasūtījums #<?php echo $order['pasutijuma_numurs'] ?? $order['id_pasutijums']; ?>
+                                                <?php endif; ?>
+                                            </h3>
                                             <span class="order-date"><?php echo date('d.m.Y H:i', strtotime($order['pas_datums'])); ?></span>
                                         </div>
-                                        <div class="order-status <?php echo strtolower($order['statuss']); ?>">
-                                            <?php echo $order['statuss']; ?>
-                                            <?php if ($order['statuss'] == 'Aizsūtīts'): ?>
-                                            <div class="order-actions">
-                                                <a href="admin/db/sanemts_sutijums.php?id=<?php echo $order['id_pasutijums']; ?>" 
-                                                class="btn btn-success">
-                                                    <i class="fas fa-check"></i>
-                                                    Atzīmēt kā saņemtu
-                                                </a>
+                                        <div class="order-status-section">
+                                            <div class="order-status <?php echo strtolower($order['statuss']); ?>">
+                                                <?php echo $order['statuss']; ?>
                                             </div>
-                                        <?php endif; ?>
+                                            <button class="expand-button btn" data-order="order-<?php echo $order_counter; ?>">
+                                                <i class="fas fa-chevron-down"></i>
+                                                Skatīt detaļas
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="order-details">
+                                    <div class="order-details" id="order-<?php echo $order_counter; ?>" style="display: none;">
                                         <div class="order-info">
                                             <div class="order-summary">
-                                                <div class="summary-item">
-                                                    <span class="label">Kopējā summa:</span>
-                                                    <span class="value">€<?php echo number_format($order['kopeja_cena'], 2); ?></span>
-                                                </div>
-                                                <div class="summary-item">
-                                                    <span class="label">Produktu skaits:</span>
-                                                    <span class="value"><?php echo $order['produktu_skaits']; ?></span>
-                                                </div>
-                                                <div class="summary-item">
-                                                    <span class="label">Apmaksas veids:</span>
-                                                    <span class="value"><?php echo $order['apmaksas_veids']; ?></span>
-                                                </div>
-                                                <div class="summary-item">
-                                                    <span class="label">Piegādes veids:</span>
-                                                    <span class="value"><?php echo $order['piegades_veids']; ?></span>
-                                                </div>
+                                                <?php if ($order['order_type'] == 'regular'): ?>
+                                                    <div class="summary-item">
+                                                        <span class="label">Kopējā summa:</span>
+                                                        <span class="value">€<?php echo number_format($order['kopeja_cena'], 2); ?></span>
+                                                    </div>
+                                                    <div class="summary-item">
+                                                        <span class="label">Produktu skaits:</span>
+                                                        <span class="value"><?php echo $order['produktu_skaits']; ?></span>
+                                                    </div>
+                                                    <div class="summary-item">
+                                                        <span class="label">Apmaksas veids:</span>
+                                                        <span class="value"><?php echo $order['apmaksas_veids']; ?></span>
+                                                    </div>
+                                                    <div class="summary-item">
+                                                        <span class="label">Piegādes veids:</span>
+                                                        <span class="value"><?php echo $order['piegades_veids']; ?></span>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="summary-item">
+                                                        <span class="label">Veids:</span>
+                                                        <span class="value">Pielāgots produkts</span>
+                                                    </div>
+                                                    <div class="summary-item">
+                                                        <span class="label">Daudzums:</span>
+                                                        <span class="value"><?php echo $order['daudzums']; ?></span>
+                                                    </div>
+                                                    <div class="summary-item">
+                                                        <span class="label">Cena:</span>
+                                                        <span class="value">€<?php echo number_format($order['cena'], 2);?></span>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                             
                                             <div class="order-address">
-                                                <h4>Piegādes adrese:</h4>
+                                                <h4>Piegādes informācija:</h4>
                                                 <p><?php echo htmlspecialchars($order['vards'] . ' ' . $order['uzvards']); ?></p>
-                                                <?php if ($order['piegades_veids'] == 'Kurjers'): ?>
+                                                <?php if ($order['order_type'] == 'regular' && $order['piegades_veids'] == 'Kurjers'): ?>
                                                     <p><?php echo htmlspecialchars($order['adrese']); ?></p>
                                                     <p><?php echo htmlspecialchars($order['pilseta'] . ', ' . $order['pasta_indeks']); ?></p>
+                                                <?php elseif ($order['order_type'] == 'custom'): ?>
+                                                    <p><?php echo htmlspecialchars($order['adrese']); ?></p>
+                                                    <p><?php echo htmlspecialchars($order['pilseta'] . ', ' . $order['pasta_indekss']); ?></p>
                                                 <?php else: ?>
                                                     <p><em>Izņemšana no veikala</em></p>
                                                 <?php endif; ?>
                                                 <p>Tel: <?php echo htmlspecialchars($order['talrunis']); ?></p>
+                                                <p>E-pasts: <?php echo htmlspecialchars($order['epasts']); ?></p>
                                             </div>
                                         </div>
                                         
+                                        <?php if ($order['order_type'] == 'regular'): ?>
                                         <div class="order-items">
                                             <h4>Pasūtītās preces:</h4>
                                             <?php
                                             // Iegūst pasūtījuma vienumus
-                                            $items_query = "SELECT pv.*, p.nosaukums, p.attels1
-                                                           FROM sparkly_pasutijuma_vienumi pv
-                                                           JOIN produkcija_sprarkly p ON pv.produkta_id = p.id_bumba
-                                                           WHERE pv.pasutijuma_id = ?";
-                                            $items_stmt = $savienojums->prepare($items_query);
-                                            $items_stmt->bind_param("i", $order['id_pasutijums']);
-                                            $items_stmt->execute();
-                                            $items_result = $items_stmt->get_result();
+                                            $order_items = getOrderItems($savienojums, $order['id_pasutijums']);
                                             ?>
                                             
                                             <div class="items-grid">
-                                                <?php while ($item = $items_result->fetch_assoc()): ?>
+                                                <?php foreach ($order_items as $item): ?>
                                                     <div class="item-card">
                                                         <div class="item-image">
                                                             <img src="data:image/jpeg;base64,<?php echo base64_encode($item['attels1']); ?>" 
@@ -238,12 +272,60 @@ include 'header.php';
                                                             <p class="item-total">Kopā: €<?php echo number_format($item['cena'] * $item['daudzums_no_groza'], 2); ?></p>
                                                         </div>
                                                     </div>
-                                                <?php endwhile; ?>
+                                                <?php endforeach; ?>
                                             </div>
                                         </div>
+                                        <?php else: ?>
+                                        <div class="order-items">
+                                            <h4>Pielāgotā produkta specifikācijas:</h4>
+                                            <div class="custom-specs">
+                                                <?php if (!empty($order['forma_name'])): ?>
+                                                    <div class="spec-item">
+                                                        <span class="spec-label">Forma:</span>
+                                                        <span class="spec-value"><?php echo htmlspecialchars($order['forma_name']); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($order['audums_name'])): ?>
+                                                    <div class="spec-item">
+                                                        <span class="spec-label">Audums:</span>
+                                                        <span class="spec-value"><?php echo htmlspecialchars($order['audums_name']); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($order['malu_figura_name'])): ?>
+                                                    <div class="spec-item">
+                                                        <span class="spec-label">Malu figūra:</span>
+                                                        <span class="spec-value"><?php echo htmlspecialchars($order['malu_figura_name']); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($order['dekorejums1_name'])): ?>
+                                                    <div class="spec-item">
+                                                        <span class="spec-label">Dekorējums 1:</span>
+                                                        <span class="spec-value"><?php echo htmlspecialchars($order['dekorejums1_name']); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($order['dekorejums2_name'])): ?>
+                                                    <div class="spec-item">
+                                                        <span class="spec-label">Dekorējums 2:</span>
+                                                        <span class="spec-value"><?php echo htmlspecialchars($order['dekorejums2_name']); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($order['piezimes'])): ?>
+                                                    <div class="spec-item full-width">
+                                                        <span class="spec-label">Piezīmes:</span>
+                                                        <span class="spec-value"><?php echo nl2br(htmlspecialchars($order['piezimes'])); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         <?php else: ?>
                             <div class="empty-orders">
                                 <div class="empty-icon">
@@ -251,7 +333,10 @@ include 'header.php';
                                 </div>
                                 <h3>Jums vēl nav pasūtījumu</h3>
                                 <p>Kad būsiet veicis pasūtījumu, tie parādīsies šeit.</p>
-                                <a href="produkcija.php" class="btn">Sākt iepirkšanos</a>
+                                <div class="empty-actions">
+                                    <a href="produkcija.php" class="btn">Sākt iepirkšanos</a>
+                                    <a href="materiali.php" class="btn">Izveidot pielāgotu</a>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -292,7 +377,6 @@ include 'header.php';
     </div>
 </section>
 
-
 <div id="delete-confirmation" class="confirmation-modal">
     <div class="modal-content">
         <h3>Apstiprināt konta dzēšanu</h3>
@@ -304,163 +388,12 @@ include 'header.php';
     </div>
 </div>
 
-
 <script>
-// Cilņu pārslēgšanas funkcionalitāte
-document.addEventListener('DOMContentLoaded', function() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Noņem aktīvo klasi no visiem pogas un paneliem
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanes.forEach(pane => pane.classList.remove('active'));
-            
-            // Pievieno aktīvo klasi noklikšķinātai pogai un atbilstošajam panelim
-            button.classList.add('active');
-            const tabId = button.getAttribute('data-tab');
-            document.getElementById(tabId).classList.add('active');
-        });
-    });
-    
-    // Order filter functionality
-    const filterButtons = document.querySelectorAll('.filter-button');
-    const orderItems = document.querySelectorAll('.order-item');
-    
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active class from all filter buttons
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            button.classList.add('active');
-            
-            // Get selected status
-            const selectedStatus = button.getAttribute('data-status');
-            
-            // Filter orders
-            orderItems.forEach(item => {
-                const itemStatus = item.getAttribute('data-status');
-                if (selectedStatus === 'all' || itemStatus === selectedStatus) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    });
-    
-    // Konta dzēšanas modāļa funkcionalitāte
-    const deleteBtn = document.getElementById('delete-account-btn');
-    const deleteModal = document.getElementById('delete-confirmation');
-    const cancelBtn = document.getElementById('cancel-delete');
-    
-    if (deleteBtn && deleteModal && cancelBtn) {
-        deleteBtn.addEventListener('click', function() {
-            deleteModal.style.display = 'flex';
-        });
-        
-        cancelBtn.addEventListener('click', function() {
-            deleteModal.style.display = 'none';
-        });
-        
-        // Aizvērt modālu, kad noklikšķina ārpus tā
-        deleteModal.addEventListener('click', function(e) {
-            if (e.target === deleteModal) {
-                deleteModal.style.display = 'none';
-            }
-        });
-    }
 
-
-// Attēla priekšskatījuma funkcija
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        const imagePreview = document.querySelector('.image-preview');
-        const imagePlaceholder = document.getElementById('image-placeholder');
-        
-        reader.onload = function(e) {
-            if (imagePreview) {
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
-            } else {
-                // Izveido jaunu attēla priekšskatījumu, ja tas neeksistē
-                const newImg = document.createElement('img');
-                newImg.src = e.target.result;
-                newImg.alt = 'Profila attēls';
-                newImg.className = 'image-preview';
-                document.querySelector('.current-image').appendChild(newImg);
-            }
-            
-            if (imagePlaceholder) {
-                imagePlaceholder.style.display = 'none';
-            }
-        };
-        
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-    
-    // Pievieno paroļu sakritības pārbaudes funkcionalitāti
-    const newPassword = document.getElementById('new_password');
-    const confirmPassword = document.getElementById('confirm_password');
-    
-    if (newPassword && confirmPassword) {
-        // Funkcija, lai pārbaudītu, vai paroles sakrīt
-        function checkPasswordMatch() {
-            // Noņem visus esošos ikonu konteinerus
-            const existingIcons = confirmPassword.parentElement.querySelectorAll('.icon-container');
-            existingIcons.forEach(icon => icon.remove());
-            
-            if (confirmPassword.value === '') {
-                // Ja apstiprinājuma parole ir tukša, nerāda nevienu ikonu
-                return;
-            }
-            
-            // Izveido ikonu konteineru
-            const iconContainer = document.createElement('span');
-            iconContainer.className = 'icon-container';
-            
-            if (newPassword.value === confirmPassword.value) {
-                // Paroles sakrīt
-                iconContainer.classList.add('match-container', 'visible');
-                iconContainer.innerHTML = '<i class="fas fa-check password-match-icon"></i>';
-            } else {
-                // Paroles nesakrīt
-                iconContainer.classList.add('mismatch-container', 'visible');
-                iconContainer.innerHTML = '<i class="fas fa-times password-mismatch-icon"></i>';
-            }
-            
-            // Pievieno ikonu konteineru apstiprinājuma paroles lauka vecākam
-            confirmPassword.parentElement.style.position = 'relative';
-            confirmPassword.parentElement.appendChild(iconContainer);
-        }
-        
-        // Pārbauda paroles pie ievades
-        newPassword.addEventListener('input', checkPasswordMatch);
-        confirmPassword.addEventListener('input', checkPasswordMatch);
-        
-        // Formas validācija pirms nosūtīšanas
-        const passwordForm = document.querySelector('.password-form');
-        if (passwordForm) {
-            passwordForm.addEventListener('submit', function(event) {
-                if (newPassword.value !== confirmPassword.value) {
-                    event.preventDefault();
-                    alert('Paroles nesakrīt!');
-                    return false;
-                }
-                
-
-            });
-        }
-    }
-    });
 </script>
 
+
 <?php
-// Iekļauj footer
+// Include footer
 include 'footer.php';
 ?>

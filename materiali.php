@@ -1,110 +1,391 @@
 <?php
-    require 'header.php'
+// Start session
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is logged in
+if (!isset($_SESSION['lietotajvardsSIN'])) {
+    $_SESSION['pazinojums'] = "Lūdzu ielogojieties, lai izveidotu pielāgotu produktu";
+    $_SESSION['redirect_after_login'] = "materiali.php";
+    header("Location: login.php");
+    exit();
+}
+
+// Include database connection
+require "admin/db/con_db.php";
+
+// Get current user info
+$username = $_SESSION['lietotajvardsSIN'];
+$user_query = "SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?";
+$user_stmt = $savienojums->prepare($user_query);
+$user_stmt->bind_param("s", $username);
+$user_stmt->execute();
+$user_result = $user_stmt->get_result();
+$user = $user_result->fetch_assoc();
+if (isset($_POST['submit_custom_order'])) {
+    // Define required fields
+    $required_fields = [
+        'forma' => 'Forma',
+        'audums' => 'Audums',
+        'malu_figura' => 'Mālu figūra',
+        'dekorejums1' => 'Dekorējums 1',
+        'dekorejums2' => 'Dekorējums 2',
+        'vards' => 'Vārds',
+        'uzvards' => 'Uzvārds',
+        'epasts' => 'E-pasts',
+        'talrunis' => 'Tālrunis',
+        'adrese' => 'Adrese',
+        'pilseta' => 'Pilsēta',
+        'pasta_indekss' => 'Pasta indekss',
+        'daudzums' => 'Daudzums'
+    ];
+    
+    $errors = [];
+    
+    // Validate required fields
+    foreach ($required_fields as $field => $label) {
+        if (empty($_POST[$field]) || $_POST[$field] === '') {
+            $errors[] = "Lauks '$label' ir obligāts";
+        }
+    }
+    
+    // Validate email format
+    if (!empty($_POST['epasts']) && !filter_var($_POST['epasts'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Nepareizs e-pasta formāts";
+    }
+    
+    // Validate quantity is positive number
+    if (!empty($_POST['daudzums']) && (int)$_POST['daudzums'] < 1) {
+        $errors[] = "Daudzums jābūt vismaz 1";
+    }
+    
+    // If there are validation errors, display them
+    if (!empty($errors)) {
+        $error_message = "Lūdzu izlabojiet šādas kļūdas:<br>• " . implode("<br>• ", $errors);
+    } else {
+        // Proceed with form submission if validation passes
+        $vards = htmlspecialchars($_POST['vards']);
+        $uzvards = htmlspecialchars($_POST['uzvards']);
+        $epasts = htmlspecialchars($_POST['epasts']);
+        $talrunis = htmlspecialchars($_POST['talrunis']);
+        $adrese = htmlspecialchars($_POST['adrese']);
+        $pilseta = htmlspecialchars($_POST['pilseta']);
+        $pasta_indekss = htmlspecialchars($_POST['pasta_indekss']);
+        
+        // Product specifications
+        $forma = htmlspecialchars($_POST['forma']);
+        $audums = htmlspecialchars($_POST['audums']);
+        $malu_figura = htmlspecialchars($_POST['malu_figura'] ?? '');
+        $dekorejums1 = htmlspecialchars($_POST['dekorejums1'] ?? '');
+        $dekorejums2 = htmlspecialchars($_POST['dekorejums2'] ?? '');
+        $daudzums = intval($_POST['daudzums']);
+        $piezimes = htmlspecialchars($_POST['piezimes']);
+
+        // Insert custom order
+        $insert_query = "INSERT INTO sparkly_spec_pas 
+                        (lietotajs_id, vards, uzvards, epasts, talrunis, adrese, pilseta, pasta_indekss, 
+                         forma, audums, malu_figura, dekorejums1, dekorejums2, 
+                         daudzums, piezimes, statuss) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Iesniegts')";
+        
+        $stmt = $savienojums->prepare($insert_query);
+        
+        if ($stmt === false) {
+            $error_message = "Database prepare error: " . $savienojums->error;
+        } else {
+            $stmt->bind_param("issssssssssssis", 
+                $user['id_lietotajs'], $vards, $uzvards, $epasts, $talrunis, $adrese, $pilseta, $pasta_indekss,
+                $forma, $audums, $malu_figura, $dekorejums1, $dekorejums2,
+                $daudzums, $piezimes
+            );
+            
+            if ($stmt->execute()) {
+                $_SESSION['pazinojums'] = "Jūsu pielāgotā produkta pieprasījums ir veiksmīgi nosūtīts! Mēs sazināsimies ar jums drīzumā.";
+                header("Location: profils.php");
+                exit();
+            } else {
+                $error_message = "Kļūda nosūtot pieprasījumu: " . $stmt->error;
+            }
+            $stmt->close();
+        }
+    }
+}
+// Fetch materials for dropdowns (including images)
+$formas = [];
+$check_formas = "SHOW TABLES LIKE 'sparkly_formas'";
+if ($savienojums->query($check_formas)->num_rows > 0) {
+    $formas_query = "SELECT * FROM sparkly_formas  WHERE id_forma = 1 OR id_forma = 2 OR id_forma = 3 ORDER BY forma";
+    $formas_result = $savienojums->query($formas_query);
+    while ($forma = $formas_result->fetch_assoc()) {
+        $formas[] = $forma;
+    }
+}
+
+$audumi = [];
+$check_audums = "SHOW TABLES LIKE 'sparkly_audums'";
+if ($savienojums->query($check_audums)->num_rows > 0) {
+    $audums_query = "SELECT * FROM sparkly_audums WHERE id_audums = 1 OR id_audums = 2 OR id_audums = 3 OR id_audums = 4 ORDER BY nosaukums";
+    $audums_result = $savienojums->query($audums_query);
+    while ($audums = $audums_result->fetch_assoc()) {
+        $audumi[] = $audums;
+    }
+}
+
+$malu_figuras = [];
+$check_figuras = "SHOW TABLES LIKE 'sparkly_malu_figura'";
+if ($savienojums->query($check_figuras)->num_rows > 0) {
+    $figuras_query = "SELECT * FROM sparkly_malu_figura ORDER BY nosaukums";
+    $figuras_result = $savienojums->query($figuras_query);
+    while ($figura = $figuras_result->fetch_assoc()) {
+        $malu_figuras[] = $figura;
+    }
+}
+
+$dekorejumi1 = [];
+$check_dekorejums1 = "SHOW TABLES LIKE 'sparkly_dekorejums1'";
+if ($savienojums->query($check_dekorejums1)->num_rows > 0) {
+    $dekorejums1_query = "SELECT * FROM sparkly_dekorejums1 ORDER BY nosaukums";
+    $dekorejums1_result = $savienojums->query($dekorejums1_query);
+    while ($dekorejums = $dekorejums1_result->fetch_assoc()) {
+        $dekorejumi1[] = $dekorejums;
+    }
+}
+
+$dekorejumi2 = [];
+$check_dekorejums2 = "SHOW TABLES LIKE 'sparkly_dekorejums2'";
+if ($savienojums->query($check_dekorejums2)->num_rows > 0) {
+    $dekorejums2_query = "SELECT * FROM sparkly_dekorejums2 ORDER BY nosaukums";
+    $dekorejums2_result = $savienojums->query($dekorejums2_query);
+    while ($dekorejums = $dekorejums2_result->fetch_assoc()) {
+        $dekorejumi2[] = $dekorejums;
+    }
+}
+
+include 'header.php';
 ?>
+
 <section id="materiali">
-    <h2>Apskaties materiālus, lai pāsūtītu Tavu iedomātu rotājumu!</h2>
-    <div class="box-container">
-        <div class="box">
-            <h3>Formas:</h3>
-            <div class="krasa">
-                <img src="images/krasa1.png" alt="">
-                <p>Apaļa 10x10</p>
-            </div>
-            <div class="krasa">
-                <img src="images/krasa2.png" alt="">
-                <p>Apaļa 15x15</p>
-            </div>
-            <div class="krasa">
-                <img src="images/krasa3.png" alt="">
-                <p>Medaljons</p>
-            </div>
-            <div class="krasa">
-                <img src="images/krasa4.png" alt="">
-                <p>Lāsteka</p>
-            </div>
-            <div class="krasa">
-                <img src="images/krasa4.png" alt="">
-                <p>Mālu rāmis</p>
-            </div>
-            <div class="krasa">
-                <img src="images/krasa4.png" alt="">
-                <p>Mālu lietussargs</p>
+    <h1>Izveidojiet savu pielāgoto produktu</h1>
+    
+    <?php if (isset($error_message)): ?>
+        <div class="error-message">
+            <p><?php echo $error_message; ?></p>
+        </div>
+    <?php endif; ?>
+    
+    <div class="custom-product-container">
+        <div class="form-section">
+            <h2>Produkta specifikācijas</h2>
+            <p class="form-description">
+                Izvēlieties materiālus un dizainu savam pielāgotajam produktam. 
+                Jūs varat izvēlēties no mūsu pieejamajiem materiāliem vai aprakstīt savas vēlmes.
+            </p>
+            
+            <form id="custom-product-form" method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" enctype="multipart/form-data">
+                
+                <!-- Product Specifications -->
+                <div class="form-group">
+                    <label for="forma">Forma*:</label>
+                    <select id="forma" name="forma">
+                        <option value="">Izvēlieties formu</option>
+                        <?php foreach ($formas as $forma): ?>
+                            <option value="<?= $forma['id_forma'] ?>"><?= htmlspecialchars($forma['forma']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="audums">Audums*:</label>
+                    <select id="audums" name="audums">
+                        <option value="">Izvēlieties audumu</option>
+                        <?php foreach ($audumi as $audums): ?>
+                            <option value="<?= $audums['id_audums'] ?>"><?= htmlspecialchars($audums['nosaukums']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <!-- Malu figura with images -->
+                <div class="form-group">
+                    <label for="malu_figura">Malu figūra*:</label>
+                    <select id="malu_figura" name="malu_figura" onchange="updateImageDisplay('malu_figura')">
+                        <option value="">Izvēlieties malu figūru</option>
+                        <?php foreach ($malu_figuras as $figura): ?>
+                            <option value="<?= $figura['id_malu_figura'] ?>" 
+                                    data-image="<?= !empty($figura['attels']) ? base64_encode($figura['attels']) : '' ?>">
+                                <?= htmlspecialchars($figura['nosaukums']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div id="malu_figura_image" class="material-image-preview" style="display: none;">
+                        <img src="" alt="Malu figūra" />
+                    </div>
+                </div>
+                
+                <!-- Dekorejums 1 with images -->
+                <div class="form-group">
+                    <label for="dekorejums1">Dekorējums 1*:</label>
+                    <select id="dekorejums1" name="dekorejums1" onchange="updateImageDisplay('dekorejums1')">
+                        <option value="">Izvēlieties dekorējumu</option>
+                        <?php foreach ($dekorejumi1 as $dekorejums): ?>
+                            <option value="<?= $dekorejums['id_dekorejums1'] ?>" 
+                                    data-image="<?= !empty($dekorejums['attels']) ? base64_encode($dekorejums['attels']) : '' ?>">
+                                <?= htmlspecialchars($dekorejums['nosaukums']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div id="dekorejums1_image" class="material-image-preview" style="display: none;">
+                        <img src="" alt="Dekorējums 1" />
+                    </div>
+                </div>
+                
+                <!-- Dekorejums 2 with images -->
+                <div class="form-group">
+                    <label for="dekorejums2">Dekorējums 2*:</label>
+                    <select id="dekorejums2" name="dekorejums2" onchange="updateImageDisplay('dekorejums2')">
+                        <option value="">Izvēlieties dekorējumu</option>
+                        <?php foreach ($dekorejumi2 as $dekorejums): ?>
+                            <option value="<?= $dekorejums['id_dekorejums2'] ?>" 
+                                    data-image="<?= !empty($dekorejums['attels']) ? base64_encode($dekorejums['attels']) : '' ?>">
+                                <?= htmlspecialchars($dekorejums['nosaukums']) ?>
+            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div id="dekorejums2_image" class="material-image-preview" style="display: none;">
+                        <img src="" alt="Dekorējums 2" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="daudzums">Daudzums*:</label>
+                    <input type="number" id="daudzums" name="daudzums" min="1" value="1" required>
+                </div>
+                
+                <!-- Contact Information -->
+                <h2>Kontaktinformācija</h2>
+                
+                <div class="form-group">
+                    <label for="vards">Vārds*:</label>
+                    <input type="text" id="vards" name="vards" value="<?= htmlspecialchars($user['vards'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="uzvards">Uzvārds*:</label>
+                    <input type="text" id="uzvards" name="uzvards" value="<?= htmlspecialchars($user['uzvards'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="epasts">E-pasts*:</label>
+                    <input type="email" id="epasts" name="epasts" value="<?= htmlspecialchars($user['epasts'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="talrunis">Tālrunis*:</label>
+                    <input type="text" id="talrunis" name="talrunis" value="<?= htmlspecialchars($user['talrunis'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adrese">Adrese*:</label>
+                    <input type="text" id="adrese" name="adrese" value="<?= htmlspecialchars($user['adrese'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pilseta">Pilsēta*:</label>
+                    <input type="text" id="pilseta" name="pilseta" value="<?= htmlspecialchars($user['pilseta'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pasta_indekss">Pasta indekss*:</label>
+                    <input type="text" id="pasta_indekss" name="pasta_indekss" value="<?= htmlspecialchars($user['pasta_indekss'] ?? '') ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="piezimes">Papildu piezīmes:</label>
+                    <textarea id="piezimes" name="piezimes" rows="4" placeholder="Jebkādas papildu piezīmes par jūsu pieprasījumu"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" name="submit_custom_order" class="btn btn-primary">Nosūtīt pieprasījumu</button>
+                    <a href="produkcija.php" class="btn btn-secondary">Atgriezties pie produktiem</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="info-section">
+            <h2>Kā tas darbojas?</h2>
+            <div class="info-card">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Aizpildiet formu</h3>
+                        <p>Izvēlieties materiālus un aprakstiet savu vēlamo produktu</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Mēs sazināsimies</h3>
+                        <p>Mūsu komanda sazināsies ar Jums, kad noteiksim cenu un termiņu</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Jūsu apstiprinājums</h3>
+                        <p>Pēc individuālā cenas aprēķina mēs ar Jums sazināsimies apstiprināšanai</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Izgatavošana</h3>
+                        <p>Pēc apstiprināšanas sāksim jūsu produkta izgatavošanu</p>
+                    </div>
+                </div>
             </div>
             
-        </div>
-        <div class="box">
-            <h3>Pamatkrāsas:</h3>
-            <div class="krasa">
-                <img src="images/krasa1.png" alt="">
-                <p>Baltā</p>
+            <div class="info-note">
+                <h3>Svarīga informācija:</h3>
+                <ul>
+                    <li>Pielāgotos produktus nav iespējams atgriezt</li>
+                    <li>Izgatavošanas laiks: 7-14 darba dienas</li>
+                    <li>Cena tiks aprēķināta individuāli</li>
+                    <li>Apmaksa pēc cenas apstiprināšanas</li>
+                </ul>
             </div>
-            <div class="krasa">
-                <img src="images/krasa2.png" alt="">
-                <p>Bēšs</p>
-            </div>
-            <div class="krasa">
-                <img src="images/krasa3.png" alt="">
-                <p>Rozā</p>
-            </div>
-            <div class="krasa">
-                <img src="images/krasa4.png" alt="">
-                <p>Pelēka</p>
-            </div>
-        </div>
-        <div class="box">
-            <h3>Mālu figūras:</h3>
-            <div class="krasa">
-                <img src="images/figuri1.jpg" alt="">
-                <p>Rāmis</p>
-            </div>
-            <div class="krasa">
-                <img src="images/figuri2.jpg" alt="">
-                <p>Lācis</p>
-            </div>
-            <div class="krasa">
-                <img src="images/figuri3.jpg" alt="">
-                <p>Logi</p>
-            </div>
-            <div class="krasa">
-                <img src="images/figuri4.jpg" alt="">
-                <p>Putns</p>
-            </div>
-            <div class="krasa">
-                <img src="images/figuri5.jpg" alt="">
-                <p>Karuselis</p>
-            </div>
-            <div class="krasa">
-                <img src="images/figuri6.jpg" alt="">
-                <p>Enģelis</p>
-            </div>
-        </div>
-        <div class="box">
-            <h3>Dekorējums:</h3>
-            <div class="krasa">
-                <img src="images/cveti.jpg" alt="">
-                <p>Dekoratīvie ziedi</p>
-            </div>
-            <div class="krasa">
-                <img src="images/kamni.jpg" alt="">
-                <p>Sudraba dekorējumi</p>
-            </div>
-            <div class="krasa">
-                <img src="images/kamni2.jpg" alt="">
-                <p>Zelta dekorējumi</p>
-            </div>
-            <div class="krasa">
-                <img src="images/kamni2.jpg" alt="">
-                <p>Baltie dekorējumi</p>
-            </div>
-            <div class="krasa">
-                <img src="images/kamni2.jpg" alt="">
-                <p>Roza dekorējumi</p>
-            </div>
-         
         </div>
     </div>
-
 </section>
+
+<style>
+
+</style>
+
+<script>
+
+// Function to update image display when material is selected
+function updateImageDisplay(selectId) {
+    const select = document.getElementById(selectId);
+    const imageContainer = document.getElementById(selectId + '_image');
+    const img = imageContainer.querySelector('img');
+    
+    const selectedOption = select.options[select.selectedIndex];
+    const imageData = selectedOption.getAttribute('data-image');
+    
+    if (imageData && imageData !== '') {
+        img.src = 'data:image/jpeg;base64,' + imageData;
+        imageContainer.style.display = 'block';
+    } else {
+        imageContainer.style.display = 'none';
+    }
+}
+</script>
+
 <?php
-    require 'footer.php'
+// Close database connection
+$savienojums->close();
+// Include footer
+include 'footer.php';
 ?>

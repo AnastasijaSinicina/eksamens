@@ -51,40 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    var mainSlider = new Splide('#main-slider', {
-        type: 'fade',
-        rewind: true,
-        pagination: false,
-        arrows: false,
-    });
-
-    var thumbnailSlider = new Splide('#thumbnail-slider', {
-        fixedWidth: 100,
-        fixedHeight: 60,
-        gap: 10,
-        rewind: true,
-        pagination: false,
-        cover: true,
-        isNavigation: true,
-        focus: 'center',
-        breakpoints: {
-            600: {
-                fixedWidth: 60,
-                fixedHeight: 44,
-            },
-        },
-    });
-
-    mainSlider.sync(thumbnailSlider);
-    mainSlider.mount();
-    thumbnailSlider.mount();
-});
-
-
-
-
-
 $(document).ready(function() {
 
     fetchProdukcija();
@@ -118,26 +84,8 @@ $(document).ready(function() {
     
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const menuBtn = document.getElementById('menu-btn');
-    const nav = document.querySelector('header .nav');
-    
-    menuBtn.addEventListener('click', function() {
-        nav.classList.toggle('active');
-        this.querySelector('i').classList.toggle('fa-bars');
-        this.querySelector('i').classList.toggle('fa-times');
-    });
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!nav.contains(event.target) && !menuBtn.contains(event.target) && nav.classList.contains('active')) {
-            nav.classList.remove('active');
-            menuBtn.querySelector('i').classList.add('fa-bars');
-            menuBtn.querySelector('i').classList.remove('fa-times');
-        }
-    });
-});
 
+//-----------------------------------------------------------------------------------------PASŪTĪJUMA VEIDOŠANA-------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', function() {
     const paymentBtn = document.getElementById('payment-btn');
@@ -319,3 +267,141 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+
+/*------------------------------------------------------------------PROFILS----------------------------------------------------------------------------------*/
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    
+    // Order filter functionality
+    const filterButtons = document.querySelectorAll('.filter-button');
+    const orderItems = document.querySelectorAll('.order-item');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all filter buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            // Get selected status/type
+            const selectedStatus = button.getAttribute('data-status');
+            const selectedType = button.getAttribute('data-type');
+            
+            // Filter orders
+            orderItems.forEach(item => {
+                const itemStatus = item.getAttribute('data-status');
+                const itemType = item.getAttribute('data-type');
+                let show = false;
+                
+                if (selectedStatus === 'all') {
+                    show = true;
+                } else if (selectedType) {
+                    show = (itemType === selectedType);
+                } else if (selectedStatus) {
+                    show = (itemStatus === selectedStatus);
+                }
+                
+                item.style.display = show ? 'block' : 'none';
+            });
+        });
+    });
+    
+    // Konta dzēšanas modāļa funkcionalitāte
+    const deleteBtn = document.getElementById('delete-account-btn');
+    const deleteModal = document.getElementById('delete-confirmation');
+    const cancelBtn = document.getElementById('cancel-delete');
+    
+    if (deleteBtn && deleteModal && cancelBtn) {
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'flex';
+        });
+        
+        cancelBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'none';
+        });
+        
+        // Aizvērt modālu, kad noklikšķina ārpus tā
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        });
+    }
+
+    // Paroles validācija
+    const newPassword = document.getElementById('new_password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    if (newPassword && confirmPassword) {
+        function checkPasswordMatch() {
+            const existingIcons = confirmPassword.parentElement.querySelectorAll('.icon-container');
+            existingIcons.forEach(icon => icon.remove());
+            
+            if (confirmPassword.value === '') {
+                return;
+            }
+            
+            const iconContainer = document.createElement('span');
+            iconContainer.className = 'icon-container';
+            
+            if (newPassword.value === confirmPassword.value) {
+                iconContainer.classList.add('match-container', 'visible');
+                iconContainer.innerHTML = '<i class="fas fa-check password-match-icon"></i>';
+            } else {
+                iconContainer.classList.add('mismatch-container', 'visible');
+                iconContainer.innerHTML = '<i class="fas fa-times password-mismatch-icon"></i>';
+            }
+            
+            confirmPassword.parentElement.style.position = 'relative';
+            confirmPassword.parentElement.appendChild(iconContainer);
+        }
+        
+        newPassword.addEventListener('input', checkPasswordMatch);
+        confirmPassword.addEventListener('input', checkPasswordMatch);
+        
+        const passwordForm = document.querySelector('.password-form');
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', function(event) {
+                if (newPassword.value !== confirmPassword.value) {
+                    event.preventDefault();
+                    alert('Paroles nesakrīt!');
+                    return false;
+                }
+            });
+        }
+    }
+});
+
+
+// Attēla priekšskatījuma funkcija
+window.previewImage = function(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        const imagePreview = document.querySelector('.image-preview');
+        const imagePlaceholder = document.getElementById('image-placeholder');
+        
+        reader.onload = function(e) {
+            if (imagePreview) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            } else {
+                const newImg = document.createElement('img');
+                newImg.src = e.target.result;
+                newImg.alt = 'Profila attēls';
+                newImg.className = 'image-preview';
+                document.querySelector('.current-image').appendChild(newImg);
+            }
+            
+            if (imagePlaceholder) {
+                imagePlaceholder.style.display = 'none';
+            }
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+};
+
+/*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/

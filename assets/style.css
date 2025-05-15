@@ -1166,96 +1166,215 @@ footer img{
 	margin: 0 8rem;
 }
 /*------------------------------------------------------------------Materiali----------------------------------------------------------------------------------------*/
-
-#materiali .box-container{
-    margin-top: 3rem;
+#materiali {
+    padding: 4rem 6%;
+}
+#materiali h1 {
     text-align: center;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
+    margin-bottom: 2rem;
+    color: var(--tumsa);
 }
-#materiali .box{
-    width: auto;
-    padding: 3rem;
-    border-radius: .5rem;
-    box-shadow: var(--box-shadow);
+#materiali .custom-product-container {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin: 2rem 0;
-}
-#materiali .krasa{
-    display: flex;
-    flex-direction: column;
-    margin: 1rem;
-}
-#materiali .krasa img{
-    width: 16rem;
-    box-shadow: 0 0 2rem #4747473d;
-    transition: transform .8s ease; 
-}
-#materiali .krasa p{
-    margin-top: .5rem;
-    font-size: 1.2rem;
-}
-#materiali .krasa img:hover{
-    transform: scale(1.03);
-}
-#materiali .dropdown {
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    width: 60rem;
+    gap: 2rem;
+    max-width: 1200px;
     margin: 0 auto;
-    border: solid .2rem var(--maincolor);
-    border-radius: .5rem;
 }
-#materiali #drop {
-    display: flex;
-    flex-direction: column;
-    margin: 2rem 0;
+#materiali .form-section {
+    flex: 1 1 65%;
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
 }
-#materiali label {
-    font-weight: bold;
+#materiali .info-section {
+    flex: 1 1 30%;
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+#materiali .form-description {
+    color: var(--text);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    background-color: var(--light2);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--maincolor);
+}
+#materiali .form-section h2 {
+    color: var(--tumsa);
+    margin-bottom: 1.5rem;
+    margin-top: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--light3);
+}
+#materiali .form-section h2:first-of-type {
+    margin-top: 0;
+}
+#materiali .form-group {
+    margin-bottom: 1.5rem;
+}
+#materiali .form-group label {
+    display: block;
+    font-weight: 500;
     color: var(--tumsa);
     margin-bottom: 0.5rem;
-    padding: .5rem;
 }
-#radio {
-    display: flex;
-    justify-content: space-between; 
-    flex-wrap: nowrap; 
-}
-.radio-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    margin-right: 20px; 
-}
-#materiali select {
-    padding: 0.5rem;
-    margin: 1rem;
+#materiali .form-group input,
+#materiali .form-group select,
+#materiali .form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--light3);
+    border-radius: 0.5rem;
     font-size: 1rem;
-    border: 2px solid var(--maincolor);
-    background-color: var(--light1);
     color: var(--text);
-    border-radius: 5px;
-    box-shadow: var(--box-shadow);
+    background-color: white;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+#materiali .form-group input:focus,
+#materiali .form-group select:focus,
+#materiali .form-group textarea:focus {
+    border-color: var(--maincolor);
+    box-shadow: 0 0 0.5rem rgba(3, 135, 206, 0.3);
     outline: none;
-    width: 50rem;
 }
-#materiali select:focus {
-    border-color: var(--tumsa);
-    box-shadow: 0 0 5px var(--tumsa);
+#materiali .form-group small {
+    display: block;
+    color: var(--text);
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
 }
-#materiali h3{
+#materiali .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Material Image Preview Styles */
+#materiali .material-image-preview {
+    margin-top: 1rem;
     text-align: center;
-    color: var(--tumsa);
-    margin-bottom: 2rem;
-    font-size: 1.5rem;
+    background-color: var(--light2);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border: 1px solid var(--light3);
 }
+#materiali .material-image-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+#materiali .material-image-preview img:hover {
+    transform: scale(1.05);
+}
+#materiali .form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+#materiali .btn-primary {
+    background-color: var(--tumsa);
+    color: white;
+}
+#materiali .btn-primary:hover {
+    background-color: var(--maincolor);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(3, 135, 206, 0.3);
+}
+#materiali .btn-secondary {
+    background-color: var(--light3);
+    color: var(--tumsa);
+    border: 2px solid var(--light3);
+}
+#materiali .btn-secondary:hover {
+    background-color: var(--tumsa);
+    color: white;
+    border-color: var(--tumsa);
+}
+#materiali .info-section h2 {
+    color: var(--tumsa);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+#materiali .info-card {
+    background-color: var(--light2);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+#materiali .step {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+#materiali .step:last-child {
+    margin-bottom: 0;
+}
+#materiali .step-number {
+    background-color: var(--maincolor);
+    color: white;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-right: 1rem;
+}
+#materiali .step-content h3 {
+    color: var(--tumsa);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+#materiali .step-content p {
+    color: var(--text);
+    line-height: 1.5;
+    margin: 0;
+}
+#materiali .info-note {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+#materiali .info-note h3 {
+    color: var(--tumsa);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+#materiali .info-note ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+#materiali .info-note li {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+#materiali .error-message {
+    background-color: #ffebee;
+    color: #d32f2f;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /*----------------------------------------------------------------------------kontakti-------------------------------------------------------------*/
 #kontakti {
     padding: 4rem 6%; 
@@ -2115,7 +2234,7 @@ footer img{
     background-color: #fff8e1;
     color: #ffa000;
 }
-#pasutijums-apstiprinats .status.aizsūtīts {
+#pasutijums-apstiprinats .status.nosūtīts {
     background-color: #e8f5e9;
     color: #388e3c;
 }
@@ -2452,6 +2571,7 @@ footer img{
     flex-direction: column;
     gap: 1.5rem;
 }
+
 #profils .order-item {
     background-color: white;
     border-radius: 1rem;
@@ -2460,6 +2580,12 @@ footer img{
     border: 1px solid var(--light3);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+#profils .order-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
 #profils .order-header {
     display: flex;
     justify-content: space-between;
@@ -2468,6 +2594,37 @@ footer img{
     background-color: var(--light3);
     border-bottom: 1px solid var(--light3);
 }
+
+#profils .order-status-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#profils .expand-button {
+    background-color: var(--tumsa2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+#profils .expand-button:hover {
+    background-color: var(--light1);
+    transform: translateY(-2px);
+    color: var(--tumsa2);
+}
+
+#profils .expand-button i {
+    transition: transform 0.3s ease;
+}
+
 #profils .btn-success {
     background-color: #28a745;
     color: white;
@@ -2506,6 +2663,7 @@ footer img{
     font-size: 1.4rem;
     font-weight: 600;
 }
+
 #profils .order-date {
     font-size: 0.9rem;
     color: var(--text);
@@ -2516,31 +2674,34 @@ footer img{
 #profils .order-status {
     display: flex;
     align-items: center;
-    gap: 1rem;
     padding: 0.5rem 1rem;
     border-radius: 2rem;
     font-size: 0.9rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    justify-content: space-between;
 }
+
 #profils .order-status.iesniegts {
     background-color: #e3f2fd;
     color: #1976d2;
 }
+
 #profils .order-status.apstiprināts {
     background-color: #fff8e1;
     color: #ffa000;
 }
-#profils .order-status.aizsūtīts {
+
+#profils .order-status.nosūtīts {
     background-color: #e8f5e9;
     color: #388e3c;
 }
+
 #profils .order-status.saņemts {
     background-color: #f3e5f5;
     color: #7b1fa2;
 }
+
 /* Order filters styles */
 #profils .order-filters {
     display: flex;
@@ -2552,7 +2713,7 @@ footer img{
 #profils .filter-button {
     padding: 8px 16px;
     border: 1px solid #ddd;
-    border-radius:2rem;
+    border-radius: 2rem;
     background: white;
     font-size: 14px;
     cursor: pointer;
@@ -2582,7 +2743,7 @@ footer img{
     border-color: #ffa000;
 }
 
-#profils .filter-button.order-status.aizsūtīts {
+#profils .filter-button.order-status.nosūtīts {
     background-color: #e8f5e9;
     color: #388e3c;
     border-color: #388e3c;
@@ -2605,7 +2766,7 @@ footer img{
     color: white;
 }
 
-#profils .filter-button.order-status.active.aizsūtīts {
+#profils .filter-button.order-status.active.nosūtīts {
     background-color: #388e3c;
     color: white;
 }
@@ -2614,16 +2775,35 @@ footer img{
     background-color: #7b1fa2;
     color: white;
 }
+
+/* Order details - initially hidden */
 #profils .order-details {
     padding: 1.5rem;
     background-color: white;
+    border-top: 1px solid var(--light3);
+    animation: slideDown 0.3s ease-out;
 }
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding: 0 1.5rem;
+    }
+    to {
+        opacity: 1;
+        max-height: 1000px;
+        padding: 1.5rem;
+    }
+}
+
 #profils .order-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
+
 #profils .order-summary,
 #profils .order-address {
     background-color: white;
@@ -2632,50 +2812,60 @@ footer img{
     border-radius: 0.75rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 #profils .summary-item {
     display: flex;
     justify-content: space-between;
     padding: 0.75rem 0;
     border-bottom: 1px solid var(--light3);
 }
+
 #profils .summary-item:last-child {
     border-bottom: none;
 }
+
 #profils .summary-item .label {
     color: var(--text);
     font-weight: 500;
 }
+
 #profils .summary-item .value {
     color: var(--tumsa);
     font-weight: 600;
 }
+
 #profils .order-address h4 {
     color: var(--tumsa);
     margin-bottom: 1rem;
     font-size: 1.1rem;
     font-weight: 600;
 }
+
 #profils .order-address p {
     margin: 0.5rem 0;
     color: var(--text);
     line-height: 1.5;
 }
+
 #profils .order-items {
     background-color: white;
-    padding: 1.5rem;
+    padding: .5rem 1.5rem;
     border-radius: 0.75rem;
 }
+
 #profils .order-items h4 {
     color: var(--tumsa);
     margin-bottom: 1.5rem;
     font-size: 1.1rem;
     font-weight: 600;
 }
+
 #profils .items-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
+
 #profils .item-card {
     background-color: white;
     border-radius: 0.5rem;
@@ -2684,6 +2874,7 @@ footer img{
     border: 2px dashed #ddd;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 #profils .item-image {
     width: 10rem;
     height: 10rem;
@@ -2691,55 +2882,113 @@ footer img{
     overflow: hidden;
     border-radius: 0.5rem;
 }
+
 #profils .item-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 #profils .item-info h5 {
     color: var(--tumsa);
     font-size: 1rem;
     margin-bottom: 0.5rem;
     font-weight: 600;
 }
+
 #profils .item-info p {
     margin: 0.25rem 0;
     font-size: 0.9rem;
 }
+
 #profils .item-price {
     color: var(--tumsa);
     font-weight: 600;
 }
+
 #profils .item-quantity {
     color: var(--text);
 }
+
 #profils .item-total {
     color: var(--tumsa);
     font-weight: 600;
     margin-top: 0.5rem;
 }
+
+#profils .custom-badge {
+    background-color: var(--maincolor);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    letter-spacing: 0.5px;
+}
+
+#profils .custom-specs {
+    background-color: var(--light3);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+#profils .spec-item {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.3rem;
+    border-left: 3px solid var(--maincolor);
+}
+
+#profils .spec-item.full-width {
+    grid-column: 1 / -1;
+}
+
+#profils .spec-label {
+    font-weight: 600;
+    color: var(--tumsa);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+#profils .spec-value {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
 #profils .empty-orders {
     text-align: center;
     padding: 3rem;
     background-color: var(--light3);
     border-radius: 1rem;
 }
+
 #profils .empty-icon {
     font-size: 4rem;
     color: var(--light1);
     margin-bottom: 1.5rem;
 }
+
 #profils .empty-orders h3 {
     color: var(--tumsa);
     margin-bottom: 1rem;
     font-size: 1.5rem;
     font-weight: 600;
 }
+
 #profils .empty-orders p {
     color: var(--text);
     margin-bottom: 2rem;
     font-size: 1.1rem;
 }
+
+
 #profils .settings-form {
     max-width: 600px;
     margin: 0 auto;
@@ -3221,9 +3470,6 @@ footer img{
     .slider-container {
         width: 95%;
     }
-    #parMums h2 {
-        font-size: 2rem;
-    }
     .news-item.featured {
         flex-direction: column;
     }
@@ -3236,6 +3482,13 @@ footer img{
     #pasutisana .order-summary,
     #pasutisana .checkout-form {
         flex-basis: 100%;
+    }
+    #materiali .custom-product-container {
+        flex-direction: column;
+    }
+    #materiali .info-section {
+        position: relative;
+        top: auto;
     }
 }
 /* -----------------------------------------------------------------------------------900px-------------------------------------------------------------------------- */
@@ -3359,20 +3612,6 @@ footer img{
     }
     [id$="-thumbnail-slider"] .splide__slide img {
         height: 40px; /* Smaller thumbnails */
-    }
-    #parmums h2{
-        font-size: 1.2rem;
-    }
-    #parmums p{
-        font-size: 1rem;
-    }
-    #parmums .box{
-        padding: 1rem .5rem;
-    }
-    #parmums .box i{
-        width: 3rem;
-        height: 3rem;
-        line-height: 3rem;
     }
     #custom-design h1{
         font-size: 1.5rem;
@@ -3532,34 +3771,6 @@ footer img{
         from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
         to { transform: translateX(-50%) translateY(0); opacity: 1; }
     }
-    #parMums .box {
-        flex-direction: column;
-        height: auto;
-        text-align: center;
-        justify-content: center;
-        align-items: center;
-        padding: 1.5rem;
-    }
-    #parMums .box img {
-        width: 80%;
-        max-width: 18rem;
-        margin: 0 auto 1.5rem auto;
-    }
-    #parMums .box p {
-        text-align: center;
-    }
-    button.prev, button.next {
-        padding: 0.5rem 0.8rem;
-        font-size: 1rem;
-    }
-    #parMums .box-darbinieki {
-        flex-direction: column;
-        align-items: center;
-    }
-    #parMums .darbinieks {
-        width: 90%;
-        max-width: 25rem;
-    }
     .news-grid {
         grid-template-columns: 1fr;
     }
@@ -3579,16 +3790,6 @@ footer img{
         gap: 1rem;
         text-align: center;
     }
-    
-    #profils .order-info {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    #profils .items-grid {
-        grid-template-columns: 1fr;
-    }
-    
     #profils .profile-tabs {
         flex-direction: column;
     }
@@ -3608,6 +3809,23 @@ footer img{
     #profils .order-address p {
         font-size: 1rem;
     }
+    #profils .order-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    #profils .order-status-section {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    #profils .order-info {
+        grid-template-columns: 1fr;
+    }
+    
+    #profils .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
     #pasutijums-apstiprinats .actions {
         flex-direction: column;
         gap: 1rem;
@@ -3626,6 +3844,27 @@ footer img{
     #pasutijums-apstiprinats .item-total {
         margin-left: 0;
         margin-top: 1rem;
+    }
+    #materiali {
+        padding: 2rem 4%;
+    }
+    #materiali .form-section,
+    #materiali .info-section {
+        padding: 1.5rem;
+    }
+    #materiali .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #materiali  .step {
+        flex-direction: column;
+        text-align: center;
+    }
+    #materiali .step-number {
+        margin: 0 auto 1rem auto;
+    }
+    #materiali .material-image-preview img {
+        max-height: 150px;
     }
 }
 
@@ -3770,29 +4009,21 @@ footer img{
     .notification-message {
         font-size: 0.9rem;
     }
-    #parMums {
-        padding: 1rem 0.5rem;
-    }    
-    .slider-container {
-        width: 100%;
-    }   
-    #parMums .box {
-        padding: 1rem;
-        border-radius: 0.5rem;
-    }
-    #parMums h2 {
-        font-size: 1.5rem;
-    }
-    button.prev, button.next {
-        margin: 0 0.5rem;
-        padding: 0.4rem 0.6rem;
-    }
-    #parMums .citats {
-        padding: 0.8rem;
-    }
         #profils .order-status, #profils .btn-success{
         font-size: .7rem;
         padding: .4rem .5rem;
+    }
+    #materiali {
+        padding: 1.5rem 3%;
+    }
+    #materiali .form-section,
+    #materiali .info-section {
+        padding: 1rem;
+    }
+    #materiali .form-group input,
+    #materiali .form-group select,
+    #materiali .form-group textarea {
+        padding: 0.6rem;
     }
     
 }

@@ -31,7 +31,7 @@ $stmt->execute();
 $user_result = $stmt->get_result();
 $user = $user_result->fetch_assoc();
 
-// Get order information - UPDATED: Added piegades_veids
+// Get order information - UPDATED: Added pasutijuma_numurs
 $order_query = "SELECT * FROM sparkly_pasutijumi WHERE id_pasutijums = ? AND lietotajs_id = ?";
 $order_stmt = $savienojums->prepare($order_query);
 $order_stmt->bind_param("ii", $order_id, $user['id_lietotajs']);
@@ -66,7 +66,8 @@ include 'header.php';
             <i class="fas fa-check-circle"></i>
         </div>
         <h1>Pasūtījums pieņemts!</h1>
-        <p>Jūsu pasūtījums Nr. <?= $order_id ?> ir veiksmīgi pieņemts.</p>
+        <!-- Display both order ID and order number -->
+        <p>Jūsu pasūtījums Nr. <?= $order['pasutijuma_numurs'] ?> ir veiksmīgi pieņemts.</p>
         
         <?php if (isset($_SESSION['pazinojums'])): ?>
             <div class="success-message">
@@ -81,8 +82,9 @@ include 'header.php';
             <div class="order-info">
                 <div class="info-row">
                     <span>Pasūtījuma numurs:</span>
-                    <span>#<?= $order_id ?></span>
+                    <span>#<?= $order['pasutijuma_numurs'] ?></span>
                 </div>
+
                 <div class="info-row">
                     <span>Datums:</span>
                     <span><?= date('d.m.Y H:i', strtotime($order['pas_datums'])) ?></span>
@@ -95,7 +97,7 @@ include 'header.php';
                     <span>Apmaksas veids:</span>
                     <span><?= $order['apmaksas_veids'] ?></span>
                 </div>
-                <!-- NEW: Display delivery method -->
+                <!-- Display delivery method -->
                 <div class="info-row">
                     <span>Piegādes veids:</span>
                     <span><?= $order['piegades_veids'] ?></span>
