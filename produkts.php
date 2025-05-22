@@ -2,6 +2,10 @@
 require 'admin/db/con_db.php'; // Database connection
 require 'header.php';
 
+if (isset($_GET['id'])) {
+    $_SESSION['redirect_after_login'] = "produkts.php?id=" . intval($_GET['id']);
+}
+
 if (isset($_SESSION['pazinojums'])) {
     echo "<script>
         document.addEventListener('DOMContentLoaded', function() {

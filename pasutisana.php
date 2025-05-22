@@ -106,11 +106,14 @@ if (isset($_POST['submit_order'])) {
     $status = 'Iesniegts';
     
     try {
+        // Start transaction to ensure atomicity
+        $savienojums->autocommit(FALSE);
+        
         // Generate unique order number
         $unique_order_number = generateUniqueOrderNumber($savienojums);
         error_log("Generated unique order number: " . $unique_order_number);
         
-        // Updated query to include pasutijuma_numurs
+        // Insert the order
         $insert_order = $savienojums->prepare("INSERT INTO sparkly_pasutijumi (lietotajs_id, pasutijuma_numurs, kopeja_cena, apmaksas_veids, piegades_veids, produktu_skaits, vards, uzvards, epasts, talrunis, pilseta, adrese, pasta_indeks, statuss) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $insert_order->bind_param("iidssissssssss", 
             $user['id_lietotajs'],
@@ -129,48 +132,64 @@ if (isset($_POST['submit_order'])) {
             $status
         );
         
-        if ($insert_order->execute()) {
-            $pasutijums_id = $savienojums->insert_id;
-            error_log("Order created with ID: " . $pasutijums_id);
-
-            foreach ($cart_items as $item) {
-                
-                $insert_items = $savienojums->prepare("INSERT INTO sparkly_pasutijuma_vienumi 
-                                (pasutijuma_id, produkta_id, daudzums_no_groza, cena) 
-                                VALUES (?, ?, ?, ?)");
-                
-                $insert_items->bind_param("iiid", 
-                    $pasutijums_id, 
-                    $item['bumba_id'], 
-                    $item['daudzums'], 
-                    $item['cena']
-                );
-                
-                if (!$insert_items->execute()) {
-                    error_log("SQL Error in order item insertion: " . $insert_items->error);
-                    $error_message = "Kļūda veidojot pasūtījumu: " . $insert_items->error;
-                }
-            }
-            
-            $update_cart = $savienojums->prepare("UPDATE grozs_sparkly SET statuss = 'pasūtīts' WHERE lietotajvards = ? AND statuss = 'aktīvs'");
-            $update_cart->bind_param("s", $username);
-            
-            if ($update_cart->execute()) {
-                error_log("Cart updated to 'pasūtīts' status");
-            } else {
-                error_log("Error updating cart: " . $update_cart->error);
-            }
-            
-            $_SESSION['pazinojums'] = "Pasūtījums veiksmīgi noformēts!";
-            error_log("Redirecting to confirmation page");
-            header("Location: pasutijums_apstiprinats.php?id=" . $pasutijums_id);
-            exit();
-        } else {
-            error_log("Error inserting order: " . $insert_order->error);
-            $error_message = "Kļūda veidojot pasūtījumu. Lūdzu, mēģiniet vēlreiz.";
+        if (!$insert_order->execute()) {
+            throw new Exception("Failed to insert order: " . $insert_order->error);
         }
+        
+        $pasutijums_id = $savienojums->insert_id;
+        error_log("Order created with ID: " . $pasutijums_id);
+
+        // Insert order items
+        foreach ($cart_items as $item) {
+            $insert_items = $savienojums->prepare("INSERT INTO sparkly_pasutijuma_vienumi 
+                            (pasutijuma_id, produkta_id, daudzums_no_groza, cena) 
+                            VALUES (?, ?, ?, ?)");
+            
+            $insert_items->bind_param("iiid", 
+                $pasutijums_id, 
+                $item['bumba_id'], 
+                $item['daudzums'], 
+                $item['cena']
+            );
+            
+            if (!$insert_items->execute()) {
+                throw new Exception("Failed to insert order item: " . $insert_items->error);
+            }
+        }
+        
+        // Update cart status
+        $update_cart = $savienojums->prepare("UPDATE grozs_sparkly SET statuss = 'pasūtīts' WHERE lietotajvards = ? AND statuss = 'aktīvs'");
+        $update_cart->bind_param("s", $username);
+        
+        if (!$update_cart->execute()) {
+            throw new Exception("Failed to update cart: " . $update_cart->error);
+        }
+        
+        // INCREMENT USER ORDER COUNT - THIS IS THE NEW PART
+        $update_order_count = $savienojums->prepare("UPDATE lietotaji_sparkly SET pas_skaits = pas_skaits + 1 WHERE id_lietotajs = ?");
+        $update_order_count->bind_param("i", $user['id_lietotajs']);
+        
+        if (!$update_order_count->execute()) {
+            throw new Exception("Failed to update user order count: " . $update_order_count->error);
+        }
+        
+        error_log("User order count incremented for user ID: " . $user['id_lietotajs']);
+        
+        // Commit transaction
+        $savienojums->commit();
+        $savienojums->autocommit(TRUE);
+        
+        $_SESSION['pazinojums'] = "Pasūtījums veiksmīgi noformēts!";
+        error_log("Redirecting to confirmation page");
+        header("Location: pasutijums_apstiprinats.php?id=" . $pasutijums_id);
+        exit();
+        
     } catch (Exception $e) {
-        error_log("Error generating order number: " . $e->getMessage());
+        // Rollback transaction on error
+        $savienojums->rollback();
+        $savienojums->autocommit(TRUE);
+        
+        error_log("Error creating order: " . $e->getMessage());
         $error_message = "Kļūda veidojot pasūtījumu. Lūdzu, mēģiniet vēlreiz.";
     }
 }

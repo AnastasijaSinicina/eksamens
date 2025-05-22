@@ -15,6 +15,9 @@ if (!isset($_SESSION['lietotajvardsSIN'])) {
 // Get current user's username
 $username = $_SESSION['lietotajvardsSIN'];
 
+// Include cart items query from admin/db
+require "admin/db/grozs.php";
+
 // Include header
 include 'header.php';
 ?>
@@ -29,40 +32,21 @@ include 'header.php';
         });
     </script>
     <?php unset($_SESSION['pazinojums']); ?>
-<?php endif; ?>
+    <?php endif; ?>
     
-    <?php
-    // Include database connection
-    require "admin/db/con_db.php";
-    
-    // Get cart items from database
-    $query = "SELECT g.*, p.nosaukums, p.cena, p.attels1 
-              FROM grozs_sparkly g 
-              JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
-              WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
-    $stmt = $savienojums->prepare($query);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows == 0) {
-        // Empty cart
-        ?>
+    <?php if (!$has_items): ?>
         <div class="empty-cart">
             <i class="fa-solid fa-cart-shopping empty-cart-icon"></i>
             <h2>Jūsu grozs ir tukšs</h2>
             <p>Pievienojiet preces savam grozam, lai veiktu pasūtījumu</p>
             <a href="produkcija.php" class="btn">Turpināt iepirkties</a>
         </div>
-        <?php
-    } else {
-        // Display cart items
-        $totalPrice = 0;
-        ?>
+    <?php else: ?>
         <div class="cart-container">
             <div class="cart-items">
                 <?php
-                while ($item = $result->fetch_assoc()) {
+                $totalPrice = 0;
+                foreach ($cart_items as $item) {
                     $itemTotal = $item['cena'] * $item['daudzums'];
                     $totalPrice += $itemTotal;
                     ?>
@@ -77,13 +61,11 @@ include 'header.php';
                         </div>
                         
                         <div class="cart-item-quantity">
-                            <form action="admin/db/update_cart.php" method="post" class="quantity-form">
+                            <form action="admin/db/update_grozs.php" method="post" class="quantity-form">
                                 <input type="hidden" name="id" value="<?= $item['id_grozs'] ?>">
                                 <button type="submit" name="decrease" class="quantity-btn">-</button>
                                 <span><?= $item['daudzums'] ?></span>
                                 <button type="submit" name="increase" class="quantity-btn">+</button>
-                                
-                                
                             </form>
                         </div>
                         
@@ -92,7 +74,7 @@ include 'header.php';
                         </div>
                         
                         <div class="cart-item-remove">
-                            <form action="admin/db/update_cart.php" method="post">
+                            <form action="admin/db/update_grozs.php" method="post">
                                 <input type="hidden" name="id" value="<?= $item['id_grozs'] ?>">
                                 <button type="submit" name="remove" class="remove-btn">
                                     <i class="fa-solid fa-trash"></i>
@@ -112,22 +94,19 @@ include 'header.php';
                 <a href="pasutisana.php" class="btn full">Pasūtīt</a>
                 <a href="produkcija.php" class="btn full">Turpināt iepirkties</a>
                 
-                <form action="admin/db/update_cart.php" method="post">
+                <form action="admin/db/update_grozs.php" method="post">
                     <input type="hidden" name="user" value="<?= $username ?>">
                     <button type="submit" name="clear" class="btn clear-btn">Iztīrīt grozu</button>
                 </form>
             </div>
         </div>
-    <?php
-    }
-    
-    // Close the statement and connection
-    $stmt->close();
-    $savienojums->close();
-    ?>
+    <?php endif; ?>
 </section>
 
 <?php
+// Close database connection
+$savienojums->close();
+
 // Include footer
 include 'footer.php';
 ?>

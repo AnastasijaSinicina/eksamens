@@ -28,7 +28,7 @@
         <nav class="sidebar-nav">
             <ul class="nav-list primary-nav">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="index.php" class="nav-link">
                         <span class="nav-icon">
                             <i class="fa-solid fa-house"></i>
                         </span>

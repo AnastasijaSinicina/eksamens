@@ -219,11 +219,8 @@
                 
                 <div class="form-group">
                     <label for="parole">Parole:<?php echo $editData ? ' (atstājiet tukšu, lai nemainītu)' : ''; ?></label>
-<<<<<<< HEAD
                     <input type="password" id="parole" name="parole" <?php echo $editData ? '' : 'required'; ?> autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
-=======
                     <input type="password" id="parole" name="parole" <?php echo $editData ? '' : 'required'; ?>>
->>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
                 </div>
                 
                 <div class="form-group">

@@ -1,12 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Goudy+Bookletter+1911&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 :root{
-    --maincolor:  #0387ce;
+    --maincolor:  #151A2D;
     --text: #454545;
     --light1: #d0e3ff;
     --light2: #e7f1ff;
     --light3: #e6ebf1;
 	--tumsa:  #081f5c;
-    --tumsa2: #151A2D;
     --gradient: linear-gradient(#F1FAFF, #dbecff);
 	--box-shadow: 0 0 .6rem #4747473d;
     --box-shadow2: 0 0 .6rem #7096d1;
@@ -37,7 +36,7 @@ body{
 }
 
 header {
-    background-color: var(--tumsa2);
+    background-color: var(--maincolor);
     color: var(--text);
     width: 98%;
     width: 100wh;
@@ -80,9 +79,6 @@ h2{
 	flex-direction: row;
 	justify-content: center;
 }
-p{
-	padding: 0 1rem;
-}
 span{
 	color: var(--tumsa);
 	text-shadow: 1px 1px 1px rgb(73, 103, 194);
@@ -94,7 +90,7 @@ span{
     font-size: 1.1rem;
     text-align: center;
     color: var(--light3);
-    background: var(--tumsa2);
+    background: var(--maincolor);
     z-index: 1;
     font-weight: bold;
 	text-decoration: none;
@@ -151,7 +147,7 @@ span{
     transition: 0.7s ease;
 }
 .nav a:hover {
-    color: var(--tumsa2);
+    color: var(--maincolor);
     background: #fff;
 }
 .nav a:hover::before {
@@ -169,8 +165,8 @@ span{
     position: absolute;
     top: -10px;
     right: -10px;
-    background-color: var(--maincolor);
-    color: white;
+    background-color: var(--light2);
+    color: var(--maincolor);
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -506,7 +502,7 @@ section{
     .newsletter {
         margin-top: 4rem;
         text-align: center;
-        background-color: var(--tumsa2);
+        background-color: var(--maincolor);
         padding: 3rem;
         border-radius: 1rem;
         color: white;
@@ -854,124 +850,7 @@ section{
     border-radius: 0.3rem;
 }
 /*----------------------------------------------------------------Atsauksmes---------------------------------------------------------------------------------------------*/
-#atsauksmes h1{
-    color: var(--light1);
-    margin-bottom: 2rem;
-}
-#atsauksmesNew h1{
-    color: var(--tumsa2);
-    margin-bottom: 2rem;
-}
-#atsauksmes {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    padding: 4rem 6%;
-    text-align: center;
-    background: var(--tumsa2);
-    color: var(--light1);
-    min-height: 40rem;
-}
-#atsauksmesNew {
-    width: 100%;
-    height: auto;
-    padding: 4rem 6%;
-    text-align: center;
-    background: var(--gradient);
-    color: var(--light1);
-}
-#atsauksmes .box-container{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 2rem;
-    margin: 2rem 0;
-}
-#atsauksmesNew .box-container{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-    margin: 2rem 0;
-}
-#atsauksmes .box, #atsauksmesNew .box{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-direction: row;
-    width: 30rem; 
-    padding: 1.5rem;
-    border: solid 2px var(--maincolor);
-    box-shadow: 0 0 .3rem #6699ff;
-    border-radius: .5rem;
-    background-color: rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-#atsauksmesNew .box {
-    width: 45%;
-    min-width: 30rem;
-    margin: 1rem;
-    background: var(--tumsa2);
-}
-#atsauksmes .box:hover, #atsauksmesNew .box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 1rem #6699ff;
-}
-#atsauksmes .text, #atsauksmesNew .text{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    height: auto;
-    min-height: 10rem;
-    width: 65%;
-    padding: 0 0 0 1rem;
-    margin: 0;
-}
-#atsauksmes h3, #atsauksmesNew h3 {
-    color: var(--light1);
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    text-align: left;
-}
-#atsauksmes img{
-    width: 30%;
-    height: auto;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--light1);
-}
-#atsauksmesNew img {
-    width: 30%;
-    height: auto;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--light1);
-}
-#atsauksmes .text div, #atsauksmesNew .text div {
-    text-align: left;
-    margin-bottom: 0.5rem;
-}
-#atsauksmes i, #atsauksmesNew i{
-    color: yellow;
-    margin: 0 .2rem;
-    font-size: 1rem;
-}
-#atsauksmes p, #atsauksmesNew p {
-    text-align: left;
-    font-size: 1rem;
-    line-height: 1.5;
-}
-#atsauksmes .btn {
-    border: 2px solid var(--light1);
-}
-#atsauksmes .btn:hover, #atsauksmesNew .btn:hover {
-    background-color: var(--light1);
-    color: var(--tumsa);
-}
+
 /*--------------------------------------------------------------Par Mums------------------------------------------------------------------------------------------------------------*/
 #parMums {
     text-align: center;
@@ -1492,7 +1371,7 @@ footer img{
     width: 100%;
     border: none;
     cursor: pointer;
-    background-color: var(--tumsa2);
+    background-color: var(--maincolor);
     color: white;
     border-radius: 0.5rem;
     transition: background-color 0.3s ease;
@@ -1507,7 +1386,7 @@ footer img{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: var(--tumsa2);
+    background-color: var(--maincolor);
     color: white;
     padding: 1.5rem;
     border-radius: 0.5rem;
@@ -1585,21 +1464,7 @@ footer img{
     font-size: 1.1rem;
     max-width: 600px;
 }
-.empty-cart .btn {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--tumsa);
-    color: white;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-block;
-}
-.empty-cart .btn:hover {
-    background-color: var(--maincolor);
-    transform: translateY(-2px);
-}
+
 .cart-container {
     display: flex;
     flex-wrap: wrap;
@@ -2027,7 +1892,7 @@ footer img{
 }
 
 #pasutisana .modal-header h2 {
-    color: var(--tumsa2);
+    color: var(--maincolor);
     margin: 0;
     font-size: 1.3rem;
 }
@@ -2041,7 +1906,7 @@ footer img{
 }
 
 #pasutisana .modal-close:hover {
-    color: var(--tumsa2);
+    color: var(--maincolor);
 }
 
 #pasutisana .modal-body {
@@ -2065,7 +1930,7 @@ footer img{
 }
 
 #pasutisana .payment-option:hover {
-    border-color: var(--tumsa2);
+    border-color: var(--maincolor);
     background-color: #f8f9ff;
 }
 
@@ -2075,12 +1940,12 @@ footer img{
 }
 
 #pasutisana .payment-option input[type="radio"]:checked + .payment-label {
-    color: var(--tumsa2);
+    color: var(--maincolor);
     font-weight: 600;
 }
 
 #pasutisana .payment-option:has(input[type="radio"]:checked) {
-    border-color: var(--tumsa2);
+    border-color: var(--maincolor);
     background-color: #f8f9ff;
 }
 
@@ -2135,12 +2000,12 @@ footer img{
 
 #pasutisana .courier-notice i {
     font-size: 2.5rem;
-    color: var(--tumsa2);
+    color: var(--maincolor);
     margin-bottom: 1rem;
 }
 
 #pasutisana .courier-notice h3 {
-    color: var(--tumsa2);
+    color: var(--maincolor);
     margin-bottom: 0.8rem;
     font-size: 1.3rem;
 }
@@ -2152,13 +2017,13 @@ footer img{
 }
 
 #pasutisana .payment-option.selected {
-    border-color: var(--tumsa2);
+    border-color: var(--maincolor);
     background-color: #f8f9ff;
     opacity: 0.8;
 }
 
 #pasutisana .payment-option input[type="radio"]:disabled + .payment-label {
-    color: var(--tumsa2);
+    color: var(--maincolor);
     font-weight: 600;
 }
 
@@ -2370,7 +2235,7 @@ footer img{
     align-items: center;
     gap: 1.5rem;
     padding: 2rem;
-    background-color: var(--tumsa2);
+    background-color: var(--maincolor);
     color: var(--light3);
 }
 #profils .profile-avatar {
@@ -2555,14 +2420,14 @@ footer img{
     gap: 0.5rem;
     cursor: pointer;
     text-decoration: none;
-    background-color: var(--tumsa2);
+    background-color: var(--maincolor);
     color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 0.5rem;
     transition: all 0.3s ease;
 }
 #profils .image-actions label.btn:hover {
-    color: var(--tumsa2);
+    color: var(--maincolor);
     background-color: var(--light1);
     transform: translateY(-2px);
 }
@@ -2602,7 +2467,7 @@ footer img{
 }
 
 #profils .expand-button {
-    background-color: var(--tumsa2);
+    background-color: var(--maincolor);
     color: white;
     padding: 0.5rem 1rem;
     border: none;
@@ -2618,7 +2483,7 @@ footer img{
 #profils .expand-button:hover {
     background-color: var(--light1);
     transform: translateY(-2px);
-    color: var(--tumsa2);
+    color: var(--maincolor);
 }
 
 #profils .expand-button i {
@@ -3338,7 +3203,7 @@ footer img{
         top: 56px;
         left: 13px;
         right: 13px;
-        background: var(--tumsa2);
+        background: var(--maincolor);
         flex-direction: column;
         margin-left: 0;
         padding: 10px;
@@ -3431,9 +3296,6 @@ footer img{
     }
     .material-item img {
         max-width: 150px;
-    }
-    #atsauksmesNew .box {
-        width: 80%;
     }
     .contact-container {
         flex-direction: column;
@@ -3638,27 +3500,6 @@ footer img{
     }
     .material-slider-container h3 {
         font-size: 1.5rem;
-    }
-    #atsauksmes .box, #atsauksmesNew .box {
-        flex-direction: column;
-        width: 90%;
-        margin: 1rem auto;
-        padding: 1.5rem;
-    }
-    #atsauksmes .text, #atsauksmesNew .text {
-        width: 100%;
-        margin-top: 1rem;
-        padding: 0;
-    }
-    #atsauksmes img, #atsauksmesNew img {
-        width: 50%;
-        height: auto;
-        margin: 0 auto 1rem auto;
-    }
-    #atsauksmes h3, #atsauksmesNew h3,
-    #atsauksmes .text div, #atsauksmesNew .text div,
-    #atsauksmes p, #atsauksmesNew p {
-        text-align: center;
     }
     .profile-header {
         flex-direction: column;

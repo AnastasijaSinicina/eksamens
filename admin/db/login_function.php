@@ -51,28 +51,22 @@ if (isset($_SESSION['pending_product'])) {
     // Set success message
     $_SESSION['pazinojums'] = "Prece pievienota grozam!";
 }
-
-            // Redirect based on role
-            // Redirect based on role
-            // Check if there's a redirect URL set in session
             if (isset($_SESSION['redirect_after_login'])) {
                 $redirect = $_SESSION['redirect_after_login'];
                 unset($_SESSION['redirect_after_login']);
-                header("Location: ../../" . $redirect); // Redirect to the stored URL
+                header("Location: ../../" . $redirect); 
             } else {
                 // Default redirects based on role
                 if ($lietotajs['loma'] === "admin" || $lietotajs['loma'] === "moder") {
-                    header("Location: ../index.php"); // Redirect to admin dashboard
+                    header("Location: ../index.php"); 
                 } elseif ($lietotajs['loma'] === "klients") {
                     header("Location: ../../index.php"); // Redirect to client dashboard
-                } else {
-                    header("Location: ../../login.php"); // Redirect back to login on unknown role
                 }
             }
             exit();
         } else {
             // Invalid password
-            $_SESSION['pazinojums'] = "Nepareizs lietotājvārds vai parole!";
+            $_SESSION['pazinojums'] = "Nepareiza parole!";
             header("Location: ../../login.php");
             exit();
         }

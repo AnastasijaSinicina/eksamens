@@ -1,13 +1,11 @@
 <?php
-// Start session
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
+// Set redirect BEFORE checking login status
+$_SESSION['redirect_after_login'] = "materiali.php";
 
 // Check if user is logged in
 if (!isset($_SESSION['lietotajvardsSIN'])) {
     $_SESSION['pazinojums'] = "Lūdzu ielogojieties, lai izveidotu pielāgotu produktu";
-    $_SESSION['redirect_after_login'] = "materiali.php";
     header("Location: login.php");
     exit();
 }
@@ -23,6 +21,8 @@ $user_stmt->bind_param("s", $username);
 $user_stmt->execute();
 $user_result = $user_stmt->get_result();
 $user = $user_result->fetch_assoc();
+
+// Rest of your code remains the same...
 if (isset($_POST['submit_custom_order'])) {
     // Define required fields
     $required_fields = [
@@ -64,107 +64,43 @@ if (isset($_POST['submit_custom_order'])) {
     if (!empty($errors)) {
         $error_message = "Lūdzu izlabojiet šādas kļūdas:<br>• " . implode("<br>• ", $errors);
     } else {
-        // Proceed with form submission if validation passes
-        $vards = htmlspecialchars($_POST['vards']);
-        $uzvards = htmlspecialchars($_POST['uzvards']);
-        $epasts = htmlspecialchars($_POST['epasts']);
-        $talrunis = htmlspecialchars($_POST['talrunis']);
-        $adrese = htmlspecialchars($_POST['adrese']);
-        $pilseta = htmlspecialchars($_POST['pilseta']);
-        $pasta_indekss = htmlspecialchars($_POST['pasta_indekss']);
+        // Include the custom order insertion file
+        require "admin/db/spec_pas.php";
         
-        // Product specifications
-        $forma = htmlspecialchars($_POST['forma']);
-        $audums = htmlspecialchars($_POST['audums']);
-        $malu_figura = htmlspecialchars($_POST['malu_figura'] ?? '');
-        $dekorejums1 = htmlspecialchars($_POST['dekorejums1'] ?? '');
-        $dekorejums2 = htmlspecialchars($_POST['dekorejums2'] ?? '');
-        $daudzums = intval($_POST['daudzums']);
-        $piezimes = htmlspecialchars($_POST['piezimes']);
-
-        // Insert custom order
-        $insert_query = "INSERT INTO sparkly_spec_pas 
-                        (lietotajs_id, vards, uzvards, epasts, talrunis, adrese, pilseta, pasta_indekss, 
-                         forma, audums, malu_figura, dekorejums1, dekorejums2, 
-                         daudzums, piezimes, statuss) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Iesniegts')";
+        // Prepare data for insertion
+        $order_data = [
+            'vards' => htmlspecialchars($_POST['vards']),
+            'uzvards' => htmlspecialchars($_POST['uzvards']),
+            'epasts' => htmlspecialchars($_POST['epasts']),
+            'talrunis' => htmlspecialchars($_POST['talrunis']),
+            'adrese' => htmlspecialchars($_POST['adrese']),
+            'pilseta' => htmlspecialchars($_POST['pilseta']),
+            'pasta_indekss' => htmlspecialchars($_POST['pasta_indekss']),
+            'forma' => htmlspecialchars($_POST['forma']),
+            'audums' => htmlspecialchars($_POST['audums']),
+            'malu_figura' => htmlspecialchars($_POST['malu_figura'] ?? ''),
+            'dekorejums1' => htmlspecialchars($_POST['dekorejums1'] ?? ''),
+            'dekorejums2' => htmlspecialchars($_POST['dekorejums2'] ?? ''),
+            'daudzums' => intval($_POST['daudzums']),
+            'piezimes' => htmlspecialchars($_POST['piezimes'])
+        ];
         
-        $stmt = $savienojums->prepare($insert_query);
+        // Insert the order
+        $result = insertCustomOrder($user['id_lietotajs'], $order_data);
         
-        if ($stmt === false) {
-            $error_message = "Database prepare error: " . $savienojums->error;
+        if ($result['success']) {
+            $_SESSION['pazinojums'] = "Jūsu pielāgotā produkta pieprasījums ir veiksmīgi nosūtīts! Mēs sazināsimies ar jums drīzumā.";
+            header("Location: profils.php");
+            exit();
         } else {
-            $stmt->bind_param("issssssssssssis", 
-                $user['id_lietotajs'], $vards, $uzvards, $epasts, $talrunis, $adrese, $pilseta, $pasta_indekss,
-                $forma, $audums, $malu_figura, $dekorejums1, $dekorejums2,
-                $daudzums, $piezimes
-            );
-            
-            if ($stmt->execute()) {
-                $_SESSION['pazinojums'] = "Jūsu pielāgotā produkta pieprasījums ir veiksmīgi nosūtīts! Mēs sazināsimies ar jums drīzumā.";
-                header("Location: profils.php");
-                exit();
-            } else {
-                $error_message = "Kļūda nosūtot pieprasījumu: " . $stmt->error;
-            }
-            $stmt->close();
+            $error_message = "Kļūda nosūtot pieprasījumu: " . $result['error'];
         }
     }
 }
-// Fetch materials for dropdowns (including images)
-$formas = [];
-$check_formas = "SHOW TABLES LIKE 'sparkly_formas'";
-if ($savienojums->query($check_formas)->num_rows > 0) {
-    $formas_query = "SELECT * FROM sparkly_formas  WHERE id_forma = 1 OR id_forma = 2 OR id_forma = 3 ORDER BY forma";
-    $formas_result = $savienojums->query($formas_query);
-    while ($forma = $formas_result->fetch_assoc()) {
-        $formas[] = $forma;
-    }
-}
-
-$audumi = [];
-$check_audums = "SHOW TABLES LIKE 'sparkly_audums'";
-if ($savienojums->query($check_audums)->num_rows > 0) {
-    $audums_query = "SELECT * FROM sparkly_audums WHERE id_audums = 1 OR id_audums = 2 OR id_audums = 3 OR id_audums = 4 ORDER BY nosaukums";
-    $audums_result = $savienojums->query($audums_query);
-    while ($audums = $audums_result->fetch_assoc()) {
-        $audumi[] = $audums;
-    }
-}
-
-$malu_figuras = [];
-$check_figuras = "SHOW TABLES LIKE 'sparkly_malu_figura'";
-if ($savienojums->query($check_figuras)->num_rows > 0) {
-    $figuras_query = "SELECT * FROM sparkly_malu_figura ORDER BY nosaukums";
-    $figuras_result = $savienojums->query($figuras_query);
-    while ($figura = $figuras_result->fetch_assoc()) {
-        $malu_figuras[] = $figura;
-    }
-}
-
-$dekorejumi1 = [];
-$check_dekorejums1 = "SHOW TABLES LIKE 'sparkly_dekorejums1'";
-if ($savienojums->query($check_dekorejums1)->num_rows > 0) {
-    $dekorejums1_query = "SELECT * FROM sparkly_dekorejums1 ORDER BY nosaukums";
-    $dekorejums1_result = $savienojums->query($dekorejums1_query);
-    while ($dekorejums = $dekorejums1_result->fetch_assoc()) {
-        $dekorejumi1[] = $dekorejums;
-    }
-}
-
-$dekorejumi2 = [];
-$check_dekorejums2 = "SHOW TABLES LIKE 'sparkly_dekorejums2'";
-if ($savienojums->query($check_dekorejums2)->num_rows > 0) {
-    $dekorejums2_query = "SELECT * FROM sparkly_dekorejums2 ORDER BY nosaukums";
-    $dekorejums2_result = $savienojums->query($dekorejums2_query);
-    while ($dekorejums = $dekorejums2_result->fetch_assoc()) {
-        $dekorejumi2[] = $dekorejums;
-    }
-}
+require "admin/db/materiali.php";
 
 include 'header.php';
 ?>
-
 <section id="materiali">
     <h1>Izveidojiet savu pielāgoto produktu</h1>
     
@@ -248,7 +184,7 @@ include 'header.php';
                             <option value="<?= $dekorejums['id_dekorejums2'] ?>" 
                                     data-image="<?= !empty($dekorejums['attels']) ? base64_encode($dekorejums['attels']) : '' ?>">
                                 <?= htmlspecialchars($dekorejums['nosaukums']) ?>
-            </option>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                     <div id="dekorejums2_image" class="material-image-preview" style="display: none;">
