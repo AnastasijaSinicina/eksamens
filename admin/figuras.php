@@ -1,132 +1,6 @@
 <?php
     // Include admin header
     require 'header.php';
-    
-    // Database connection
-    require 'db/con_db.php';
-
-    // Handle figure deletion
-    if (isset($_GET['delete'])) {
-        $id = $_GET['delete'];
-        $sql = "DELETE FROM sparkly_malu_figura WHERE id_malu_figura = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        
-        if ($stmt->execute()) {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Malu figūra ir izdzēsta.');
-                    });
-                  </script>";
-        } else {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('error', 'Kļūda!', 'Neizdevās dzēst malu figūru.');
-                    });
-                  </script>";
-        }
-        $stmt->close();
-    }
-
-    // Handle figure addition/update
-    if (isset($_POST['submit'])) {
-        $nosaukums = $_POST['nosaukums'];
-        
-        // Check if it's an update or add operation
-        if (isset($_POST['id']) && !empty($_POST['id'])) {
-            // Update existing figure
-            $id = $_POST['id'];
-            
-            // Initialize SQL parts
-            $sql_parts = ["nosaukums = ?"];
-            $params = [$nosaukums];
-            $types = "s";
-            
-            // Handle image update if provided
-            if (isset($_FILES["attels"]) && $_FILES["attels"]['error'] == 0) {
-                $image = file_get_contents($_FILES["attels"]['tmp_name']);
-                $sql_parts[] = "attels = ?";
-                $params[] = $image;
-                $types .= "b"; // binary data
-            }
-            
-            // Add ID parameter
-            $params[] = $id;
-            $types .= "i";
-            
-            // Create final SQL query
-            $sql = "UPDATE sparkly_malu_figura SET " . implode(", ", $sql_parts) . " WHERE id_malu_figura = ?";
-            $stmt = $savienojums->prepare($sql);
-            
-            // Dynamically bind parameters
-            $stmt->bind_param($types, ...$params);
-            
-            if ($stmt->execute()) {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('success', 'Veiksmīgi!', 'Malu figūra ir atjaunināta.');
-                        });
-                      </script>";
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Neizdevās atjaunināt malu figūru: " . $stmt->error . "');
-                        });
-                      </script>";
-            }
-            $stmt->close();
-            
-        } else {
-            // Add new figure
-            // Check if image is provided
-            if (isset($_FILES['attels']) && $_FILES['attels']['error'] == 0) {
-                $image = file_get_contents($_FILES['attels']['tmp_name']);
-                
-                $sql = "INSERT INTO sparkly_malu_figura (nosaukums, attels) VALUES (?, ?)";
-                $stmt = $savienojums->prepare($sql);
-                $stmt->bind_param("sb", $nosaukums, $image);
-                
-                if ($stmt->execute()) {
-                    echo "<script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                showNotification('success', 'Veiksmīgi!', 'Malu figūra ir pievienota.');
-                            });
-                          </script>";
-                } else {
-                    echo "<script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                showNotification('error', 'Kļūda!', 'Neizdevās pievienot malu figūru: " . $stmt->error . "');
-                            });
-                          </script>";
-                }
-                $stmt->close();
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Lūdzu, augšupielādējiet attēlu.');
-                        });
-                      </script>";
-            }
-        }
-        
-        // Redirect to clear the form
-        echo "<script>window.location.href = 'figuras.php';</script>";
-    }
-
-    // Get figure data for editing
-    $editData = null;
-    if (isset($_GET['edit'])) {
-        $id = $_GET['edit'];
-        $sql = "SELECT * FROM sparkly_malu_figura WHERE id_malu_figura = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $editData = $result->fetch_assoc();
-        }
-        $stmt->close();
-    }
 ?>
 
 <main>
@@ -138,7 +12,29 @@
             <p>Darbība veiksmīgi izpildīta.</p>
         </div>
     </div>
-
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <div class="confirm-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="confirm-modal-title">Apstiprināt darbību</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <p class="confirm-modal-message" id="confirmMessage">
+                    Vai tiešām vēlaties dzēst šo vienumu?
+                </p>
+                <div class="confirm-modal-buttons">
+                    <button class="confirm-btn confirm-btn-danger" id="confirmYes">
+                        <i class="fas fa-trash-alt"></i> Dzēst
+                    </button>
+                    <button class="confirm-btn confirm-btn-cancel" id="confirmNo">
+                        <i class="fas fa-times"></i> Atcelt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <section class="admin-content">
         <h1>Malu Figūru pārvaldība</h1>
         
@@ -146,7 +42,7 @@
         <div class="product-table-container">
             <div class="table-header">
                 <h2>Esošās malu figūras</h2>
-                <a href="figuras.php?action=add" class="btn add-btn"><i class="fas fa-plus"></i></a>
+                <button onclick="openAddModal()" class="btn "><i class="fas fa-plus"></i></button>
             </div>
             
             <div class="table-responsive">
@@ -156,92 +52,199 @@
                             <th>ID</th>
                             <th>Nosaukums</th>
                             <th>Attēls</th>
-                            <th>Datums</th>
+                            <th>Pievienošanas datums</th>
+                            <th>Pēdējās izmaiņas</th>
                             <th>Darbības</th>
                         </tr>
                     </thead>
-                    <tbody>     
-                        <?php
-                            // Fetch all figures
-                            $sql = "SELECT * FROM sparkly_malu_figura ORDER BY id_malu_figura";
-                            $result = $savienojums->query($sql);
-                            
-                            if ($result && $result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td>{$row['id_malu_figura']}</td>";
-                                    echo "<td>{$row['nosaukums']}</td>";
-                                    
-                                    // Display image
-                                    if (!empty($row['attels'])) {
-                                        echo "<td><img src='data:image/jpeg;base64," . base64_encode($row['attels']) . "' alt='{$row['nosaukums']}' width='50'></td>";
-                                    } else {
-                                        echo "<td>Nav attēla</td>";
-                                    }
-                                    
-                                    // Get date
-                                    $datums = isset($row['datums']) ? $row['datums'] : date('Y-m-d H:i:s');
-                                    echo "<td>{$datums}</td>";
-                                    
-                                    echo "<td class='action-buttons'>";
-                                    echo "<a href='figuras.php?edit={$row['id_malu_figura']}' class='btn edit-btn'><i class='fas fa-edit'></i> Rediģēt</a>";
-                                    echo "<a href='figuras.php?delete={$row['id_malu_figura']}' class='btn delete-btn' onclick='return confirm(\"Vai tiešām vēlaties dzēst šo malu figūru?\")'><i class='fas fa-trash-alt'></i> Dzēst</a>";
-                                    echo "</td>";
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='5' class='no-records'>Nav atrasta neviena malu figūra</td></tr>";
-                            }
-                        ?>
+                    <tbody id="figuras-table-body">     
+                        <!-- Table content will be loaded via JavaScript -->
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <?php 
-        // Show the form only when adding or editing
-        if (isset($_GET['action']) && $_GET['action'] == 'add' || isset($_GET['edit'])): 
-        ?>
-        <!-- Form for adding/editing -->
-        <div class="custom-form-container">
-            <h2><?php echo $editData ? 'Rediģēt malu figūru' : 'Pievienot jaunu malu figūru'; ?></h2>
-            <form class="custom-form" method="POST" enctype="multipart/form-data">
-                <?php if ($editData): ?>
-                    <input type="hidden" name="id" value="<?php echo $editData['id_malu_figura']; ?>">
-                <?php endif; ?>
-                
-                <div class="dropdown">
-                    <div id="drop">
-                        <label for="nosaukums">Nosaukums:</label>
-                        <input type="text" id="nosaukums" name="nosaukums" value="<?php echo $editData ? $editData['nosaukums'] : ''; ?>" required>
-                    </div>
-                    
-                    <div id="drop">
-                        <label for="attels">Attēls:</label>
-                        <?php if ($editData && !empty($editData["attels"])): ?>
-                            <div class="current-image">
+        <!-- Modal for Add/Edit Figures -->
+        <div id="figuras-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Pievienot jaunu malu figūru</h2>
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="figuras-form-element" enctype="multipart/form-data">
+                        <input type="hidden" id="figura-id" name="id">
+                        
+                        <div class="form-group">
+                            <label for="nosaukums">Nosaukums:</label>
+                            <input type="text" id="nosaukums" name="nosaukums" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="attels">Attēls:</label>
+                            <div id="current-image" style="display: none;">
                                 <p>Pašreizējais attēls:</p>
-                                <img src="data:image/jpeg;base64,<?php echo base64_encode($editData["attels"]); ?>" alt="Malu figūras attēls" width="100">
+                                <img id="current-image-preview" alt="Malu figūras attēls" width="100">
                             </div>
-                        <?php endif; ?>
-                        <input type="file" id="attels" name="attels" <?php echo (!$editData) ? 'required' : ''; ?>>
-                        <small>Atbalstītie formāti: JPG, JPEG, PNG</small>
-                    </div>
+                            <input type="file" id="attels" name="attels" accept="image/*">
+                            <small>Atbalstītie formāti: JPG, JPEG, PNG</small>
+                        </div>
+                        
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">Pievienot malu figūru</button>
+                            <button type="button" onclick="closeModal()" class="btn btn-secondary">Atcelt</button>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="form-buttons">
-                    <button type="submit" name="submit" class="btn"><?php echo $editData ? 'Atjaunināt malu figūru' : 'Pievienot malu figūru'; ?></button>
-                    <a href="figuras.php" class="btn clear-btn">Atcelt</a>
-                </div>
-            </form>
+            </div>
         </div>
-        <?php endif; ?>
         
     </section>
 </main>
 
-<!-- JavaScript for notifications -->
+<!-- JavaScript for managing figuras -->
 <script>
+    let editMode = false;
+
+    // Function definitions
+    function openAddModal() {
+        editMode = false;
+        document.getElementById('modal-title').textContent = 'Pievienot jaunu malu figūru';
+        document.getElementById('submit-btn').textContent = 'Pievienot malu figūru';
+        document.getElementById('figuras-form-element').reset();
+        document.getElementById('figura-id').value = '';
+        document.getElementById('current-image').style.display = 'none';
+        document.getElementById('attels').required = true;
+        document.getElementById('figuras-modal').style.display = 'block';
+    }
+
+    function openEditModal(id) {
+        editMode = true;
+        document.getElementById('modal-title').textContent = 'Rediģēt malu figūru';
+        document.getElementById('submit-btn').textContent = 'Atjaunināt malu figūru';
+        
+        // Fetch figura data
+        fetch(`db/materiali.php?fetch_figuras_single=1&id=${id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                document.getElementById('figura-id').value = data.id_malu_figura;
+                document.getElementById('nosaukums').value = data.nosaukums;
+                
+                if (data.attels) {
+                    document.getElementById('current-image').style.display = 'block';
+                    // Image data is now base64 encoded from PHP
+                    document.getElementById('current-image-preview').src = `data:image/jpeg;base64,${data.attels}`;
+                }
+                
+                document.getElementById('attels').required = false;
+                document.getElementById('figuras-modal').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching figura:', error);
+            showNotification('error', 'Kļūda!', 'Neizdevās ielādēt malu figūras datus.');
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('figuras-modal').style.display = 'none';
+    }
+
+    function deleteFigura(id) {
+    showConfirmModal(
+        'Vai tiešām vēlaties dzēst šo mālu figūru? Šī darbība ir neatgriezeniska.',
+        function() {
+            // Confirmed - proceed with deletion
+            const formData = new FormData();
+            formData.append('delete_figura', '1');
+            formData.append('id', id);
+            
+            fetch('db/materiali_delete.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification('success', 'Veiksmīgi!', data.message);
+                    loadAudums();
+                } else {
+                    showNotification('error', 'Kļūda!', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting figūra:', error);
+                showNotification('error', 'Kļūda!', 'Neizdevās dzēst mālu figūru.');
+            });
+        }
+    );
+}
+
+
+    function loadFiguras() {
+        fetch('db/materiali.php?fetch_figuras=1')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.getElementById('figuras-table-body');
+            tbody.innerHTML = '';
+            
+            if (data.length > 0) {
+                data.forEach(figura => {
+                    const datums = figura.datums || new Date().toISOString().slice(0, 19).replace('T', ' ');
+                    
+                    // Handle image display
+                    let imageHtml = 'Nav attēla';
+                    if (figura.attels) {
+                        // Image data is now base64 encoded from PHP
+                        imageHtml = `<img src="data:image/jpeg;base64,${figura.attels}" alt="${figura.nosaukums}" width="50">`;
+                    }
+                    
+                    // Format last modified info
+                    let lastModified = '';
+                    if (figura.red_dat && figura.red_liet_name) {
+                        const modifiedDate = new Date(figura.red_dat).toLocaleString('lv-LV');
+                        lastModified = `${figura.red_liet_name}<br><small>${modifiedDate}</small>`;
+                    } else if (figura.datums && figura.izveidots_liet_name) {
+                        const createdDate = new Date(figura.datums).toLocaleString('lv-LV');
+                        lastModified = `${figura.izveidots_liet_name}<br><small>${createdDate}</small>`;
+                    }
+                    
+                    const row = `
+                        <tr>
+                            <td>${figura.id_malu_figura}</td>
+                            <td>${figura.nosaukums}</td>
+                            <td>${imageHtml}</td>
+                            <td>${datums}</td>
+                            <td>${lastModified}</td>
+                            <td class='action-buttons'>
+                                <button onclick="openEditModal(${figura.id_malu_figura})" class='btn edit-btn'><i class='fas fa-edit'></i></button>
+                                <button onclick="deleteFigura(${figura.id_malu_figura})" class='btn delete-btn'><i class='fas fa-trash-alt'></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = "<tr><td colspan='6' class='no-records'>Nav atrasta neviena malu figūra</td></tr>";
+            }
+        })
+        .catch(error => {
+            console.error('Error loading figuras:', error);
+            showNotification('error', 'Kļūda!', 'Neizdevās ielādēt malu figūras.');
+        });
+    }
+
     function showNotification(type, title, message) {
         const container = document.querySelector('.notification-container');
         const notification = document.querySelector('.notification');
@@ -265,5 +268,47 @@
             container.style.display = 'none';
         }, 5000);
     }
-</script>
 
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFiguras();
+        
+        // Handle form submission - ONLY ONCE!
+        document.getElementById('figuras-form-element').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const endpoint = editMode ? 'db/materiali_edit.php' : 'db/materiali_add.php';
+            const action = editMode ? 'edit_figura' : 'add_figura';
+            
+            formData.append(action, '1');
+            
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification('success', 'Veiksmīgi!', data.message);
+                    closeModal();
+                    loadFiguras();
+                } else {
+                    showNotification('error', 'Kļūda!', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving figura:', error);
+                showNotification('error', 'Kļūda!', 'Neizdevās saglabāt malu figūru.');
+            });
+        });
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('figuras-modal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>

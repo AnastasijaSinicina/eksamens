@@ -1,124 +1,6 @@
 <?php
     // Include admin header
     require 'header.php';
-    
-    // Database connection
-    require 'db/con_db.php';
-
-    // Handle user deletion
-    if (isset($_GET['delete'])) {
-        $id = $_GET['delete'];
-        $sql = "DELETE FROM lietotaji_sparkly WHERE id_lietotajs = ? AND (loma = 'admin' OR loma = 'moder')";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        
-        if ($stmt->execute()) {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Lietotājs ir izdzēsts.');
-                    });
-                  </script>";
-        } else {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('error', 'Kļūda!', 'Neizdevās dzēst lietotāju.');
-                    });
-                  </script>";
-        }
-        $stmt->close();
-    }
-
-    // Handle user addition/update
-    if (isset($_POST['submit'])) {
-        $vards = $_POST['vards'];
-        $uzvards = $_POST['uzvards'];
-        $lietotajvards = $_POST['lietotajvards'];
-        $epasts = $_POST['epasts'];
-        $parole = $_POST['parole'];
-        $loma = $_POST['loma'];
-        
-        // Ensure loma is only admin or moder
-        if ($loma != 'admin' && $loma != 'moder') {
-            $loma = 'moder'; // Default to moder if invalid value is passed
-        }
-        
-        // Check if we're updating or adding
-        if (isset($_POST['id']) && !empty($_POST['id'])) {
-            // Update existing user
-            $id = $_POST['id'];
-            
-            // Check if password was provided for update
-            if (!empty($parole)) {
-                // Hash the password
-                $hashed_password = password_hash($parole, PASSWORD_DEFAULT);
-                $sql = "UPDATE lietotaji_sparkly SET vards = ?, uzvards = ?, lietotajvards = ?, epasts = ?, parole = ?, loma = ? WHERE id_lietotajs = ? AND (loma = 'admin' OR loma = 'moder')";
-                $stmt = $savienojums->prepare($sql);
-                $stmt->bind_param("ssssssi", $vards, $uzvards, $lietotajvards, $epasts, $hashed_password, $loma, $id);
-            } else {
-                // Update without changing password
-                $sql = "UPDATE lietotaji_sparkly SET vards = ?, uzvards = ?, lietotajvards = ?, epasts = ?, loma = ? WHERE id_lietotajs = ? AND (loma = 'admin' OR loma = 'moder')";
-                $stmt = $savienojums->prepare($sql);
-                $stmt->bind_param("sssssi", $vards, $uzvards, $lietotajvards, $epasts, $loma, $id);
-            }
-            
-            if ($stmt->execute()) {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('success', 'Veiksmīgi!', 'Lietotājs ir atjaunināts.');
-                        });
-                      </script>";
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Neizdevās atjaunināt lietotāju: " . $stmt->error . "');
-                        });
-                      </script>";
-            }
-            $stmt->close();
-            
-        } else {
-            // Add new user
-            // Hash the password
-            $hashed_password = password_hash($parole, PASSWORD_DEFAULT);
-            
-            $sql = "INSERT INTO lietotaji_sparkly (vards, uzvards, lietotajvards, epasts, parole, loma) VALUES (?, ?, ?, ?, ?, ?)";
-            $stmt = $savienojums->prepare($sql);
-            $stmt->bind_param("ssssss", $vards, $uzvards, $lietotajvards, $epasts, $hashed_password, $loma);
-            
-            if ($stmt->execute()) {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('success', 'Veiksmīgi!', 'Lietotājs ir pievienots.');
-                        });
-                      </script>";
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Neizdevās pievienot lietotāju: " . $stmt->error . "');
-                        });
-                      </script>";
-            }
-            $stmt->close();
-        }
-        
-        // Redirect to clear the form
-        echo "<script>window.location.href = 'lietotaji.php';</script>";
-    }
-
-    // Get user data for editing
-    $editData = null;
-    if (isset($_GET['edit'])) {
-        $id = $_GET['edit'];
-        $sql = "SELECT * FROM lietotaji_sparkly WHERE id_lietotajs = ? AND (loma = 'admin' OR loma = 'moder')";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $editData = $result->fetch_assoc();
-        }
-        $stmt->close();
-    }
 ?>
 
 <main>
@@ -130,7 +12,29 @@
             <p>Darbība veiksmīgi izpildīta.</p>
         </div>
     </div>
-
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <div class="confirm-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="confirm-modal-title">Apstiprināt darbību</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <p class="confirm-modal-message" id="confirmMessage">
+                    Vai tiešām vēlaties dzēst šo vienumu?
+                </p>
+                <div class="confirm-modal-buttons">
+                    <button class="confirm-btn confirm-btn-danger" id="confirmYes">
+                        <i class="fas fa-trash-alt"></i> Dzēst
+                    </button>
+                    <button class="confirm-btn confirm-btn-cancel" id="confirmNo">
+                        <i class="fas fa-times"></i> Atcelt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <section class="admin-content">
         <h1>Administrātoru un moderātoru pārvaldība</h1>
         
@@ -138,7 +42,7 @@
         <div class="product-table-container">
             <div class="table-header">
                 <h2>Esošie lietotāji</h2>
-                <a href="lietotaji.php?action=add" class="btn add-btn"><i class="fas fa-plus"></i></a>
+                <button onclick="openAddModal()" class="btn"><i class="fas fa-plus"></i></button>
             </div>
             
             <div class="table-responsive">
@@ -151,102 +55,216 @@
                             <th>Lietotājvārds</th>
                             <th>E-pasts</th>
                             <th>Loma</th>
+                            <th>Izveidoja</th>
+                            <th>Izveidošanas datums</th>
+                            <th>Pēdējās izmaiņas</th>
+                            <th>Rediģēja</th>
                             <th>Darbības</th>
                         </tr>
                     </thead>
-                    <tbody>     
-                        <?php
-                            // Fetch all admin and moder users
-                            $sql = "SELECT * FROM lietotaji_sparkly WHERE loma = 'admin' OR loma = 'moder' ORDER BY loma, id_lietotajs";
-                            $result = $savienojums->query($sql);
-                            
-                            if ($result && $result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td>{$row['id_lietotajs']}</td>";
-                                    echo "<td>{$row['vards']}</td>";
-                                    echo "<td>{$row['uzvards']}</td>";
-                                    echo "<td>{$row['lietotajvards']}</td>";
-                                    echo "<td>{$row['epasts']}</td>";
-                                    echo "<td>" . ucfirst($row['loma']) . "</td>";
-                                    
-                                    echo "<td class='action-buttons'>";
-                                    echo "<a href='lietotaji.php?edit={$row['id_lietotajs']}' class='btn edit-btn'><i class='fas fa-edit'></i> Rediģēt</a>";
-                                    echo "<a href='lietotaji.php?delete={$row['id_lietotajs']}' class='btn delete-btn' onclick='return confirm(\"Vai tiešām vēlaties dzēst šo lietotāju?\")'><i class='fas fa-trash-alt'></i> Dzēst</a>";
-                                    echo "</td>";
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='7' class='no-records'>Nav atrasts neviens administrators vai moderators</td></tr>";
-                            }
-                        ?>
+                    <tbody id="users-table-body">     
+                        <!-- Table content will be loaded via JavaScript -->
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <?php 
-        // Show the form only when adding or editing
-        if (isset($_GET['action']) && $_GET['action'] == 'add' || isset($_GET['edit'])): 
-        ?>
-        <!-- Form for adding/editing -->
-        <div class="custom-form-container">
-            <h2><?php echo $editData ? 'Rediģēt lietotāju' : 'Pievienot jaunu lietotāju'; ?></h2>
-            <form class="custom-form" method="POST">
-                <?php if ($editData): ?>
-                    <input type="hidden" name="id" value="<?php echo $editData['id_lietotajs']; ?>">
-                <?php endif; ?>
-                
-                <div class="form-group">
-                    <label for="vards">Vārds:</label>
-                    <input type="text" id="vards" name="vards" value="<?php echo $editData ? $editData['vards'] : ''; ?>" required>
+        <!-- Modal for Add/Edit Users -->
+        <div id="users-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Pievienot jaunu lietotāju</h2>
+                    <span class="close" onclick="closeModal()">&times;</span>
                 </div>
-                
-                <div class="form-group">
-                    <label for="uzvards">Uzvārds:</label>
-                    <input type="text" id="uzvards" name="uzvards" value="<?php echo $editData ? $editData['uzvards'] : ''; ?>" required>
+                <div class="modal-body">
+                    <form id="users-form-element">
+                        <input type="hidden" id="user-id" name="id">
+                        
+                        <div class="form-group">
+                            <label for="vards">Vārds:</label>
+                            <input type="text" id="vards" name="vards" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="uzvards">Uzvārds:</label>
+                            <input type="text" id="uzvards" name="uzvards" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="lietotajvards">Lietotājvārds:</label>
+                            <input type="text" id="lietotajvards" name="lietotajvards" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="epasts">E-pasts:</label>
+                            <input type="email" id="epasts" name="epasts" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="parole">Parole:</label>
+                            <input type="password" id="parole" name="parole">
+                            <small id="password-hint" style="display: none; color: #666;">Atstājiet tukšu, lai nemainītu esošo paroli</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loma">Loma:</label>
+                            <select id="loma" name="loma" required>
+                                <option value="">Izvēlieties lomu</option>
+                                <option value="admin">Administrators</option>
+                                <option value="moder">Moderators</option>
+                            </select>
+                        </div>
+                        
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">Pievienot lietotāju</button>
+                            <button type="button" onclick="closeModal()" class="btn btn-secondary">Atcelt</button>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="form-group">
-                    <label for="lietotajvards">Lietotājvārds:</label>
-                    <input type="text" id="lietotajvards" name="lietotajvards" value="<?php echo $editData ? $editData['lietotajvards'] : ''; ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="epasts">E-pasts:</label>
-                    <input type="email" id="epasts" name="epasts" value="<?php echo $editData ? $editData['epasts'] : ''; ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="parole">Parole:<?php echo $editData ? ' (atstājiet tukšu, lai nemainītu)' : ''; ?></label>
-<<<<<<< HEAD
-                    <input type="password" id="parole" name="parole" <?php echo $editData ? '' : 'required'; ?> autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
-=======
-                    <input type="password" id="parole" name="parole" <?php echo $editData ? '' : 'required'; ?>>
->>>>>>> 2693dfa7b12716cdcc4ed99fa269d70868694183
-                </div>
-                
-                <div class="form-group">
-                    <label for="loma">Loma:</label>
-                    <select id="loma" name="loma" required>
-                        <option value="admin" <?php echo ($editData && $editData['loma'] == 'admin') ? 'selected' : ''; ?>>Administrators</option>
-                        <option value="moder" <?php echo ($editData && $editData['loma'] == 'moder') ? 'selected' : ''; ?>>Moderators</option>
-                    </select>
-                </div>
-                
-                <div class="form-buttons">
-                    <button type="submit" name="submit" class="btn"><?php echo $editData ? 'Atjaunināt lietotāju' : 'Pievienot lietotāju'; ?></button>
-                    <a href="lietotaji.php" class="btn clear-btn">Atcelt</a>
-                </div>
-            </form>
+            </div>
         </div>
-        <?php endif; ?>
         
     </section>
 </main>
 
-<!-- JavaScript for notifications -->
+<!-- JavaScript for managing users -->
 <script>
+    let editMode = false;
+
+    // Function definitions
+    function openAddModal() {
+        editMode = false;
+        document.getElementById('modal-title').textContent = 'Pievienot jaunu lietotāju';
+        document.getElementById('submit-btn').textContent = 'Pievienot lietotāju';
+        document.getElementById('users-form-element').reset();
+        document.getElementById('user-id').value = '';
+        document.getElementById('parole').required = true;
+        document.getElementById('password-hint').style.display = 'none';
+        document.getElementById('users-modal').style.display = 'block';
+    }
+
+    function openEditModal(id) {
+        editMode = true;
+        document.getElementById('modal-title').textContent = 'Rediģēt lietotāju';
+        document.getElementById('submit-btn').textContent = 'Atjaunināt lietotāju';
+        document.getElementById('parole').required = false;
+        document.getElementById('password-hint').style.display = 'block';
+        
+        // Fetch user data
+        fetch(`db/users.php?fetch_user_single=1&id=${id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                document.getElementById('user-id').value = data.id_lietotajs;
+                document.getElementById('vards').value = data.vards;
+                document.getElementById('uzvards').value = data.uzvards;
+                document.getElementById('lietotajvards').value = data.lietotajvards;
+                document.getElementById('epasts').value = data.epasts;
+                document.getElementById('loma').value = data.loma;
+                document.getElementById('parole').value = '';
+                document.getElementById('users-modal').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user:', error);
+            showNotification('error', 'Kļūda!', 'Neizdevās ielādēt lietotāja datus.');
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('users-modal').style.display = 'none';
+    }
+
+    function deleteUser(id) {
+    showConfirmModal(
+        'Vai tiešām vēlaties dzēst šo lietotāju? Šī darbība ir neatgriezeniska.',
+        function() {
+            // Confirmed - proceed with deletion
+            const formData = new FormData();
+            formData.append('delete_user', '1');
+            formData.append('id', id);
+            
+            fetch('db/materiali_delete.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification('success', 'Veiksmīgi!', data.message);
+                    loadAudums();
+                } else {
+                    showNotification('error', 'Kļūda!', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting lietotāju:', error);
+                showNotification('error', 'Kļūda!', 'Neizdevās dzēst lietotāju.');
+            });
+        }
+    );
+}
+
+
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleString('lv-LV', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    }
+
+    function loadUsers() {
+        fetch('db/users.php?fetch_users=1')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+            
+            if (data.length > 0) {
+                data.forEach(user => {
+                    const row = `
+                        <tr>
+                            <td>${user.id_lietotajs}</td>
+                            <td>${user.vards}</td>
+                            <td>${user.uzvards}</td>
+                            <td>${user.lietotajvards}</td>
+                            <td>${user.epasts}</td>
+                            <td>${user.loma.charAt(0).toUpperCase() + user.loma.slice(1)}</td>
+                            <td>${user.izveidots_liet_name || ''}</td>
+                            <td>${formatDate(user.datums)}</td>
+                            <td>${formatDate(user.red_dat) || ''}</td>
+                            <td>${user.red_liet_name || ''}</td>
+                            <td class='action-buttons'>
+                                <button onclick="openEditModal(${user.id_lietotajs})" class='btn edit-btn'><i class='fas fa-edit'></i></button>
+                                <button onclick="deleteUser(${user.id_lietotajs})" class='btn delete-btn'><i class='fas fa-trash-alt'></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = "<tr><td colspan='11' class='no-records'>Nav atrasts neviens administrators vai moderators</td></tr>";
+            }
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            showNotification('error', 'Kļūda!', 'Neizdevās ielādēt lietotājus.');
+        });
+    }
+
     function showNotification(type, title, message) {
         const container = document.querySelector('.notification-container');
         const notification = document.querySelector('.notification');
@@ -269,5 +287,48 @@
         setTimeout(() => {
             container.style.display = 'none';
         }, 5000);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUsers();
+        
+        // Handle form submission
+        document.getElementById('users-form-element').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const endpoint = editMode ? 'db/users_edit.php' : 'db/users_add.php';
+            const action = editMode ? 'edit_user' : 'add_user';
+            
+            formData.append(action, '1');
+            
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification('success', 'Veiksmīgi!', data.message);
+                    closeModal();
+                    loadUsers();
+                } else {
+                    showNotification('error', 'Kļūda!', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving user:', error);
+                showNotification('error', 'Kļūda!', 'Neizdevās saglabāt lietotāju.');
+            });
+        });
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('users-modal');
+        if (event.target == modal) {
+            closeModal();
+        }
     }
 </script>

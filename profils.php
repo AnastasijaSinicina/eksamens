@@ -169,6 +169,7 @@ include 'header.php';
                         <button class="filter-button order-status apstiprināts" data-status="Apstiprināts">Apstiprināts</button>
                         <button class="filter-button order-status nosūtīts" data-status="Nosūtīts">Nosūtīts</button>
                         <button class="filter-button order-status saņemts" data-status="Saņemts">Saņemts</button>
+                        <button class="filter-button order-status atcelts" data-status="Atcelts">Atcelts</button>
                     </div>
                     
                     <div class="orders-list">

@@ -1,178 +1,19 @@
 <?php
-    // Include admin header
-    require 'header.php';
-    
-    // Database connection
-    require 'db/con_db.php';
+// admin/produkcija.php
+// Main product management page - displays product list only
 
-    // Handle product deletion
-    if (isset($_GET['delete'])) {
-        $id = $_GET['delete'];
-        $sql = "DELETE FROM produkcija_sprarkly WHERE id_bumba = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        
-        if ($stmt->execute()) {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Produkts ir izdzēsts.');
-                    });
-                  </script>";
-        } else {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('error', 'Kļūda!', 'Neizdevās dzēst produktu.');
-                    });
-                  </script>";
-        }
-        $stmt->close();
-    }
+require 'header.php';
 
-    // Check if dekorejums tables exist
-    $check_dekorejums1_table_sql = "SHOW TABLES LIKE 'sparkly_dekorejums1'";
-    $dekorejums1_table_exists = $savienojums->query($check_dekorejums1_table_sql)->num_rows > 0;
-    
-    $check_dekorejums2_table_sql = "SHOW TABLES LIKE 'sparkly_dekorejums2'";
-    $dekorejums2_table_exists = $savienojums->query($check_dekorejums2_table_sql)->num_rows > 0;
+// Handle product deletion via AJAX (we'll modify this approach)
+// Remove the GET delete handling since we'll use AJAX
 
-    // Handle product addition/update
-    if (isset($_POST['submit'])) {
-        $forma = $_POST['forma'];
-        $nosaukums = $_POST['nosaukums'];
-        $audums_id = $_POST['audums_id'];
-        $figura_id = $_POST['figura_id'];
-        $dekorejums1_id = $_POST['dekorejums1_id'];
-        $dekorejums2_id = $_POST['dekorejums2_id'];
-        $cena = $_POST['cena'];
-        
-        // Check if we're updating or adding
-        if (isset($_POST['id']) && !empty($_POST['id'])) {
-            // Update existing product
-            $id = $_POST['id'];
-            
-            // Initialize SQL query parts
-            $sql_parts = [];
-            $params = [];
-            $types = "";
-            
-            // Basic fields
-            $sql_parts[] = "forma = ?";
-            $sql_parts[] = "nosaukums = ?";
-            $sql_parts[] = "audums_id = ?";
-            $sql_parts[] = "figura_id = ?";
-            $sql_parts[] = "dekorejums1_id = ?";
-            $sql_parts[] = "dekorejums2_id = ?";
-            $sql_parts[] = "cena = ?";
-            $params[] = $forma;
-            $params[] = $nosaukums;
-            $params[] = $audums_id;
-            $params[] = $figura_id;
-            $params[] = $dekorejums1_id;
-            $params[] = $dekorejums2_id;
-            $params[] = $cena;
-            $types .= "isiiiisd"; // i for integer, s for strings, d for double (cena)
-            
-            // Handle image uploads if provided
-            for ($i = 1; $i <= 3; $i++) {
-                if (isset($_FILES["attels$i"]) && $_FILES["attels$i"]['error'] == 0) {
-                    $image = file_get_contents($_FILES["attels$i"]['tmp_name']);
-                    $sql_parts[] = "attels$i = ?";
-                    $params[] = $image;
-                    $types .= "b"; // binary data
-                }
-            }
-            
-            // Add ID parameter
-            $params[] = $id;
-            $types .= "i";
-            
-            // Create final SQL query
-            $sql = "UPDATE produkcija_sprarkly SET " . implode(", ", $sql_parts) . " WHERE id_bumba = ?";
-            $stmt = $savienojums->prepare($sql);
-            
-            // Dynamically bind parameters
-            $stmt->bind_param($types, ...$params);
-            
-            if ($stmt->execute()) {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('success', 'Veiksmīgi!', 'Produkts ir atjaunināts.');
-                        });
-                      </script>";
-                // Redirect to clear the form
-                echo "<script>window.location.href = 'produkts.php';</script>";
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Neizdevās atjaunināt produktu: " . $stmt->error . "');
-                        });
-                      </script>";
-            }
-            $stmt->close();
-            
-        } else {
-            // Add new product
-            // Check if all required images are provided
-            if (isset($_FILES['attels1']) && $_FILES['attels1']['error'] == 0 &&
-                isset($_FILES['attels2']) && $_FILES['attels2']['error'] == 0 &&
-                isset($_FILES['attels3']) && $_FILES['attels3']['error'] == 0) {
-                
-                // Process images
-                $attels1 = file_get_contents($_FILES['attels1']['tmp_name']);
-                $attels2 = file_get_contents($_FILES['attels2']['tmp_name']);
-                $attels3 = file_get_contents($_FILES['attels3']['tmp_name']);
-                
-                // Insert product with images
-                $sql = "INSERT INTO produkcija_sprarkly (forma, nosaukums, audums_id, figura_id, dekorejums1_id, dekorejums2_id, attels1, attels2, attels3, cena) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $savienojums->prepare($sql);
-                $stmt->bind_param("isiiiibbbd", $forma, $nosaukums, $audums_id, $figura_id, $dekorejums1_id, $dekorejums2_id, $attels1, $attels2, $attels3, $cena);
-                
-                if ($stmt->execute()) {
-                    echo "<script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                showNotification('success', 'Veiksmīgi!', 'Produkts ir pievienots.');
-                            });
-                          </script>";
-                    // Redirect to clear the form
-                    echo "<script>window.location.href = 'produkts.php';</script>";
-                } else {
-                    echo "<script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                showNotification('error', 'Kļūda!', 'Neizdevās pievienot produktu: " . $stmt->error . "');
-                            });
-                          </script>";
-                }
-                $stmt->close();
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Lūdzu, augšupielādējiet visus trīs attēlus.');
-                        });
-                      </script>";
-            }
-        }
-    }
-
-    // Get product data for editing
-    $editData = null;
-    if (isset($_GET['edit'])) {
-        $id = $_GET['edit'];
-        $sql = "SELECT * FROM produkcija_sprarkly WHERE id_bumba = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $editData = $result->fetch_assoc();
-        }
-        $stmt->close();
-    }
+// Load product data
+require 'db/produkcija_admin.php';
 ?>
 
 <main>
     <!-- Notification container -->
-    <div class="notification-container">
+    <div class="notification-container" style="display: none;">
         <div class="notification">
             <i class="fas fa-check-circle success"></i>
             <h3>Veiksmīgi!</h3>
@@ -180,18 +21,56 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <div class="confirm-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="confirm-modal-title">Apstiprināt dzēšanu</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <p class="confirm-modal-message" id="confirmMessage">
+                    Vai tiešām vēlaties dzēst šo produktu?
+                </p>
+                <div class="confirm-modal-buttons">
+                    <button class="confirm-btn confirm-btn-danger" id="confirmYes">
+                        <i class="fas fa-trash-alt"></i> Dzēst
+                    </button>
+                    <button class="confirm-btn confirm-btn-cancel" id="confirmNo">
+                        <i class="fas fa-times"></i> Atcelt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <section class="admin-content">
-        <h1>Produktu pārvaldība</h1>
+        <div class="page-header">
+            <h1>Produktu pārvaldība</h1>
+            <a href="produkcija_form.php" class="btn">
+                <i class="fas fa-plus"></i> Pievienot jaunu produktu
+            </a>
+        </div>
+
         
         <!-- Product Table -->
         <div class="product-table-container">
             <div class="table-header">
                 <h2>Esošie produkti</h2>
-                <a href="produkts.php?action=add" class="btn add-btn"><i class="fas fa-plus"></i></a>
+                <div class="table-actions">
+                    <input type="text" id="searchInput" placeholder="Meklēt produktus..." class="search-input">
+                    <select id="filterSelect" class="filter-select">
+                        <option value="">Visi produkti</option>
+                        <option value="recent">Nesen pievienoti</option>
+                        <option value="updated">Nesen atjaunināti</option>
+                    </select>
+                </div>
             </div>
             
             <div class="table-responsive">
-                <table class="product-table">
+                <table class="product-table" id="productTable">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -203,341 +82,483 @@
                             <th>Dekorējums (1)</th>
                             <th>Dekorējums (2)</th>
                             <th>Cena</th>
+                            <th>Izveidots</th>
+                            <th>Atjaunināts</th>
                             <th>Darbības</th>
                         </tr>
                     </thead>
                     <tbody>     
                         <?php
-                            // Check if tables exist
-                            $check_formas_table_sql = "SHOW TABLES LIKE 'sparkly_formas'";
-                            $formas_table_exists = $savienojums->query($check_formas_table_sql)->num_rows > 0;
-                            
-                            $check_audumi_table_sql = "SHOW TABLES LIKE 'sparkly_audums'";
-                            $audumi_table_exists = $savienojums->query($check_audumi_table_sql)->num_rows > 0;
-                            
-                            $check_malu_figura_table_sql = "SHOW TABLES LIKE 'sparkly_malu_figura'";
-                            $malu_figura_table_exists = $savienojums->query($check_malu_figura_table_sql)->num_rows > 0;
-                            
-                            // Get all products with joined tables as needed
-                            $sql = "SELECT p.*, ";
-                            
-                            // Add optional joins based on table existence
-                            if ($formas_table_exists) {
-                                $sql .= "f.forma AS forma_name, ";
-                            } else {
-                                $sql .= "p.forma AS forma_name, ";
-                            }
-                            
-                            if ($audumi_table_exists) {
-                                $sql .= "a.nosaukums AS audums_name, ";
-                            } else {
-                                $sql .= "p.audums_id AS audums_name, ";
-                            }
-                            
-                            if ($malu_figura_table_exists) {
-                                $sql .= "m.nosaukums AS malu_figura_name, ";
-                            } else {
-                                $sql .= "p.figura_id AS malu_figura_name, ";
-                            }
-                            
-                            // Get dekorejums names from the appropriate tables
-                            if ($dekorejums1_table_exists) {
-                                $sql .= "d1.nosaukums AS dekorejums1_name, ";
-                            } else {
-                                $sql .= "p.dekorejums1_id AS dekorejums1_name, ";
-                            }
-                            
-                            if ($dekorejums2_table_exists) {
-                                $sql .= "d2.nosaukums AS dekorejums2_name ";
-                            } else {
-                                $sql .= "p.dekorejums2_id AS dekorejums2_name ";
-                            }
-                            
-                            $sql .= "FROM produkcija_sprarkly p ";
-                            
-                            // Add optional LEFT JOINs based on table existence
-                            if ($formas_table_exists) {
-                                $sql .= "LEFT JOIN sparkly_formas f ON p.forma = f.id_forma ";
-                            }
-                            
-                            if ($audumi_table_exists) {
-                                $sql .= "LEFT JOIN sparkly_audums a ON p.audums_id = a.id_audums ";
-                            }
-                            
-                            if ($malu_figura_table_exists) {
-                                $sql .= "LEFT JOIN sparkly_malu_figura m ON p.figura_id = m.id_malu_figura ";
-                            }
-                            
-                            // Use the correct join for dekorejums1 if table exists
-                            if ($dekorejums1_table_exists) {
-                                $sql .= "LEFT JOIN sparkly_dekorejums1 d1 ON p.dekorejums1_id = d1.id_dekorejums1 ";
-                            }
-                            
-                            // Use the correct join for dekorejums2 if table exists
-                            if ($dekorejums2_table_exists) {
-                                $sql .= "LEFT JOIN sparkly_dekorejums2 d2 ON p.dekorejums2_id = d2.id_dekorejums2 ";
-                            }
-                            
-                            $sql .= "ORDER BY p.id_bumba DESC";
-                            
-                            $result = $savienojums->query($sql);
-                            
-                            if ($result && $result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td>{$row['id_bumba']}</td>";
-                                    // Display first image as preview
-                                    echo "<td><img src='data:image/jpeg;base64," . base64_encode($row['attels1']) . "' alt='{$row['nosaukums']}' width='50'></td>";
-                                    echo "<td>{$row['nosaukums']}</td>";
-                                    echo "<td>{$row['forma_name']}</td>";
-                                    echo "<td>{$row['audums_name']}</td>";
-                                    echo "<td>{$row['malu_figura_name']}</td>";
-                                    echo "<td>{$row['dekorejums1_name']}</td>";
-                                    echo "<td>{$row['dekorejums2_name']}</td>";
-                                    echo "<td>€{$row['cena']}</td>";
-                                    
-                                    echo "<td class='action-buttons'>";
-                                    echo "<a href='produkts.php?edit={$row['id_bumba']}' class='btn edit-btn'><i class='fas fa-edit'></i> Rediģēt</a>";
-                                    echo "<a href='produkts.php?delete={$row['id_bumba']}' class='btn delete-btn' onclick='return confirm(\"Vai tiešām vēlaties dzēst šo produktu?\")'><i class='fas fa-trash-alt'></i> Dzēst</a>";
-                                    echo "</td>";
-                                    echo "</tr>";
+                        if ($products_result && $products_result->num_rows > 0) {
+                            while ($row = $products_result->fetch_assoc()) {
+                                echo "<tr data-product-id='{$row['id_bumba']}'>";
+                                echo "<td>{$row['id_bumba']}</td>";
+                                
+                                // Display first image as preview
+                                if (!empty($row['attels1'])) {
+                                    echo "<td><img src='data:image/jpeg;base64," . base64_encode($row['attels1']) . "' alt='" . htmlspecialchars($row['nosaukums']) . "' class='product-thumbnail'></td>";
+                                } else {
+                                    echo "<td><div class='no-image'><i class='fas fa-image'></i></div></td>";
                                 }
-                            } else {
-                                echo "<tr><td colspan='10' class='no-records'>Nav atrasts neviens produkts</td></tr>";
+                                
+                                echo "<td class='product-name'>" . htmlspecialchars($row['nosaukums']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['forma_name']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['audums_name']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['malu_figura_name']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['dekorejums1_name']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['dekorejums2_name']) . "</td>";
+                                echo "<td class='price'>€" . number_format($row['cena'], 2) . "</td>";
+                                
+                                // Created info - UPDATED VERSION WITH USER NAMES
+                                $created_info = '';
+                                if (!empty($row['created_first_name']) && !empty($row['created_last_name'])) {
+                                    $created_info .= htmlspecialchars($row['created_first_name'] . ' ' . $row['created_last_name']);
+                                } elseif (!empty($row['izveidots_liet'])) {
+                                    $created_info .= 'Lietotājs ID: ' . $row['izveidots_liet'];
+                                }
+                                
+                                if (!empty($row['created_at'])) {
+                                    $created_info .= '<small>' . date('d.m.Y H:i', strtotime($row['created_at'])) . '</small>';
+                                }
+                                echo "<td class='metadata'>" . ($created_info) . "</td>";
+                                
+                                // Updated info - UPDATED VERSION WITH USER NAMES
+                                $updated_info = '';
+                                if (!empty($row['updated_first_name']) && !empty($row['updated_last_name'])) {
+                                    $updated_info .= htmlspecialchars($row['updated_first_name'] . ' ' . $row['updated_last_name']);
+                                } elseif (!empty($row['red_liet'])) {
+                                    $updated_info .= 'Lietotājs ID: ' . $row['red_liet'];
+                                } else {
+                                    $updated_info = '';
+                                }
+                                
+                                if (!empty($row['updated_at'])) {
+                                    $updated_info .= ($updated_info ? '<br>' : '') . '<small>' . date('d.m.Y H:i', strtotime($row['updated_at'])) . '</small>';
+                                }
+                                echo "<td class='metadata'>" . ($updated_info ?: 'Nav atjaunināts') . "</td>";
+                                
+                                // Action buttons - UPDATED TO USE NEW FUNCTION
+                                echo "<td class='action-buttons'>";
+                                echo "<a href='produkcija_form.php?edit={$row['id_bumba']}' class='btn edit-btn' title='Rediģēt produktu'>";
+                                echo "<i class='fas fa-edit'></i>";
+                                echo "</a>";
+                                echo "<button onclick='deleteProduct({$row['id_bumba']}, \"" . htmlspecialchars(addslashes($row['nosaukums'])) . "\")' class='btn delete-btn' title='Dzēst produktu'>";
+                                echo "<i class='fas fa-trash-alt'></i>";
+                                echo "</button>";
+                                echo "</td>";
+                                echo "</tr>";
                             }
+                        } else {
+                            echo "<tr><td colspan='12' class='no-records'>";
+                            echo "<div class='empty-state'>";
+                            echo "<i class='fas fa-box-open'></i>";
+                            echo "<h3>Nav atrasts neviens produkts</h3>";
+                            echo "<p>Sāciet, pievienojot savu pirmo produktu.</p>";
+                            echo "<a href='produkcija_form.php' class='btn add-btn'>";
+                            echo "<i class='fas fa-plus'></i> Pievienot produktu";
+                            echo "</a>";
+                            echo "</div>";
+                            echo "</td></tr>";
+                        }
                         ?>
                     </tbody>
                 </table>
             </div>
         </div>
-        
-        <?php 
-        // Show the form only when adding or editing
-        if (isset($_GET['action']) && $_GET['action'] == 'add' || isset($_GET['edit'])): 
-        ?>
-        <!-- Product Form -->
-        <div class="custom-form-container">
-            <h2><?php echo $editData ? 'Rediģēt produktu' : 'Pievienot jaunu produktu'; ?></h2>
-            <form class="custom-form" method="POST" enctype="multipart/form-data">
-                <?php if ($editData): ?>
-                    <input type="hidden" name="id" value="<?php echo $editData['id_bumba']; ?>">
-                <?php endif; ?>
-                
-                <div class="dropdown">
-                    <?php 
-                    // Check if sparkly_formas table exists
-                    $check_formas_table_sql = "SHOW TABLES LIKE 'sparkly_formas'";
-                    $formas_table_exists = $savienojums->query($check_formas_table_sql)->num_rows > 0;
-                    
-                    if ($formas_table_exists):
-                    ?>
-                    <div id="drop">
-                        <label for="forma">Forma:</label>
-                        <select id="forma" name="forma" required>
-                            <option value="">Izvēlieties formu</option>
-                            <?php
-                                // Fetch all forms from sparkly_formas table
-                                $forma_sql = "SELECT * FROM sparkly_formas ORDER BY forma";
-                                $forma_result = $savienojums->query($forma_sql);
-                                
-                                if ($forma_result && $forma_result->num_rows > 0) {
-                                    while ($forma_row = $forma_result->fetch_assoc()) {
-                                        $selected = ($editData && $editData['forma'] == $forma_row['id_forma']) ? 'selected' : '';
-                                        echo "<option value='{$forma_row['id_forma']}' {$selected}>{$forma_row['forma']}</option>";
-                                    }
-                                }
-                            ?>
-                        </select>
-                    </div>
-                    <?php else: ?>
-                    <div id="drop">
-                        <label for="forma">Forma:</label>
-                        <input type="number" id="forma" name="forma" value="<?php echo $editData ? $editData['forma'] : ''; ?>" required>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <div id="drop">
-                        <label for="nosaukums">Nosaukums:</label>
-                        <input type="text" id="nosaukums" name="nosaukums" value="<?php echo $editData ? $editData['nosaukums'] : ''; ?>" required>
-                    </div>
-                    
-                    <?php 
-                    // Check if sparkly_audums table exists
-                    $check_audumi_table_sql = "SHOW TABLES LIKE 'sparkly_audums'";
-                    $audumi_table_exists = $savienojums->query($check_audumi_table_sql)->num_rows > 0;
-                    
-                    if ($audumi_table_exists):
-                    ?>
-                    <div id="drop">
-                        <label for="audums_id">Audums:</label>
-                        <select id="audums_id" name="audums_id" required>
-                            <option value="">Izvēlieties audumu</option>
-                            <?php
-                                // Fetch all fabrics from sparkly_audums table
-                                $audums_sql = "SELECT * FROM sparkly_audums ORDER BY nosaukums";
-                                $audums_result = $savienojums->query($audums_sql);
-                                
-                                if ($audums_result && $audums_result->num_rows > 0) {
-                                    while ($audums_row = $audums_result->fetch_assoc()) {
-                                        $selected = ($editData && isset($editData['audums_id']) && $editData['audums_id'] == $audums_row['id_audums']) ? 'selected' : '';
-                                        echo "<option value='{$audums_row['id_audums']}' {$selected}>{$audums_row['nosaukums']}</option>";
-                                    }
-                                }
-                            ?>
-                        </select>
-                    </div>
-                    <?php else: ?>
-                    <div id="drop">
-                        <label for="audums_id">Audums ID:</label>
-                        <input type="number" id="audums_id" name="audums_id" value="<?php echo $editData ? $editData['audums_id'] : ''; ?>" required>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php 
-                    // Check if sparkly_malu_figura table exists
-                    $check_malu_figura_table_sql = "SHOW TABLES LIKE 'sparkly_malu_figura'";
-                    $malu_figura_table_exists = $savienojums->query($check_malu_figura_table_sql)->num_rows > 0;
-                    
-                    if ($malu_figura_table_exists):
-                    ?>
-                    <div id="drop">
-                        <label for="figura_id">Malu figūra:</label>
-                        <select id="figura_id" name="figura_id" required>
-                            <option value="">Izvēlieties malu figūru</option>
-                            <?php
-                                // Fetch all edge figures from sparkly_malu_figura table
-                                $malu_figura_sql = "SELECT * FROM sparkly_malu_figura ORDER BY nosaukums";
-                                $malu_figura_result = $savienojums->query($malu_figura_sql);
-                                
-                                if ($malu_figura_result && $malu_figura_result->num_rows > 0) {
-                                    while ($malu_figura_row = $malu_figura_result->fetch_assoc()) {
-                                        $selected = ($editData && isset($editData['figura_id']) && $editData['figura_id'] == $malu_figura_row['id_malu_figura']) ? 'selected' : '';
-                                        echo "<option value='{$malu_figura_row['id_malu_figura']}' {$selected}>{$malu_figura_row['nosaukums']}</option>";
-                                    }
-                                }
-                            ?>
-                        </select>
-                    </div>
-                    <?php else: ?>
-                    <div id="drop">
-                        <label for="figura_id">Malu figūra ID:</label>
-                        <input type="number" id="figura_id" name="figura_id" value="<?php echo $editData ? $editData['figura_id'] : ''; ?>" required>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php 
-                    // Check for dekorejums1 table
-                    if ($dekorejums1_table_exists):
-                    ?>
-                    <div id="drop">
-                        <label for="dekorejums1_id">Dekorējums 1:</label>
-                        <select id="dekorejums1_id" name="dekorejums1_id" required>
-                            <option value="">Izvēlieties dekorējumu</option>
-                            <?php
-                                // Fetch all decorations from sparkly_dekorejums table
-                                $dekorejums_sql = "SELECT * FROM sparkly_dekorejums1 ORDER BY nosaukums";
-                                $dekorejums_result = $savienojums->query($dekorejums_sql);
-                                
-                                if ($dekorejums_result && $dekorejums_result->num_rows > 0) {
-                                    while ($dekorejums_row = $dekorejums_result->fetch_assoc()) {
-                                        $selected = ($editData && isset($editData['dekorejums1_id']) && $editData['dekorejums1_id'] == $dekorejums_row['id_dekorejums1']) ? 'selected' : '';
-                                        echo "<option value='{$dekorejums_row['id_dekorejums']}' {$selected}>{$dekorejums_row['nosaukums']}</option>";
-                                    }
-                                }
-                            ?>
-                        </select>
-                    </div>
-                    <?php else: ?>
-                    <div id="drop">
-                        <label for="dekorejums1_id">Dekorējums 1 ID:</label>
-                        <input type="number" id="dekorejums1_id" name="dekorejums1_id" value="<?php echo $editData ? $editData['dekorejums1_id'] : ''; ?>" required>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php 
-                    // Check for dekorejums2 table
-                    if ($dekorejums2_table_exists):
-                    ?>
-                    <div id="drop">
-                        <label for="dekorejums2_id">Dekorējums 2:</label>
-                        <select id="dekorejums2_id" name="dekorejums2_id" required>
-                            <option value="">Izvēlieties dekorējumu</option>
-                            <?php
-                                // Fetch all decorations from sparkly_dekorejums2 table
-                                $dekorejums2_sql = "SELECT * FROM sparkly_dekorejums2 ORDER BY nosaukums";
-                                $dekorejums2_result = $savienojums->query($dekorejums2_sql);
-                                
-                                if ($dekorejums2_result && $dekorejums2_result->num_rows > 0) {
-                                    while ($dekorejums2_row = $dekorejums2_result->fetch_assoc()) {
-                                        $selected = ($editData && isset($editData['dekorejums2_id']) && $editData['dekorejums2_id'] == $dekorejums2_row['id_dekorejums2']) ? 'selected' : '';
-                                        echo "<option value='{$dekorejums2_row['id_dekorejums2']}' {$selected}>{$dekorejums2_row['nosaukums']}</option>";
-                                    }
-                                }
-                            ?>
-                        </select>
-                    </div>
-                    <?php else: ?>
-                    <div id="drop">
-                        <label for="dekorejums2_id">Dekorējums 2 ID:</label>
-                        <input type="number" id="dekorejums2_id" name="dekorejums2_id" value="<?php echo $editData ? $editData['dekorejums2_id'] : ''; ?>" required>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <div id="drop">
-                        <label for="cena">Cena:</label>
-                        <input type="number" id="cena" name="cena" step="0.01" value="<?php echo $editData ? $editData['cena'] : ''; ?>" required>
-                    </div>
-                    
-                    <!-- Image uploads -->
-                    <?php for ($i = 1; $i <= 3; $i++): ?>
-                    <div id="drop">
-                        <label for="attels<?php echo $i; ?>">Attēls <?php echo $i; ?>:</label>
-                        <?php if ($editData && !empty($editData["attels$i"])): ?>
-                            <div class="current-image">
-                                <p>Pašreizējais attēls <?php echo $i; ?>:</p>
-                                <img src="data:image/jpeg;base64,<?php echo base64_encode($editData["attels$i"]); ?>" alt="Attēls <?php echo $i; ?>" width="100">
-                            </div>
-                        <?php endif; ?>
-                        <input type="file" id="attels<?php echo $i; ?>" name="attels<?php echo $i; ?>" <?php echo (!$editData) ? 'required' : ''; ?>>
-                        <small>Atbalstītie formāti: JPG, JPEG, PNG</small>
-                    </div>
-                    <?php endfor; ?>
-                </div>
-                
-                <div class="form-buttons">
-                    <button type="submit" name="submit" class="btn"><?php echo $editData ? 'Atjaunināt produktu' : 'Pievienot produktu'; ?></button>
-                    <a href="produkts.php" class="btn clear-btn">Atcelt</a>
-                </div>
-            </form>
-        </div>
-        <?php endif; ?>
-        
     </section>
 </main>
 
-<!-- JavaScript for notifications -->
-<script>
-    function showNotification(type, title, message) {
-        const container = document.querySelector('.notification-container');
-        const notification = document.querySelector('.notification');
-        const icon = notification.querySelector('i');
-        const titleElement = notification.querySelector('h3');
-        const messageElement = notification.querySelector('p');
-        
-        // Set notification content
-        icon.className = type === 'success' ? 'fas fa-check-circle success' : 'fas fa-exclamation-circle error';
-        titleElement.textContent = title;
-        messageElement.textContent = message;
-        
-        // Add class based on type
-        notification.className = 'notification ' + type;
-        
-        // Show the notification
-        container.style.display = 'block';
-        
-        // Hide after 5 seconds
-        setTimeout(() => {
-            container.style.display = 'none';
-        }, 5000);
+<!-- Product View Modal -->
+<div id="productModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Produkta informācija</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Product details will be loaded here -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn cancel-btn" onclick="closeModal()">Aizvērt</button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for improved styling -->
+<style>
+    .product-thumbnail {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s;
     }
+
+    .product-thumbnail:hover {
+        transform: scale(1.1);
+    }
+    
+    .no-image {
+        width: 50px;
+        height: 50px;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        color: #6c757d;
+    }
+    
+    .metadata {
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+    
+    .metadata small {
+        color: #6c757d;
+    }
+</style>
+
+<!-- JavaScript for enhanced functionality -->
+<script>
+// ===== REUSABLE CONFIRMATION MODAL FUNCTIONS =====
+function showConfirmModal(message, onConfirm, onCancel = null) {
+    const modal = document.getElementById('confirmModal');
+    const messageElement = document.getElementById('confirmMessage');
+    const yesButton = document.getElementById('confirmYes');
+    const noButton = document.getElementById('confirmNo');
+    
+    messageElement.textContent = message;
+    modal.style.display = 'block';
+    
+    // Remove any existing event listeners
+    const newYesButton = yesButton.cloneNode(true);
+    const newNoButton = noButton.cloneNode(true);
+    yesButton.parentNode.replaceChild(newYesButton, yesButton);
+    noButton.parentNode.replaceChild(newNoButton, noButton);
+    
+    // Add new event listeners
+    document.getElementById('confirmYes').addEventListener('click', function() {
+        hideConfirmModal();
+        if (onConfirm) onConfirm();
+    });
+    
+    document.getElementById('confirmNo').addEventListener('click', function() {
+        hideConfirmModal();
+        if (onCancel) onCancel();
+    });
+}
+
+function hideConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+}
+
+// Close confirmation modal when clicking outside
+window.addEventListener('click', function(event) {
+    const confirmModal = document.getElementById('confirmModal');
+    if (event.target === confirmModal) {
+        hideConfirmModal();
+    }
+});
+
+// ===== PRODUCT DELETION FUNCTION =====
+function deleteProduct(productId, productName) {
+    showConfirmModal(
+        `Vai tiešām vēlaties dzēst produktu "${productName}"? Šī darbība ir neatgriezeniska.`,
+        function() {
+            // Confirmed - proceed with deletion via AJAX
+            const formData = new FormData();
+            formData.append('delete_product', '1');
+            formData.append('id', productId);
+            
+            fetch('db/produkcija_delete.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification('success', 'Veiksmīgi!', data.message);
+                    // Remove the row from table
+                    const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                    // Check if table is empty
+                    checkEmptyTable();
+                } else {
+                    showNotification('error', 'Kļūda!', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting product:', error);
+                showNotification('error', 'Kļūda!', 'Neizdevās dzēst produktu.');
+            });
+        }
+    );
+}
+
+function checkEmptyTable() {
+    const tbody = document.querySelector('#productTable tbody');
+    const visibleRows = tbody.querySelectorAll('tr[data-product-id]');
+    
+    if (visibleRows.length === 0) {
+        tbody.innerHTML = `
+            <tr><td colspan='12' class='no-records'>
+                <div class='empty-state'>
+                    <i class='fas fa-box-open'></i>
+                    <h3>Nav atrasts neviens produkts</h3>
+                    <p>Sāciet, pievienojot savu pirmo produktu.</p>
+                    <a href='produkcija_form.php' class='btn add-btn'>
+                        <i class='fas fa-plus'></i> Pievienot produktu
+                    </a>
+                </div>
+            </td></tr>
+        `;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const filterSelect = document.getElementById('filterSelect');
+    const productTable = document.getElementById('productTable');
+    const tbody = productTable.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Search function
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+        
+        rows.forEach(row => {
+            if (row.querySelector('.no-records')) return;
+            
+            const productName = row.querySelector('.product-name')?.textContent.toLowerCase() || '';
+            const productId = row.querySelector('td:first-child')?.textContent || '';
+            const createdDate = row.getAttribute('data-created') || '';
+            const updatedDate = row.getAttribute('data-updated') || '';
+            
+            // Search filter
+            const matchesSearch = productName.includes(searchTerm) || 
+                                productId.includes(searchTerm);
+            
+            // Date filter
+            let matchesFilter = true;
+            if (filterValue === 'recent') {
+                const created = new Date(createdDate);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                matchesFilter = created > weekAgo;
+            } else if (filterValue === 'updated') {
+                const updated = new Date(updatedDate);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                matchesFilter = updated > weekAgo;
+            }
+            
+            // Show/hide row
+            if (matchesSearch && matchesFilter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Check if any rows are visible
+        const visibleRows = rows.filter(row => 
+            row.style.display !== 'none' && !row.querySelector('.no-records')
+        );
+        
+        // Show/hide "no results" message
+        let noResultsRow = tbody.querySelector('.no-results');
+        if (visibleRows.length === 0 && rows.length > 0 && !rows[0].querySelector('.no-records')) {
+            if (!noResultsRow) {
+                noResultsRow = document.createElement('tr');
+                noResultsRow.className = 'no-results';
+                noResultsRow.innerHTML = `
+                    <td colspan="12" class="no-records">
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>Nav atrasti rezultāti</h3>
+                            <p>Mēģiniet mainīt meklēšanas kritērijus.</p>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(noResultsRow);
+            }
+            noResultsRow.style.display = '';
+        } else if (noResultsRow) {
+            noResultsRow.style.display = 'none';
+        }
+    }
+    
+    // Event listeners for search and filter
+    searchInput.addEventListener('input', filterTable);
+    filterSelect.addEventListener('change', filterTable);
+    
+    // Image click to enlarge
+    document.querySelectorAll('.product-thumbnail').forEach(img => {
+        img.addEventListener('click', function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 90%; max-height: 90%;">
+                    <div class="modal-header">
+                        <h2>Produkta attēls</h2>
+                        <span class="close">&times;</span>
+                    </div>
+                    <div class="modal-body" style="text-align: center;">
+                        <img src="${this.src}" alt="${this.alt}" style="max-width: 100%; max-height: 70vh;">
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+            
+            // Close modal events
+            modal.querySelector('.close').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            };
+        });
+    });
+});
+
+function viewProduct(productId) {
+    // This would fetch product details via AJAX
+    // For now, redirect to edit page
+    window.location.href = `produkcija_form.php?edit=${productId}`;
+}
+
+function closeModal() {
+    const modal = document.getElementById('productModal');
+    modal.style.display = 'none';
+}
+
+function showNotification(type, title, message) {
+    const container = document.querySelector('.notification-container');
+    
+    // Clear any existing notifications first to prevent stacking
+    container.innerHTML = '';
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'notification ' + type;
+    notification.innerHTML = `
+        <i class="${type === 'success' ? 'fas fa-check-circle success' : 'fas fa-exclamation-circle error'}"></i>
+        <div>
+            <h3>${title}</h3>
+            <p>${message}</p>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove(); checkNotificationContainer();">×</button>
+    `;
+    
+    // Add to container and show
+    container.appendChild(notification);
+    container.style.display = 'block';
+    
+    // Auto-hide after 5 seconds
+    const timeoutId = setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+            checkNotificationContainer();
+        }
+    }, 5000);
+    
+
+}
+
+// Helper function to check if container should be hidden
+function checkNotificationContainer() {
+    const container = document.querySelector('.notification-container');
+    if (container.children.length === 0) {
+        container.style.display = 'none';
+    }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + N for new product
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        window.location.href = 'produkcija_form.php';
+    }
+    
+    // Escape to close modals
+    if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal[style*="display: flex"], .modal[style*="display: block"]');
+        modals.forEach(modal => {
+            modal.style.display = 'none';
+            if (modal.parentNode && !modal.id) {
+                modal.parentNode.removeChild(modal);
+            }
+        });
+        hideConfirmModal();
+    }
+    
+    // Focus search with Ctrl/Cmd + F
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+    }
+});
+
+// Auto-refresh every 5 minutes to show updated data
+setInterval(() => {
+    // Only refresh if no modals are open and no active form interactions
+    const hasOpenModals = document.querySelector('.modal[style*="display: flex"], .modal[style*="display: block"]');
+    const hasActiveInputs = document.querySelector('input:focus, select:focus, textarea:focus');
+    
+    if (!hasOpenModals && !hasActiveInputs) {
+        // You could implement a subtle refresh here
+        // For now, just update the timestamp or show a subtle indicator
+        console.log('Auto-refresh check at:', new Date().toLocaleTimeString());
+    }
+}, 300000); // 5 minutes
+
+// Export table data (bonus feature)
+function exportTableData() {
+    const table = document.getElementById('productTable');
+    const rows = Array.from(table.querySelectorAll('tr'));
+    
+    let csvContent = '';
+    
+    rows.forEach(row => {
+        if (row.querySelector('.no-records')) return;
+        
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        const csvRow = cells.map(cell => {
+            // Clean up cell content
+            let content = cell.textContent.trim();
+            // Remove action buttons content
+            if (cell.classList.contains('action-buttons')) {
+                content = '';
+            }
+            // Escape quotes
+            content = content.replace(/"/g, '""');
+            return `"${content}"`;
+        }).join(',');
+        
+        csvContent += csvRow + '\n';
+    });
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `produkti_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+}
 </script>

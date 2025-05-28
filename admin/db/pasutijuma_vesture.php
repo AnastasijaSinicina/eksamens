@@ -61,6 +61,7 @@ function getRegularOrders($savienojums, $lietotajs_id) {
 
 // Iegūst lietotāja pielāgotos pasūtījumus
 
+// Iegūst lietotāja pielāgotos pasūtījumus
 function getCustomOrders($savienojums, $lietotajs_id) {
     $orders = [];
 
@@ -69,6 +70,7 @@ function getCustomOrders($savienojums, $lietotajs_id) {
         error_log("Custom orders table does not exist");
         return $orders;
     }
+    
     error_log("Custom orders table exists");
     $all_custom_query = "SELECT lietotajs_id, id_spec_pas, vards, uzvards FROM sparkly_spec_pas";
     $all_custom_result = $savienojums->query($all_custom_query);
@@ -95,7 +97,7 @@ function getCustomOrders($savienojums, $lietotajs_id) {
     LEFT JOIN sparkly_dekorejums1 sd1 ON ssp.dekorejums1 = sd1.id_dekorejums1
     LEFT JOIN sparkly_dekorejums2 sd2 ON ssp.dekorejums2 = sd2.id_dekorejums2
     WHERE ssp.lietotajs_id = ?
-    ORDER BY ssp.pas_datums DESC";
+    ORDER BY ssp.datums DESC";
 
     $custom_order_stmt = $savienojums->prepare($custom_order_query);
     if ($custom_order_stmt) {
@@ -107,8 +109,14 @@ function getCustomOrders($savienojums, $lietotajs_id) {
             
             while ($custom_order = $custom_orders_result->fetch_assoc()) {
                 $custom_order['id_pasutijums'] = $custom_order['id_spec_pas'];
+                if (isset($custom_order['datums'])) {
+                    $custom_order['pas_datums'] = $custom_order['datums'];
+                } else {
+                    $custom_order['pas_datums'] = date('Y-m-d H:i:s');
+                    error_log("Warning: Custom order {$custom_order['id_spec_pas']} had no datums field, using current time");
+                }
                 
-                $custom_order['kopeja_cena'] = 0;
+                $custom_order['kopeja_cena'] = isset($custom_order['cena']) ? $custom_order['cena'] : 0;
                 $custom_order['produktu_skaits'] = $custom_order['daudzums'] ?? 1;
                 $custom_order['apmaksas_veids'] = 'Pēc vienošanās';
                 $custom_order['piegades_veids'] = 'Pēc vienošanās';
@@ -116,7 +124,7 @@ function getCustomOrders($savienojums, $lietotajs_id) {
                 $custom_order['total_items'] = 1; 
                 
                 $orders[] = $custom_order;
-                error_log("Added custom order ID: " . $custom_order['id_spec_pas']);
+                error_log("Added custom order ID: " . $custom_order['id_spec_pas'] . " with date: " . $custom_order['pas_datums']);
             }
         } else {
             error_log("Failed to execute custom order query: " . $custom_order_stmt->error);

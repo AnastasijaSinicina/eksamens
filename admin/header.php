@@ -28,7 +28,7 @@
         <nav class="sidebar-nav">
             <ul class="nav-list primary-nav">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="index.php" class="nav-link">
                         <span class="nav-icon">
                             <i class="fa-solid fa-house"></i>
                         </span>
@@ -44,6 +44,15 @@
                         <span class="nav-label">Pasūtījumi</span>
                     </a>
                     <span class="nav-tooltip">Pasūtījumi</span>
+                </li>
+                <li class="nav-item">
+                    <a href="spec_pas.php" class="nav-link">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-palette"></i>
+                        </span>
+                        <span class="nav-label">Pielāgoti</span>
+                    </a>
+                    <span class="nav-tooltip">Pielāgoti pasūtījumi</span>
                 </li>
                 <li class="nav-item">
                     <a href="klienti.php" class="nav-link">
@@ -66,7 +75,7 @@
                 <li class="nav-item">
                     <a href="audums.php" class="nav-link">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-palette"></i>
+                            <i class="fa-solid fa-swatchbook"></i>
                         </span>
                         <span class="nav-label">Audumi</span>
                     </a>
@@ -84,25 +93,25 @@
                 <li class="nav-item">
                     <a href="figuras.php" class="nav-link">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-shield-cat"></i>
+                            <i class="fa-solid fa-star"></i>
                         </span>
                         <span class="nav-label">Mālu figūras</span>
                     </a>
                     <span class="nav-tooltip">Mālu figūras</span>
                 </li>
                 <li class="nav-item">
-                    <a href="dekorejums1.php" class="nav-link">
+                    <a href="dekorejumi.php" class="nav-link">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-shield-cat"></i>
+                            <i class="fa-solid fa-gem"></i>
                         </span>
                         <span class="nav-label">Dekorējumi</span>
                     </a>
                     <span class="nav-tooltip">Dekorējumi</span>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="atsauksmes.php" class="nav-link">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-comments"></i>
                         </span>
                         <span class="nav-label">Atsauksmes</span>
                     </a>
@@ -120,7 +129,7 @@
             </ul>
             <ul class="nav-list secondary-nav">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="profils.php" class="nav-link">
                         <span class="nav-icon">
                             <i class="fa-solid fa-gear"></i>
                         </span>

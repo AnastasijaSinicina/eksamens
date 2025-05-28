@@ -57,9 +57,6 @@ $cartCount = $cartCount ?: 0;
         <div class="logo1">
             <a href="index.php"><img src="images/logo_balts.png" alt=""></a>
         </div>
-        <div class="logo2">
-            <img src="images/bumba.png" alt="">       
-    </div>
     <nav class="nav">
         <a href="index.php">Sākums</a>
         <a href="jaunumi.php">Jaunumi</a>

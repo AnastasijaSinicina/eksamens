@@ -1,100 +1,6 @@
 <?php
     // Include admin header
     require 'header.php';
-    
-    // Database connection
-    require 'db/con_db.php';
-
-    // Handle form deletion
-    if (isset($_GET['delete'])) {
-        $id = $_GET['delete'];
-        $sql = "DELETE FROM sparkly_formas WHERE id_forma = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        
-        if ($stmt->execute()) {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Forma ir izdzēsta.');
-                    });
-                  </script>";
-        } else {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('error', 'Kļūda!', 'Neizdevās dzēst formu.');
-                    });
-                  </script>";
-        }
-        $stmt->close();
-    }
-
-    // Handle form addition/update
-    if (isset($_POST['submit'])) {
-        $forma = $_POST['forma'];
-        
-        // Check if we're updating or adding
-        if (isset($_POST['id']) && !empty($_POST['id'])) {
-            // Update existing form
-            $id = $_POST['id'];
-            $sql = "UPDATE sparkly_formas SET forma = ? WHERE id_forma = ?";
-            $stmt = $savienojums->prepare($sql);
-            $stmt->bind_param("si", $forma, $id);
-            
-            if ($stmt->execute()) {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('success', 'Veiksmīgi!', 'Forma ir atjaunināta.');
-                        });
-                      </script>";
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Neizdevās atjaunināt formu: " . $stmt->error . "');
-                        });
-                      </script>";
-            }
-            $stmt->close();
-            
-        } else {
-            // Add new form
-            $sql = "INSERT INTO sparkly_formas (forma) VALUES (?)";
-            $stmt = $savienojums->prepare($sql);
-            $stmt->bind_param("s", $forma);
-            
-            if ($stmt->execute()) {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('success', 'Veiksmīgi!', 'Forma ir pievienota.');
-                        });
-                      </script>";
-            } else {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showNotification('error', 'Kļūda!', 'Neizdevās pievienot formu: " . $stmt->error . "');
-                        });
-                      </script>";
-            }
-            $stmt->close();
-        }
-        
-        // Redirect to clear the form
-        echo "<script>window.location.href = 'formas.php';</script>";
-    }
-
-    // Get form data for editing
-    $editData = null;
-    if (isset($_GET['edit'])) {
-        $id = $_GET['edit'];
-        $sql = "SELECT * FROM sparkly_formas WHERE id_forma = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $editData = $result->fetch_assoc();
-        }
-        $stmt->close();
-    }
 ?>
 
 <main>
@@ -106,7 +12,29 @@
             <p>Darbība veiksmīgi izpildīta.</p>
         </div>
     </div>
-
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <div class="confirm-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="confirm-modal-title">Apstiprināt darbību</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <p class="confirm-modal-message" id="confirmMessage">
+                    Vai tiešām vēlaties dzēst šo vienumu?
+                </p>
+                <div class="confirm-modal-buttons">
+                    <button class="confirm-btn confirm-btn-danger" id="confirmYes">
+                        <i class="fas fa-trash-alt"></i> Dzēst
+                    </button>
+                    <button class="confirm-btn confirm-btn-cancel" id="confirmNo">
+                        <i class="fas fa-times"></i> Atcelt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <section class="admin-content">
         <h1>Formu pārvaldība</h1>
         
@@ -114,7 +42,7 @@
         <div class="product-table-container">
             <div class="table-header">
                 <h2>Esošās formas</h2>
-                <a href="formas.php?action=add" class="btn add-btn"><i class="fas fa-plus"></i></a>
+                <button onclick="openAddModal()" class="btn "><i class="fas fa-plus"></i></button>
             </div>
             
             <div class="table-responsive">
@@ -124,71 +52,170 @@
                             <th>ID</th>
                             <th>Forma</th>
                             <th>Datums</th>
+                            <th>Pēdējās izmaiņas</th>
                             <th>Darbības</th>
                         </tr>
                     </thead>
-                    <tbody>     
-                        <?php
-                            // Fetch all forms
-                            $sql = "SELECT * FROM sparkly_formas ORDER BY id_forma";
-                            $result = $savienojums->query($sql);
-                            
-                            if ($result && $result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td>{$row['id_forma']}</td>";
-                                    echo "<td>{$row['forma']}</td>";
-                                    // Get date from datums column, or show current date if not available
-                                    $datums = isset($row['datums']) ? $row['datums'] : date('Y-m-d H:i:s');
-                                    echo "<td>{$datums}</td>";
-                                    
-                                    echo "<td class='action-buttons'>";
-                                    echo "<a href='formas.php?edit={$row['id_forma']}' class='btn edit-btn'><i class='fas fa-edit'></i> Rediģēt</a>";
-                                    echo "<a href='formas.php?delete={$row['id_forma']}' class='btn delete-btn' onclick='return confirm(\"Vai tiešām vēlaties dzēst šo formu?\")'><i class='fas fa-trash-alt'></i> Dzēst</a>";
-                                    echo "</td>";
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='4' class='no-records'>Nav atrasta neviena forma</td></tr>";
-                            }
-                        ?>
+                    <tbody id="formas-table-body">     
+                        <!-- Table content will be loaded via JavaScript -->
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <?php 
-        // Show the form only when adding or editing
-        if (isset($_GET['action']) && $_GET['action'] == 'add' || isset($_GET['edit'])): 
-        ?>
-        <!-- Form for adding/editing -->
-        <div class="custom-form-container">
-            <h2><?php echo $editData ? 'Rediģēt formu' : 'Pievienot jaunu formu'; ?></h2>
-            <form class="custom-form" method="POST">
-                <?php if ($editData): ?>
-                    <input type="hidden" name="id" value="<?php echo $editData['id_forma']; ?>">
-                <?php endif; ?>
-                
-                <div class="dropdown">
-                    <div id="drop">
-                        <label for="forma">Forma:</label>
-                        <input type="text" id="forma" name="forma" value="<?php echo $editData ? $editData['forma'] : ''; ?>" required>
-                    </div>
+        <!-- Modal for Add/Edit Forms -->
+        <div id="formas-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Pievienot jaunu formu</h2>
+                    <span class="close" onclick="closeModal()">&times;</span>
                 </div>
-                
-                <div class="form-buttons">
-                    <button type="submit" name="submit" class="btn"><?php echo $editData ? 'Atjaunināt formu' : 'Pievienot formu'; ?></button>
-                    <a href="formas.php" class="btn clear-btn">Atcelt</a>
+                <div class="modal-body">
+                    <form id="formas-form-element">
+                        <input type="hidden" id="forma-id" name="id">
+                        
+                        <div class="form-group">
+                            <label for="forma">Forma:</label>
+                            <input type="text" id="forma" name="forma" required>
+                        </div>
+                        
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">Pievienot formu</button>
+                            <button type="button" onclick="closeModal()" class="btn btn-secondary">Atcelt</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
-        <?php endif; ?>
         
     </section>
 </main>
 
-<!-- JavaScript for notifications -->
+<!-- JavaScript for managing formas -->
 <script>
+    let editMode = false;
+
+    // Function definitions
+    function openAddModal() {
+        editMode = false;
+        document.getElementById('modal-title').textContent = 'Pievienot jaunu formu';
+        document.getElementById('submit-btn').textContent = 'Pievienot formu';
+        document.getElementById('formas-form-element').reset();
+        document.getElementById('forma-id').value = '';
+        document.getElementById('formas-modal').style.display = 'block';
+    }
+
+    function openEditModal(id) {
+        editMode = true;
+        document.getElementById('modal-title').textContent = 'Rediģēt formu';
+        document.getElementById('submit-btn').textContent = 'Atjaunināt formu';
+        
+        // Fetch forma data
+        fetch(`db/materiali.php?fetch_formas_single=1&id=${id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                document.getElementById('forma-id').value = data.id_forma;
+                document.getElementById('forma').value = data.forma;
+                document.getElementById('formas-modal').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching forma:', error);
+            showNotification('error', 'Kļūda!', 'Neizdevās ielādēt formas datus.');
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('formas-modal').style.display = 'none';
+    }
+
+    function deleteForma(id) {
+    showConfirmModal(
+        'Vai tiešām vēlaties dzēst šo formu? Šī darbība ir neatgriezeniska.',
+        function() {
+            // Confirmed - proceed with deletion
+            const formData = new FormData();
+            formData.append('delete_forma', '1');
+            formData.append('id', id);
+            
+            fetch('db/materiali_delete.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification('success', 'Veiksmīgi!', data.message);
+                    loadAudums();
+                } else {
+                    showNotification('error', 'Kļūda!', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting forma:', error);
+                showNotification('error', 'Kļūda!', 'Neizdevās dzēst formu.');
+            });
+        }
+    );
+}
+
+
+    function loadFormas() {
+        fetch('db/materiali.php?fetch_formas=1')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.getElementById('formas-table-body');
+            tbody.innerHTML = '';
+            
+            if (data.length > 0) {
+                data.forEach(forma => {
+                    const datums = forma.datums || new Date().toISOString().slice(0, 19).replace('T', ' ');
+                    
+                    // Format last modified info
+                    let lastModified = '';
+                    if (forma.red_dat && forma.red_liet_name) {
+                        const modifiedDate = new Date(forma.red_dat).toLocaleString('lv-LV');
+                        lastModified = `${forma.red_liet_name}<br><small>${modifiedDate}</small>`;
+                    } else if (forma.datums && forma.izveidots_liet_name) {
+                        const createdDate = new Date(forma.datums).toLocaleString('lv-LV');
+                        lastModified = `${forma.izveidots_liet_name}<br><small>${createdDate}</small>`;
+                    }
+                    
+                    const row = `
+                        <tr>
+                            <td>${forma.id_forma}</td>
+                            <td>${forma.forma}</td>
+                            <td>${datums}</td>
+                            <td>${lastModified}</td>
+                            <td class='action-buttons'>
+                                <button onclick="openEditModal(${forma.id_forma})" class='btn edit-btn'><i class='fas fa-edit'></i></button>
+                                <button onclick="deleteForma(${forma.id_forma})" class='btn delete-btn'><i class='fas fa-trash-alt'></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = "<tr><td colspan='5' class='no-records'>Nav atrasta neviena forma</td></tr>";
+            }
+        })
+        .catch(error => {
+            console.error('Error loading formas:', error);
+            showNotification('error', 'Kļūda!', 'Neizdevās ielādēt formas.');
+        });
+    }
+
     function showNotification(type, title, message) {
         const container = document.querySelector('.notification-container');
         const notification = document.querySelector('.notification');
@@ -212,5 +239,47 @@
             container.style.display = 'none';
         }, 5000);
     }
-</script>
 
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFormas();
+        
+        // Handle form submission - ONLY ONCE!
+        document.getElementById('formas-form-element').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const endpoint = editMode ? 'db/materiali_edit.php' : 'db/materiali_add.php';
+            const action = editMode ? 'edit_forma' : 'add_forma';
+            
+            formData.append(action, '1');
+            
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification('success', 'Veiksmīgi!', data.message);
+                    closeModal();
+                    loadFormas();
+                } else {
+                    showNotification('error', 'Kļūda!', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving forma:', error);
+                showNotification('error', 'Kļūda!', 'Neizdevās saglabāt formu.');
+            });
+        });
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('formas-modal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
