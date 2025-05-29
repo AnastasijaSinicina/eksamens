@@ -625,6 +625,9 @@ body{
 .edit-btn {
     background-color: var(--maincolor);
     color: white;
+        padding: .6rem;
+    margin: .7rem;
+    font-size: .9rem;
 }
 
 #buttons .delete-btn,

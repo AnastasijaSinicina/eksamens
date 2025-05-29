@@ -169,7 +169,7 @@ function processImage($imagePath, $mimeType) {
     return $imageData;
 }
 
-// Novirza atpakaļ uz profila lapu
-header("Location: ../../profils.php");
+// Novirza atpakaļ uz iepriekšējo lapu
+header("Location: " . ($_SERVER['HTTP_REFERER'] ?? '../../profils.php'));
 exit();
 ?>

@@ -286,6 +286,7 @@ if (isset($_GET['fetch_orders'])) {
         $stmt->close();
     }
     exit;
+}
 
 // Update order status query
 if (isset($_GET['action']) && $_GET['action'] == 'update_status') {
