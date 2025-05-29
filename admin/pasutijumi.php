@@ -1,6 +1,63 @@
 <?php
-// Include admin header
+// Handle AJAX requests for filters - FIXED: Check for POST data
+if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && $_POST['ajax'] == '1')) {
+    // Include only the database connection for AJAX requests
+    require 'db/con_db.php';
+    
+    // Get orders list with filters - pass POST data to the filter script
+    $_GET = array_merge($_GET, $_POST); // Merge POST into GET for pas_filtri.php compatibility
+    require 'db/pas_filtri.php';
+    
+    // Return only the table rows
+    if ($orders_result->num_rows > 0) {
+        while ($order = $orders_result->fetch_assoc()) {
+            echo '<tr>';
+            echo '<td>' . $order['id_pasutijums'] . '</td>';
+            echo '<td>';
+            echo '<div class="client-info">';
+            echo '<div>' . htmlspecialchars($order['vards'] . ' ' . $order['uzvards']) . '</div>';
+            echo '<small>' . htmlspecialchars($order['lietotajvards']) . '</small>';
+            echo '</div>';
+            echo '</td>';
+            echo '<td>' . date('d.m.Y H:i', strtotime($order['pas_datums'])) . '</td>';
+            echo '<td>' . number_format($order['kopeja_cena'], 2) . '€</td>';
+            echo '<td>' . $order['produktu_skaits'] . '</td>';
+            echo '<td>';
+            echo '<span class="status ' . strtolower($order['statuss']) . '">' . $order['statuss'] . '</span>';
+            echo '</td>';
+            echo '<td class="action-buttons">';
+            echo '<a href="pasutijumi.php?view=' . $order['id_pasutijums'] . '" class="btn"><i class="fas fa-eye"></i> Skatīt</a>';
+            echo '</td>';
+            echo '</tr>';
+        }
+    } else {
+        echo '<tr>';
+        echo '<td colspan="7" class="no-records">Nav atrasts neviens pasūtījums ar norādītajiem parametriem</td>';
+        echo '</tr>';
+    }
+    exit; // Stop execution after returning AJAX response
+}
+
+// Include admin header ONLY for non-AJAX requests
 require 'header.php';
+
+// Database connection
+require 'db/con_db.php';
+
+// Handle order status update
+if (isset($_POST['update_status'])) {
+    require 'db/update_status.php';
+}
+
+// Handle view order details
+$view_order = null;
+if (isset($_GET['view'])) {
+    require 'db/pas_vienumi.php';
+}
+
+// Get orders list with filters (only if not AJAX request)
+require 'db/pas_filtri.php';
+
 ?>
 
 <main>
@@ -29,13 +86,15 @@ require 'header.php';
                         <span class="status-label">Pašreizējais statuss:</span>
                         <span class="status" id="current-status"></span>
                         
-                        <form id="status-form" class="status-form">
-                            <input type="hidden" name="order_id" id="order_id" value="<?= $_GET['view'] ?>">
-                            <select name="new_status" id="new_status" class="status-select">
-                                <option value="Iesniegts">Iesniegts</option>
-                                <option value="Apstiprināts">Apstiprināts</option>
-                                <option value="Nosūtīts">Nosūtīts</option>
-                                <option value="Saņemts">Saņemts</option>
+
+                        <form method="post" action="pasutijumi.php" class="status-form">
+                            <input type="hidden" name="order_id" value="<?= $view_order['id_pasutijums'] ?>">
+                            <select name="new_status" class="status-select">
+                                <option value="Iesniegts" <?= $view_order['statuss'] == 'Iesniegts' ? 'selected' : '' ?>>Iesniegts</option>
+                                <option value="Apstiprināts" <?= $view_order['statuss'] == 'Apstiprināts' ? 'selected' : '' ?>>Apstiprināts</option>
+                                <option value="Nosūtīts" <?= $view_order['statuss'] == 'Nosūtīts' ? 'selected' : '' ?>>Nosūtīts</option>
+                                <option value="Saņemts" <?= $view_order['statuss'] == 'Saņemts' ? 'selected' : '' ?>>Saņemts</option>
+
                             </select>
                             <button type="submit" class="btn">Atjaunināt statusu</button>
                         </form>
@@ -60,8 +119,27 @@ require 'header.php';
                                     <th>Kopā</th>
                                 </tr>
                             </thead>
+
                             <tbody id="order-items-tbody">
                                 <!-- Order items will be loaded here -->
+
+                            <tbody>
+                                <?php foreach ($view_order['items'] as $item): ?>
+                                    <tr>
+                                        <td>
+                                            <img src="data:image/jpeg;base64,<?= base64_encode($item['attels1']) ?>" alt="<?= htmlspecialchars($item['nosaukums']) ?>" width="50">
+                                        </td>
+                                        <td><?= htmlspecialchars($item['nosaukums']) ?></td>
+                                        <td><?= number_format($item['cena'], 2) ?>€</td>
+                                        <td><?= $item['daudzums_no_groza'] ?></td>
+                                        <td><?= number_format($item['cena'] * $item['daudzums_no_groza'], 2) ?>€</td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr class="total-row">
+                                    <td colspan="4" class="text-right"><strong>Kopā:</strong></td>
+                                    <td><strong><?= number_format($view_order['kopeja_cena'], 2) ?>€</strong></td>
+                                </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -284,6 +362,12 @@ require 'header.php';
                             <option value="Apstiprināts">Apstiprināts</option>
                             <option value="Nosūtīts">Nosūtīts</option>
                             <option value="Saņemts">Saņemts</option>
+
+                            <option value="Iesniegts" <?= $status_filter == 'Iesniegts' ? 'selected' : '' ?>>Iesniegts</option>
+                            <option value="Apstiprināts" <?= $status_filter == 'Apstiprināts' ? 'selected' : '' ?>>Apstiprināts</option>
+                            <option value="Nosūtīts" <?= $status_filter == 'Nosūtīts' ? 'selected' : '' ?>>Nosūtīts</option>
+                            <option value="Saņemts" <?= $status_filter == 'Saņemts' ? 'selected' : '' ?>>Saņemts</option>
+
                         </select>
                     </div>
                     
@@ -295,11 +379,13 @@ require 'header.php';
                     <div class="filter-group date-range">
                         <label>Datuma diapazons:</label>
                         <div class="date-inputs">
-                            <input type="date" id="date_from" name="date_from">
+
+                            <input type="date" id="date_from" name="date_from" value="<?= $date_from ?>">
                             <span>līdz</span>
-                            <input type="date" id="date_to" name="date_to">
+                            <input type="date" id="date_to" name="date_to" value="<?= $date_to ?>">
                         </div>
                     </div>
+                    
                 </form>
             </div>
             
@@ -322,17 +408,47 @@ require 'header.php';
                             </tr>
                         </thead>
                         <tbody id="orders-tbody">
-                            <!-- Orders will be loaded here -->
+                           <!-- Orders will be loaded here -->
+
+                            <?php if ($orders_result->num_rows > 0): ?>
+                                <?php while ($order = $orders_result->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?= $order['id_pasutijums'] ?></td>
+                                        <td>
+                                            <div class="client-info">
+                                                <div><?= htmlspecialchars($order['vards'] . ' ' . $order['uzvards']) ?></div>
+                                                <small><?= htmlspecialchars($order['lietotajvards']) ?></small>
+                                            </div>
+                                        </td>
+                                        <td><?= date('d.m.Y H:i', strtotime($order['pas_datums'])) ?></td>
+                                        <td><?= number_format($order['kopeja_cena'], 2) ?>€</td>
+                                        <td><?= $order['produktu_skaits'] ?></td>
+                                        <td>
+                                            <span class="status <?= strtolower($order['statuss']) ?>"><?= $order['statuss'] ?></span>
+                                        </td>
+                                        <td class="action-buttons">
+                                            <a href="pasutijumi.php?view=<?= $order['id_pasutijums'] ?>" class="btn"><i class="fas fa-eye"></i> Skatīt</a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="7" class="no-records">Nav atrasts neviens pasūtījums ar norādītajiem parametriem</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <script>
+
                 // Load orders on page load
                 document.addEventListener('DOMContentLoaded', function() {
                     loadOrders();
                 });
+
+
 
                 // Function to load orders with AJAX
                 function loadOrders() {
@@ -347,10 +463,14 @@ require 'header.php';
                     document.getElementById('loading-indicator').style.display = 'block';
                     document.getElementById('orders-tbody').style.opacity = '0.5';
 
+
                     fetch('db/pasutijumi_admin.php', {
                         method: 'POST',
                         body: formData
                     })
+
+                    fetch('pasutijumi.php?' + new URLSearchParams(formData).toString())
+
                         .then(response => response.text())
                         .then(html => {
                             document.getElementById('orders-tbody').innerHTML = html;
@@ -364,8 +484,13 @@ require 'header.php';
                         });
                 }
 
+
                 // Auto-filter on input change with debounce
                 document.getElementById('search').addEventListener('input', function() {
+                // Auto-filter on input change (optional - can be removed if too frequent)
+                document.getElementById('search').addEventListener('input', function() {
+                    // Debounce the search input
+
                     clearTimeout(this.searchTimeout);
                     this.searchTimeout = setTimeout(() => {
                         loadOrders();
@@ -388,4 +513,9 @@ require 'header.php';
             </script>
         <?php endif; ?>
     </section>
+
 </main>
+
+</main>
+
+</document_content>

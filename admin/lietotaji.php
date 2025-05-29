@@ -122,6 +122,37 @@
                     </form>
                 </div>
             </div>
+
+                
+                <div class="form-group">
+                    <label for="lietotajvards">Lietotājvārds:</label>
+                    <input type="text" id="lietotajvards" name="lietotajvards" value="<?php echo $editData ? $editData['lietotajvards'] : ''; ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="epasts">E-pasts:</label>
+                    <input type="email" id="epasts" name="epasts" value="<?php echo $editData ? $editData['epasts'] : ''; ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="parole">Parole:<?php echo $editData ? ' (atstājiet tukšu, lai nemainītu)' : ''; ?></label>
+                    <input type="password" id="parole" name="parole" <?php echo $editData ? '' : 'required'; ?> autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                    <input type="password" id="parole" name="parole" <?php echo $editData ? '' : 'required'; ?>>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loma">Loma:</label>
+                    <select id="loma" name="loma" required>
+                        <option value="admin" <?php echo ($editData && $editData['loma'] == 'admin') ? 'selected' : ''; ?>>Administrators</option>
+                        <option value="moder" <?php echo ($editData && $editData['loma'] == 'moder') ? 'selected' : ''; ?>>Moderators</option>
+                    </select>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" name="submit" class="btn"><?php echo $editData ? 'Atjaunināt lietotāju' : 'Pievienot lietotāju'; ?></button>
+                    <a href="lietotaji.php" class="btn clear-btn">Atcelt</a>
+                </div>
+            </form>
         </div>
         
     </section>

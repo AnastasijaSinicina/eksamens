@@ -2,6 +2,10 @@
 
 $order_id = $_GET['view'];
 
+// Get order details
+$order_id = $_GET['view'];
+
+// Get order information
 $order_query = "SELECT p.*, l.lietotajvards
                FROM sparkly_pasutijumi p
                JOIN lietotaji_sparkly l ON p.lietotajs_id = l.id_lietotajs

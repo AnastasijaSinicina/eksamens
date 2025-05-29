@@ -7,13 +7,20 @@ function insertCustomOrder($user_id, $order_data) {
     
     try {
         $savienojums->autocommit(FALSE);
-        
+    
         // Include pas_datums in the INSERT query with CURRENT_TIMESTAMP
         $insert_query = "INSERT INTO sparkly_spec_pas 
                         (lietotajs_id, vards, uzvards, epasts, talrunis, adrese, pilseta, pasta_indekss, 
                          forma, audums, malu_figura, dekorejums1, dekorejums2, 
                          daudzums, piezimes, statuss, datums) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Iesniegts', CURRENT_TIMESTAMP)";
+
+        $insert_query = "INSERT INTO sparkly_spec_pas 
+                        (lietotajs_id, vards, uzvards, epasts, talrunis, adrese, pilseta, pasta_indekss, 
+                         forma, audums, malu_figura, dekorejums1, dekorejums2, 
+                         daudzums, piezimes, statuss) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Iesniegts')";
+
         
         $stmt = $savienojums->prepare($insert_query);
         
@@ -21,7 +28,10 @@ function insertCustomOrder($user_id, $order_data) {
             throw new Exception("Database prepare error: " . $savienojums->error);
         }
         
+
         // Bind parameters (removed pas_datums from bind_param since we're using CURRENT_TIMESTAMP in SQL)
+
+
         $stmt->bind_param("issssssssssssis", 
             $user_id,
             $order_data['vards'], 
@@ -47,7 +57,6 @@ function insertCustomOrder($user_id, $order_data) {
         $custom_order_id = $savienojums->insert_id;
         error_log("Custom order created with ID: " . $custom_order_id);
         
-        // Update user's custom order count
         $update_custom_order_count = $savienojums->prepare("UPDATE lietotaji_sparkly SET spec_pas_skaits = spec_pas_skaits + 1 WHERE id_lietotajs = ?");
         $update_custom_order_count->bind_param("i", $user_id);
         
