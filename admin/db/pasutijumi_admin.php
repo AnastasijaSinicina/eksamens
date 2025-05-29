@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
 require_once 'con_db.php';
 session_start();
 
@@ -287,8 +286,6 @@ if (isset($_GET['fetch_orders'])) {
         $stmt->close();
     }
     exit;
-=======
-// Database queries for order management
 
 // Update order status query
 if (isset($_GET['action']) && $_GET['action'] == 'update_status') {
@@ -325,6 +322,5 @@ if (isset($_GET['action']) && $_GET['action'] == 'get_orders_filtered') {
     $date_to_condition = "p.pas_datums <= ?";
     
     $order_by_clause = " ORDER BY p.pas_datums DESC";
->>>>>>> 1a021a866269243fba74051c1e39ad0d4862fad7
 }
 ?>
