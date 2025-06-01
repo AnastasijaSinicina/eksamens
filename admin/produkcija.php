@@ -79,8 +79,7 @@ require 'db/produkcija_admin.php';
                             <th>Forma</th>
                             <th>Audums</th>
                             <th>Malu figūra</th>
-                            <th>Dekorējums (1)</th>
-                            <th>Dekorējums (2)</th>
+                            <th>Dekorējums</th>
                             <th>Cena</th>
                             <th>Izveidots</th>
                             <th>Atjaunināts</th>
@@ -106,7 +105,6 @@ require 'db/produkcija_admin.php';
                                 echo "<td>" . htmlspecialchars($row['audums_name']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['malu_figura_name']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['dekorejums1_name']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['dekorejums2_name']) . "</td>";
                                 echo "<td class='price'>€" . number_format($row['cena'], 2) . "</td>";
                                 
                                 // Created info - UPDATED VERSION WITH USER NAMES
@@ -184,41 +182,6 @@ require 'db/produkcija_admin.php';
     </div>
 </div>
 
-<!-- Custom CSS for improved styling -->
-<style>
-    .product-thumbnail {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: transform 0.3s;
-    }
-
-    .product-thumbnail:hover {
-        transform: scale(1.1);
-    }
-    
-    .no-image {
-        width: 50px;
-        height: 50px;
-        background-color: #e9ecef;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 5px;
-        color: #6c757d;
-    }
-    
-    .metadata {
-        font-size: 0.9em;
-        line-height: 1.4;
-    }
-    
-    .metadata small {
-        color: #6c757d;
-    }
-</style>
 
 <!-- JavaScript for enhanced functionality -->
 <script>

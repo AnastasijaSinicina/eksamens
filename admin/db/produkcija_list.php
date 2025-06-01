@@ -16,7 +16,6 @@
             'audums_id' => htmlspecialchars($bumba['audums_id']),
             'figura_id' => htmlspecialchars($bumba['figura_id']),
             'dekorejums1_id' => htmlspecialchars($bumba['dekorejums1_id']),
-            'dekorejums2_id' => htmlspecialchars($bumba['dekorejums2_id']),
             'attels1' => base64_encode($bumba['attels1']),
             'attels2' => base64_encode($bumba['attels2']),
             'attels3' => base64_encode($bumba['attels3']),

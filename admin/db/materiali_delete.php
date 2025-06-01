@@ -38,23 +38,6 @@ if (isset($_POST['delete_dekorejums1']) && isset($_POST['id'])) {
     exit;
 }
 
-if (isset($_POST['delete_dekorejums2']) && isset($_POST['id'])) {
-    $id = $_POST['id'];
-    
-    $sql = "DELETE FROM sparkly_dekorejums2 WHERE id_dekorejums2 = ?";
-    $stmt = $savienojums->prepare($sql);
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        $response = ['status' => 'success', 'message' => 'Dekorējums ir izdzēsts.'];
-    } else {
-        $response = ['status' => 'error', 'message' => 'Neizdevās dzēst dekorējumu.'];
-    }
-    $stmt->close();
-    
-    echo json_encode($response);
-    exit;
-}
 
 if (isset($_POST['delete_figura']) && isset($_POST['id'])) {
     $id = $_POST['id'];

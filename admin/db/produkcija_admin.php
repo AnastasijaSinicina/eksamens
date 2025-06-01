@@ -17,8 +17,6 @@ $malu_figura_table_exists = $savienojums->query($check_malu_figura_table_sql)->n
 $check_dekorejums1_table_sql = "SHOW TABLES LIKE 'sparkly_dekorejums1'";
 $dekorejums1_table_exists = $savienojums->query($check_dekorejums1_table_sql)->num_rows > 0;
 
-$check_dekorejums2_table_sql = "SHOW TABLES LIKE 'sparkly_dekorejums2'";
-$dekorejums2_table_exists = $savienojums->query($check_dekorejums2_table_sql)->num_rows > 0;
 
 if ($formas_table_exists) {
     $sql .= "f.forma AS forma_name, ";
@@ -44,11 +42,6 @@ if ($dekorejums1_table_exists) {
     $sql .= "p.dekorejums1_id AS dekorejums1_name, ";
 }
 
-if ($dekorejums2_table_exists) {
-    $sql .= "d2.nosaukums AS dekorejums2_name, ";
-} else {
-    $sql .= "p.dekorejums2_id AS dekorejums2_name, ";
-}
 
 $sql .= "creator.lietotajvards as created_username, ";
 $sql .= "creator.vards as created_first_name, ";
@@ -75,9 +68,6 @@ if ($dekorejums1_table_exists) {
     $sql .= "LEFT JOIN sparkly_dekorejums1 d1 ON p.dekorejums1_id = d1.id_dekorejums1 ";
 }
 
-if ($dekorejums2_table_exists) {
-    $sql .= "LEFT JOIN sparkly_dekorejums2 d2 ON p.dekorejums2_id = d2.id_dekorejums2 ";
-}
 
 $sql .= "LEFT JOIN lietotaji_sparkly creator ON p.izveidots_liet = creator.id_lietotajs ";
 $sql .= "LEFT JOIN lietotaji_sparkly editor ON p.red_liet = editor.id_lietotajs ";
@@ -134,16 +124,6 @@ if ($dekorejums1_table_exists) {
     }
 }
 
-$dekorejums2_options = [];
-if ($dekorejums2_table_exists) {
-    $dekorejums2_sql = "SELECT * FROM sparkly_dekorejums2 ORDER BY nosaukums";
-    $dekorejums2_result = $savienojums->query($dekorejums2_sql);
-    if ($dekorejums2_result && $dekorejums2_result->num_rows > 0) {
-        while ($dekorejums2_row = $dekorejums2_result->fetch_assoc()) {
-            $dekorejums2_options[] = $dekorejums2_row;
-        }
-    }
-}
 
 if (isset($_GET['id'])) {
     $product_id = (int)$_GET['id'];

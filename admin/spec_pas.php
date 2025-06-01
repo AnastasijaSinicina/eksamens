@@ -182,18 +182,6 @@ require 'db/spec_pas_admin.php';
                                 </span>
                             </div>
                         <?php endif; ?>
-                        <?php if ($view_order['dekorejums2']): ?>
-                            <div class="info-row">
-                                <span>Dekorējums 2:</span>
-                                <span>
-                                    <?php if (isset($view_order['dekorejums2_name']) && $view_order['dekorejums2_name']): ?>
-                                        <?= htmlspecialchars($view_order['dekorejums2_name']) ?>
-                                    <?php else: ?>
-                                        ID: <?= $view_order['dekorejums2'] ?>
-                                    <?php endif; ?>
-                                </span>
-                            </div>
-                        <?php endif; ?>
                     </div>
                     <?php if ($view_order['piezimes']): ?>
                         <div class="notes-section">

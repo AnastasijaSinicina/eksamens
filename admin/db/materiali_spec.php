@@ -41,14 +41,5 @@ if ($result_dekorejums1 && $result_dekorejums1->num_rows > 0) {
     }
 }
 
-$sql_dekorejums2 = "SELECT id_dekorejums2, nosaukums, attels FROM sparkly_dekorejums2 ORDER BY nosaukums";
-$result_dekorejums2 = $savienojums->query($sql_dekorejums2);
-
-$dekorejumi2 = [];
-if ($result_dekorejums2 && $result_dekorejums2->num_rows > 0) {
-    while ($row = $result_dekorejums2->fetch_assoc()) {
-        $dekorejumi2[] = $row;
-    }
-}
 
 ?>

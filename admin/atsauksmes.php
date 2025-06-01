@@ -3,7 +3,7 @@
     require 'header.php';
     
     // Database connection
-    require 'db/atsauksmes.php';
+    require 'db/atsauksmes_admin.php';
 
 ?>
 
@@ -97,13 +97,6 @@
                                     <td><?= $feedback['id_atsauksme'] ?></td>
                                     <td>
                                         <div class="client-info">
-                                            <div class="client-avatar">
-                                                <?php if (!empty($feedback['foto'])): ?>
-                                                    <img src="data:image/jpeg;base64,<?= base64_encode($feedback['foto']) ?>" alt="Profila attēls">
-                                                <?php else: ?>
-                                                    <i class="fas fa-user"></i>
-                                                <?php endif; ?>
-                                            </div>
                                             <div class="client-details">
                                                 <strong><?= htmlspecialchars($feedback['vards_uzvards']) ?></strong>
                                                 <?php if ($feedback['lietotajvards']): ?>
@@ -151,13 +144,13 @@
                                     <td class="action-buttons">
                                         <?php if (!$feedback['apstiprinats']): ?>
                                             <button onclick="approveFeedback(<?= $feedback['id_atsauksme'] ?>)" 
-                                               class="btn approve-btn">
-                                                <i class="fas fa-check"></i>
+                                               class="btn reject-btn">
+                                                <i class="fas fa-times"></i>
                                             </button>
                                         <?php else: ?>
                                             <button onclick="rejectFeedback(<?= $feedback['id_atsauksme'] ?>)" 
-                                               class="btn reject-btn">
-                                                <i class="fas fa-times"></i>
+                                               class="btn approve-btn">
+                                                <i class="fas fa-check"></i>
                                             </button>
                                         <?php endif; ?>
                                     </td>

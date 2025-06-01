@@ -30,7 +30,6 @@ if (isset($_POST['submit_custom_order'])) {
         'audums' => 'Audums',
         'malu_figura' => 'Mālu figūra',
         'dekorejums1' => 'Dekorējums 1',
-        'dekorejums2' => 'Dekorējums 2',
         'vards' => 'Vārds',
         'uzvards' => 'Uzvārds',
         'epasts' => 'E-pasts',
@@ -80,7 +79,6 @@ if (isset($_POST['submit_custom_order'])) {
             'audums' => htmlspecialchars($_POST['audums']),
             'malu_figura' => htmlspecialchars($_POST['malu_figura'] ?? ''),
             'dekorejums1' => htmlspecialchars($_POST['dekorejums1'] ?? ''),
-            'dekorejums2' => htmlspecialchars($_POST['dekorejums2'] ?? ''),
             'daudzums' => intval($_POST['daudzums']),
             'piezimes' => htmlspecialchars($_POST['piezimes'])
         ];
@@ -88,9 +86,13 @@ if (isset($_POST['submit_custom_order'])) {
         // Insert the order
         $result = insertCustomOrder($user['id_lietotajs'], $order_data);
         
+        // Replace this section in your materiali.php file:
+
         if ($result['success']) {
             $_SESSION['pazinojums'] = "Jūsu pielāgotā produkta pieprasījums ir veiksmīgi nosūtīts! Mēs sazināsimies ar jums drīzumā.";
-            header("Location: profils.php");
+            
+            // Redirect to profile page with orders tab active
+            header("Location: profils.php?tab=orders&success=1");
             exit();
         } else {
             $error_message = "Kļūda nosūtot pieprasījumu: " . $result['error'];
@@ -175,22 +177,6 @@ include 'header.php';
                     </div>
                 </div>
                 
-                <!-- Dekorejums 2 with images -->
-                <div class="form-group">
-                    <label for="dekorejums2">Dekorējums 2*:</label>
-                    <select id="dekorejums2" name="dekorejums2" onchange="updateImageDisplay('dekorejums2')">
-                        <option value="">Izvēlieties dekorējumu</option>
-                        <?php foreach ($dekorejumi2 as $dekorejums): ?>
-                            <option value="<?= $dekorejums['id_dekorejums2'] ?>" 
-                                    data-image="<?= !empty($dekorejums['attels']) ? base64_encode($dekorejums['attels']) : '' ?>">
-                                <?= htmlspecialchars($dekorejums['nosaukums']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <div id="dekorejums2_image" class="material-image-preview" style="display: none;">
-                        <img src="" alt="Dekorējums 2" />
-                    </div>
-                </div>
                 <div class="form-group">
                     <label for="daudzums">Daudzums*:</label>
                     <input type="number" id="daudzums" name="daudzums" min="1" value="1" required>

@@ -59,7 +59,6 @@ $cartCount = $cartCount ?: 0;
         </div>
     <nav class="nav">
         <a href="index.php">Sākums</a>
-        <a href="jaunumi.php">Jaunumi</a>
         <a href="produkcija.php">Produkcija</a>
         <a href="materiali.php">Izveido pats</a>
         <a href="atsauksmes.php">Atsauksmes</a>

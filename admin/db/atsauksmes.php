@@ -1,108 +1,65 @@
 <?php
-    require 'header.php';
-    require 'db/con_db.php';
 
-    // Apstrādā atsauksmju apstiprināšanu/noraidīšanu
-    if (isset($_GET['approve'])) {
-        $id = $_GET['approve'];
-        // SQL vaicājums atsauksmes apstiprināšanai (apstiprinats = 1)
-        $sql = "UPDATE sparkly_atsauksmes SET apstiprinats = 1 WHERE id_atsauksme = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
+require 'con_db.php';
+$_SESSION['redirect_after_login'] = "atstajatsauksmi.php";
+
+// Display session notification if exists
+if (isset($_SESSION['pazinojums'])) {
+    echo '<div class="success-message">' . htmlspecialchars($_SESSION['pazinojums']) . '</div>';
+    unset($_SESSION['pazinojums']);
+}
+
+// Check if user is logged in to determine feedback availability
+$user_can_leave_feedback = false;
+$user_id = null;
+
+if (isset($_SESSION['lietotajvardsSIN'])) {
+    $_SESSION['redirect_after_login'] = "atsauksmes.php";
+    $username = $_SESSION['lietotajvardsSIN'];
+    $user_query = "SELECT id_lietotajs, pas_skaits FROM lietotaji_sparkly WHERE lietotajvards = ?";
+    $user_stmt = $savienojums->prepare($user_query);
+    
+    if ($user_stmt) {
+        $user_stmt->bind_param("s", $username);
+        $user_stmt->execute();
+        $user_result = $user_stmt->get_result();
+        $user = $user_result->fetch_assoc();
         
-        if ($stmt->execute()) {
-            // Parāda veiksmīgu ziņojumu
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Atsauksme ir noraidīta.');
-                    });
-                  </script>";
-        } else {
-            // Parāda kļūdas ziņojumu
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('error', 'Kļūda!', 'Neizdevās apstiprināt atsauksmi.');
-                    });
-                  </script>";
+        if ($user && $user['pas_skaits'] > 0) {
+            $user_can_leave_feedback = true;
+            $user_id = $user['id_lietotajs'];
         }
-        $stmt->close();
+        $user_stmt->close();
     }
+}
 
-    // Apstrādā atsauksmes noraidīšanu
-    if (isset($_GET['reject'])) {
-        $id = $_GET['reject'];
-        // SQL vaicājums atsauksmes noraidīšanai (apstiprinats = 0)
-        $sql = "UPDATE sparkly_atsauksmes SET apstiprinats = 0 WHERE id_atsauksme = ?";
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("i", $id);
-        
-        if ($stmt->execute()) {
-            // Parāda veiksmīgu ziņojumu
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Atsauksme ir apstiprināta.');
-                    });
-                  </script>";
-        } else {
-            // Parāda kļūdas ziņojumu
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('error', 'Kļūda!', 'Neizdevās noraidīt atsauksmi.');
-                    });
-                  </script>";
-        }
-        $stmt->close();
-    }
+// Get approved feedback with improved query including user photos
+$feedback_sql = "SELECT a.id_atsauksme, a.vards_uzvards, a.zvaigznes, a.atsauksme, a.datums,
+                        l.lietotajvards, l.foto, a.apstiprinats
+                 FROM sparkly_atsauksmes a
+                 LEFT JOIN lietotaji_sparkly l ON a.lietotajs_id = l.id_lietotajs
+                 WHERE a.apstiprinats = 1
+                 ORDER BY a.datums DESC";
 
-    // Iegūst filtrēšanas parametrus no URL
-    $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
-    $rating_filter = isset($_GET['rating']) ? $_GET['rating'] : '';
-    
-    // Izveido WHERE nosacījumu masīvu filtrēšanai
-    $where_conditions = [];
-    $params = [];
-    $types = '';
-    
-    // Pārbauda statusu filtru
-    if ($status_filter === 'approved') {
-        // Tikai apstiprinātas atsauksmes
-        $where_conditions[] = "a.apstiprinats = 1";
-    } elseif ($status_filter === 'pending') {
-        // Tikai neapstiprinātas atsauksmes (gaida apstiprinājumu)
-        $where_conditions[] = "a.apstiprinats = 0";
+$result = $savienojums->query($feedback_sql);
+$approved_feedback = [];
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $approved_feedback[] = $row;
     }
-    
-    // Pārbauda vērtējumu filtru
-    if (!empty($rating_filter)) {
-        $where_conditions[] = "a.zvaigznes = ?";
-        $params[] = $rating_filter;
-        $types .= 'i'; // integer tips parametram
-    }
-    
-    // Izveido galīgo SQL vaicājumu
-    $query = "SELECT a.*, l.lietotajvards, l.foto
-              FROM sparkly_atsauksmes a
-              LEFT JOIN lietotaji_sparkly l ON a.lietotajs_id = l.id_lietotajs";
-    
-    // Pievieno WHERE nosacījumus, ja tie eksistē
-    if (!empty($where_conditions)) {
-        $query .= " WHERE " . implode(" AND ", $where_conditions);
-    }
-    
-    // Kārto pēc datuma (jaunākās vispirms)
-    $query .= " ORDER BY a.datums DESC";
-    
-    // Sagatavo un izpilda vaicājumu
-    $stmt = $savienojums->prepare($query);
-    if ($stmt === false) {
-        // Pārtrauc izpildi, ja vaicājuma sagatavošana neizdevās
-        die('Prepare failed: ' . $savienojums->error);
-    }
-    
-    // Piesaista parametrus, ja tie eksistē
-    if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
-    }
-    $stmt->execute();
-    $feedback_result = $stmt->get_result();
+}
+
+// Calculate average rating
+$average_rating = 0;
+$total_ratings = 0;
+if (!empty($approved_feedback)) {
+    $sum_ratings = array_sum(array_column($approved_feedback, 'zvaigznes'));
+    $total_ratings = count($approved_feedback);
+    $average_rating = $sum_ratings / $total_ratings;
+}
+
+$savienojums->close();
+
+
 ?>

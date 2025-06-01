@@ -1,5 +1,6 @@
 <?php
-=
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 require_once 'con_db.php';
 
@@ -9,9 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $audums_id = $_POST['audums_id'];
     $figura_id = $_POST['figura_id'];
     $dekorejums1_id = $_POST['dekorejums1_id'];
-    $dekorejums2_id = $_POST['dekorejums2_id'];
     $cena = $_POST['cena'];
-    $izveidots_liet = $_SESSION['user_id'] ?? 1; =
+    $izveidots_liet = $_SESSION['user_id'] ?? 1;
     $timestamp = date('Y-m-d H:i:s');
     
     if (isset($_FILES['attels1']) && $_FILES['attels1']['error'] == 0 &&
@@ -41,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $attels2 = file_get_contents($_FILES['attels2']['tmp_name']);
             $attels3 = file_get_contents($_FILES['attels3']['tmp_name']);
             
-            $sql = "INSERT INTO produkcija_sprarkly (forma, nosaukums, audums_id, figura_id, dekorejums1_id, dekorejums2_id, attels1, attels2, attels3, cena, izveidots_liet, timestamp) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO produkcija_sprarkly (forma, nosaukums, audums_id, figura_id, dekorejums1_id, attels1, attels2, attels3, cena, izveidots_liet, timestamp) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $savienojums->prepare($sql);
-            $stmt->bind_param("isiiiibbidis", $forma, $nosaukums, $audums_id, $figura_id, $dekorejums1_id, $dekorejums2_id, $attels1, $attels2, $attels3, $cena, $izveidots_liet, $timestamp);
+            $stmt->bind_param("isiiisssdis", $forma, $nosaukums, $audums_id, $figura_id, $dekorejums1_id, $attels1, $attels2, $attels3, $cena, $izveidots_liet, $timestamp);
             
             if ($stmt->execute()) {
                 $success_message = "Produkts ir veiksmīgi pievienots.";

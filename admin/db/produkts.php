@@ -1,212 +1,140 @@
 <?php
-/**
- * Database functions for product operations
- */
+require 'con_db.php'; // Database connection
 
-/**
- * Get product by ID with all related information
- * @param mysqli $savienojums Database connection
- * @param int $id Product ID
- * @return array|null Product data or null if not found
- */
-function getProduktById($savienojums, $id) {
-    // Check if tables and columns exist
-    $schema_info = checkDatabaseSchema($savienojums);
-    
-    // Construct query based on available schema
-    $query = buildProductQuery($schema_info);
-    
-    $stmt = $savienojums->prepare($query);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+$bumba = null;
+$product_found = false;
 
-    if ($result->num_rows > 0) {
-        $bumba = $result->fetch_assoc();
-        
-        // Process display values based on schema
-        $bumba = processDisplayValues($bumba, $schema_info);
-        
-        return $bumba;
-    }
-    
-    return null;
-}
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $id = intval($_GET['id']); // Sanitize input
 
-/**
- * Check database schema for existing tables and columns
- * @param mysqli $savienojums Database connection
- * @return array Schema information
- */
-function checkDatabaseSchema($savienojums) {
-    $schema_info = [];
-    
     // Check if tables exist
-    $tables_to_check = [
-        'sparkly_formas',
-        'sparkly_audums',
-        'sparkly_malu_figura',
-        'sparkly_dekorejums1',
-        'sparkly_dekorejums2'
-    ];
+    $formas_table_exists = false;
+    $audums_table_exists = false;
+    $malu_figura_table_exists = false;
+    $dekorejums1_table_exists = false;
     
-    foreach ($tables_to_check as $table) {
-        $check_sql = "SHOW TABLES LIKE '$table'";
-        $schema_info[$table . '_exists'] = $savienojums->query($check_sql)->num_rows > 0;
+    $check_formas_table_sql = "SHOW TABLES LIKE 'sparkly_formas'";
+    $result = $savienojums->query($check_formas_table_sql);
+    if (isset($result) && $result->num_rows > 0) {
+        $formas_table_exists = true;
     }
     
-    // Check if columns exist in main table
-    $columns_to_check = [
-        'audums_id',
-        'figura_id',
-        'dekorejums1_id',
-        'dekorejums2_id'
-    ];
-    
-    foreach ($columns_to_check as $column) {
-        $check_sql = "SHOW COLUMNS FROM produkcija_sprarkly LIKE '$column'";
-        $schema_info[$column . '_exists'] = $savienojums->query($check_sql)->num_rows > 0;
+    $check_audums_table_sql = "SHOW TABLES LIKE 'sparkly_audums'";
+    $result = $savienojums->query($check_audums_table_sql);
+    if (isset($result) && $result->num_rows > 0) {
+        $audums_table_exists = true;
     }
     
-    return $schema_info;
-}
+    $check_malu_figura_table_sql = "SHOW TABLES LIKE 'sparkly_malu_figura'";
+    $result = $savienojums->query($check_malu_figura_table_sql);
+    if (isset($result) && $result->num_rows > 0) {
+        $malu_figura_table_exists = true;
+    }
+    
+    $check_dekorejums1_table_sql = "SHOW TABLES LIKE 'sparkly_dekorejums1'";
+    $result = $savienojums->query($check_dekorejums1_table_sql);
+    if (isset($result) && $result->num_rows > 0) {
+        $dekorejums1_table_exists = true;
+    }
 
-/**
- * Build SQL query based on available schema
- * @param array $schema_info Schema information
- * @return string SQL query
- */
-function buildProductQuery($schema_info) {
+    // Check if columns exist
+    $audums_id_exists = false;
+    $figura_id_exists = false;
+    $dekorejums1_id_exists = false;
+    
+    $check_audums_id_sql = "SHOW COLUMNS FROM produkcija_sprarkly LIKE 'audums_id'";
+    $result = $savienojums->query($check_audums_id_sql);
+    if (isset($result) && $result->num_rows > 0) {
+        $audums_id_exists = true;
+    }
+    
+    $check_figura_id_sql = "SHOW COLUMNS FROM produkcija_sprarkly LIKE 'figura_id'";
+    $result = $savienojums->query($check_figura_id_sql);
+    if (isset($result) && $result->num_rows > 0) {
+        $figura_id_exists = true;
+    }
+    
+    $check_dekorejums1_id_sql = "SHOW COLUMNS FROM produkcija_sprarkly LIKE 'dekorejums1_id'";
+    $result = $savienojums->query($check_dekorejums1_id_sql);
+    if (isset($result) && $result->num_rows > 0) {
+        $dekorejums1_id_exists = true;
+    }
+
+    // Construct query based on existing schema
     $query = "SELECT p.* ";
     
-    // Add columns from related tables if they exist
-    if ($schema_info['sparkly_formas_exists']) {
+    if ($formas_table_exists) {
         $query .= ", f.forma AS forma_name ";
     }
     
-    if ($schema_info['sparkly_audums_exists'] && $schema_info['audums_id_exists']) {
+    if ($audums_table_exists && $audums_id_exists) {
         $query .= ", a.nosaukums AS audums_name ";
     }
     
-    if ($schema_info['sparkly_malu_figura_exists'] && $schema_info['figura_id_exists']) {
+    if ($malu_figura_table_exists && $figura_id_exists) {
         $query .= ", m.nosaukums AS malu_figura_name ";
     }
     
-    if ($schema_info['sparkly_dekorejums1_exists'] && $schema_info['dekorejums1_id_exists']) {
+    if ($dekorejums1_table_exists && $dekorejums1_id_exists) {
         $query .= ", d1.nosaukums AS dekorejums1_name ";
     }
-    
-    if ($schema_info['sparkly_dekorejums2_exists'] && $schema_info['dekorejums2_id_exists']) {
-        $query .= ", d2.nosaukums AS dekorejums2_name ";
-    }
-    
+
     $query .= " FROM produkcija_sprarkly p ";
     
-    // Add JOINs based on available tables
-    if ($schema_info['sparkly_formas_exists']) {
+    if ($formas_table_exists) {
         $query .= " LEFT JOIN sparkly_formas f ON p.forma = f.id_forma ";
     }
     
-    if ($schema_info['sparkly_audums_exists'] && $schema_info['audums_id_exists']) {
+    if ($audums_table_exists && $audums_id_exists) {
         $query .= " LEFT JOIN sparkly_audums a ON p.audums_id = a.id_audums ";
     }
     
-    if ($schema_info['sparkly_malu_figura_exists'] && $schema_info['figura_id_exists']) {
+    if ($malu_figura_table_exists && $figura_id_exists) {
         $query .= " LEFT JOIN sparkly_malu_figura m ON p.figura_id = m.id_malu_figura ";
     }
     
-    if ($schema_info['sparkly_dekorejums1_exists'] && $schema_info['dekorejums1_id_exists']) {
+    if ($dekorejums1_table_exists && $dekorejums1_id_exists) {
         $query .= " LEFT JOIN sparkly_dekorejums1 d1 ON p.dekorejums1_id = d1.id_dekorejums1 ";
     }
-    
-    if ($schema_info['sparkly_dekorejums2_exists'] && $schema_info['dekorejums2_id_exists']) {
-        $query .= " LEFT JOIN sparkly_dekorejums2 d2 ON p.dekorejums2_id = d2.id_dekorejums2 ";
-    }
-    
+
     $query .= " WHERE p.id_bumba = ?";
-    
-    return $query;
-}
 
-/**
- * Process display values based on available data
- * @param array $bumba Product data
- * @param array $schema_info Schema information
- * @return array Processed product data
- */
-function processDisplayValues($bumba, $schema_info) {
-    // Determine correct display values based on schema
-    $bumba['forma_display'] = isset($bumba['forma_name']) ? $bumba['forma_name'] : $bumba['forma'];
-    
-    $bumba['audums_display'] = isset($bumba['audums_name']) ? $bumba['audums_name'] : 
-                              (isset($bumba['audums']) ? $bumba['audums'] : 
-                              (isset($bumba['audums_id']) ? $bumba['audums_id'] : 'Nav norādīts'));
-    
-    $bumba['malu_figura_display'] = isset($bumba['malu_figura_name']) ? $bumba['malu_figura_name'] : 
-                                   (isset($bumba['malu_figura']) ? $bumba['malu_figura'] : 
-                                   (isset($bumba['figura_id']) ? $bumba['figura_id'] : 'Nav norādīts'));
-    
-    $bumba['dekorejums1_display'] = isset($bumba['dekorejums1_name']) ? $bumba['dekorejums1_name'] : 
-                                   (isset($bumba['dekorejums']) ? $bumba['dekorejums'] : 
-                                   (isset($bumba['dekorejums1_id']) ? $bumba['dekorejums1_id'] : 'Nav norādīts'));
-    
-    $bumba['dekorejums2_display'] = isset($bumba['dekorejums2_name']) ? $bumba['dekorejums2_name'] : 
-                                   (isset($bumba['dekorejums2']) ? $bumba['dekorejums2'] : 
-                                   (isset($bumba['dekorejums2_id']) ? $bumba['dekorejums2_id'] : 'Nav norādīts'));
-    
-    return $bumba;
-}
-
-/**
- * Get all products (for potential future use)
- * @param mysqli $savienojums Database connection
- * @return array Products array
- */
-function getAllProdukti($savienojums) {
-    $schema_info = checkDatabaseSchema($savienojums);
-    $query = buildProductQuery($schema_info);
-    
-    // Remove the WHERE clause for getting all products
-    $query = str_replace(' WHERE p.id_bumba = ?', '', $query);
-    
-    $result = $savienojums->query($query);
-    $produkti = [];
-    
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $produkti[] = processDisplayValues($row, $schema_info);
-        }
-    }
-    
-    return $produkti;
-}
-
-/**
- * Search products by name (for potential future use)
- * @param mysqli $savienojums Database connection
- * @param string $search_term Search term
- * @return array Products array
- */
-function searchProdukti($savienojums, $search_term) {
-    $schema_info = checkDatabaseSchema($savienojums);
-    $query = buildProductQuery($schema_info);
-    
-    // Replace WHERE clause with search condition
-    $query = str_replace(' WHERE p.id_bumba = ?', ' WHERE p.nosaukums LIKE ?', $query);
-    
     $stmt = $savienojums->prepare($query);
-    $search_param = '%' . $search_term . '%';
-    $stmt->bind_param("s", $search_param);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    $produkti = [];
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $produkti[] = processDisplayValues($row, $schema_info);
+    if (isset($stmt)) {
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if (isset($result) && $result->num_rows > 0) {
+            $bumba = $result->fetch_assoc();
+            $product_found = true;
+            
+            // Prepare image sources
+            if (isset($bumba['attels1'])) {
+                $attels1Src = 'data:image/jpeg;base64,' . base64_encode($bumba['attels1']);
+            }
+            if (isset($bumba['attels2'])) {
+                $attels2Src = 'data:image/jpeg;base64,' . base64_encode($bumba['attels2']);
+            }
+            if (isset($bumba['attels3'])) {
+                $attels3Src = 'data:image/jpeg;base64,' . base64_encode($bumba['attels3']);
+            }
+            
+            // Determine correct display values based on schema
+            $forma_display = isset($bumba['forma_name']) ? $bumba['forma_name'] : (isset($bumba['forma']) ? $bumba['forma'] : 'Nav norādīts');
+            
+            $audums_display = isset($bumba['audums_name']) ? $bumba['audums_name'] : 
+                             (isset($bumba['audums']) ? $bumba['audums'] : 
+                             (isset($bumba['audums_id']) ? $bumba['audums_id'] : 'Nav norādīts'));
+            
+            $malu_figura_display = isset($bumba['malu_figura_name']) ? $bumba['malu_figura_name'] : 
+                                  (isset($bumba['malu_figura']) ? $bumba['malu_figura'] : 
+                                  (isset($bumba['figura_id']) ? $bumba['figura_id'] : 'Nav norādīts'));
+            
+            $dekorejums1_display = isset($bumba['dekorejums1_name']) ? $bumba['dekorejums1_name'] : 
+                                  (isset($bumba['dekorejums']) ? $bumba['dekorejums'] : 
+                                  (isset($bumba['dekorejums1_id']) ? $bumba['dekorejums1_id'] : 'Nav norādīts'));
         }
     }
-    
-    return $produkti;
 }
 ?>

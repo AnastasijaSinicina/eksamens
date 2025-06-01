@@ -29,8 +29,6 @@ $malu_figura_table_exists = $savienojums->query($check_malu_figura_table_sql)->n
 $check_dekorejums1_table_sql = "SHOW TABLES LIKE 'sparkly_dekorejums1'";
 $dekorejums1_table_exists = $savienojums->query($check_dekorejums1_table_sql)->num_rows > 0;
 
-$check_dekorejums2_table_sql = "SHOW TABLES LIKE 'sparkly_dekorejums2'";
-$dekorejums2_table_exists = $savienojums->query($check_dekorejums2_table_sql)->num_rows > 0;
 
 // Handle status and price update
 if (isset($_POST['update_order'])) {
@@ -76,9 +74,6 @@ if (isset($_GET['view'])) {
     if ($dekorejums1_table_exists) {
         $order_query .= ", d1.nosaukums AS dekorejums1_name";
     }
-    if ($dekorejums2_table_exists) {
-        $order_query .= ", d2.nosaukums AS dekorejums2_name";
-    }
     
     $order_query .= " FROM sparkly_spec_pas ssp
                      LEFT JOIN lietotaji_sparkly l ON ssp.lietotajs_id = l.id_lietotajs";
@@ -96,9 +91,7 @@ if (isset($_GET['view'])) {
     if ($dekorejums1_table_exists) {
         $order_query .= " LEFT JOIN sparkly_dekorejums1 d1 ON ssp.dekorejums1 = d1.id_dekorejums1";
     }
-    if ($dekorejums2_table_exists) {
-        $order_query .= " LEFT JOIN sparkly_dekorejums2 d2 ON ssp.dekorejums2 = d2.id_dekorejums2";
-    }
+
     
     $order_query .= " WHERE ssp.id_spec_pas = ?";
     

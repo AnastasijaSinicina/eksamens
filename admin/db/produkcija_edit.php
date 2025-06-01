@@ -26,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $audums_id = isset($_POST['audums_id']) ? (int)$_POST['audums_id'] : 0;
     $figura_id = isset($_POST['figura_id']) ? (int)$_POST['figura_id'] : 0;
     $dekorejums1_id = isset($_POST['dekorejums1_id']) ? (int)$_POST['dekorejums1_id'] : 0;
-    $dekorejums2_id = isset($_POST['dekorejums2_id']) ? (int)$_POST['dekorejums2_id'] : 0;
     $cena = isset($_POST['cena']) ? (float)$_POST['cena'] : 0.00;
     
     $red_liet = $_SESSION['user_id'] ?? 1;
@@ -62,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                     $current_data['audums_id'] != $audums_id ||
                     $current_data['figura_id'] != $figura_id ||
                     $current_data['dekorejums1_id'] != $dekorejums1_id ||
-                    $current_data['dekorejums2_id'] != $dekorejums2_id ||
                     abs($current_data['cena'] - $cena) > 0.001 
                 );
                 
@@ -71,8 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                         nosaukums = ?, 
                         audums_id = ?, 
                         figura_id = ?, 
-                        dekorejums1_id = ?, 
-                        dekorejums2_id = ?, 
+                        dekorejums1_id = ?,
                         cena = ?, 
                         red_liet = ?, 
                         red_dat = ? 
@@ -89,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                         $audums_id, 
                         $figura_id, 
                         $dekorejums1_id, 
-                        $dekorejums2_id, 
                         $cena, 
                         $red_liet, 
                         $red_dat, 

@@ -128,68 +128,8 @@ if (isset($_GET['fetch_dekorejums1_single']) && isset($_GET['id'])) {
     exit;
 }
 
-if (isset($_GET['fetch_dekorejums2'])) {
-    $sql = "SELECT d.*, 
-                   m.lietotajvards as red_liet_username,
-                   m.vards as red_liet_first_name,
-                   m.uzvards as red_liet_last_name,
-                   c.lietotajvards as izveidots_liet_username,
-                   c.vards as izveidots_liet_first_name,
-                   c.uzvards as izveidots_liet_last_name,
-                   d.red_dat,
-                   d.datums
-            FROM sparkly_dekorejums2 d
-            LEFT JOIN lietotaji_sparkly m ON d.red_liet = m.id_lietotajs
-            LEFT JOIN lietotaji_sparkly c ON d.izveidots_liet = c.id_lietotajs
-            ORDER BY d.id_dekorejums2";
-    $result = $savienojums->query($sql);
 
-    $dekorejums = [];
-    if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            if (!empty($row['attels'])) {
-                $row['attels'] = base64_encode($row['attels']);
-            }
 
-            if (!empty($row['red_liet_first_name']) && !empty($row['red_liet_last_name'])) {
-                $row['red_liet_name'] = $row['red_liet_first_name'] . ' ' . $row['red_liet_last_name'];
-            } else if (!empty($row['red_liet_username'])) {
-                $row['red_liet_name'] = $row['red_liet_username'];
-            }
-            if (!empty($row['izveidots_liet_first_name']) && !empty($row['izveidots_liet_last_name'])) {
-                $row['izveidots_liet_name'] = $row['izveidots_liet_first_name'] . ' ' . $row['izveidots_liet_last_name'];
-            } else if (!empty($row['izveidots_liet_username'])) {
-                $row['izveidots_liet_name'] = $row['izveidots_liet_username'];
-            }
-            
-            $dekorejums[] = $row;
-        }
-    }
-
-    echo json_encode($dekorejums);
-    exit;
-}
-
-if (isset($_GET['fetch_dekorejums2_single']) && isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $sql = "SELECT * FROM sparkly_dekorejums2 WHERE id_dekorejums2 = ?";
-    $stmt = $savienojums->prepare($sql);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $dekorejums = $result->fetch_assoc();
-        if (!empty($dekorejums['attels'])) {
-            $dekorejums['attels'] = base64_encode($dekorejums['attels']);
-        }
-        echo json_encode($dekorejums);
-    } else {
-        echo json_encode(null);
-    }
-    $stmt->close();
-    exit;
-}
 
 if (isset($_GET['fetch_figuras'])) {
     $sql = "SELECT f.*, 

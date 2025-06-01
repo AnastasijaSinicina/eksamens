@@ -152,25 +152,6 @@ require 'db/produkcija_admin.php';
                         <?php endif; ?>
                     </div>
                     
-                    <!-- Decoration 2 selection -->
-                    <div class="form-group">
-                        <label for="dekorejums2_id">Dekorējums 2: <span class="required">*</span></label>
-                        <?php if (isset($dekorejums2_table_exists) && $dekorejums2_table_exists && !empty($dekorejums2_options)): ?>
-                            <select id="dekorejums2_id" name="dekorejums2_id" required>
-                                <option value="">Izvēlieties dekorējumu</option>
-                                <?php foreach ($dekorejums2_options as $dek2_option): ?>
-                                    <option value="<?php echo $dek2_option['id_dekorejums2']; ?>" 
-                                            <?php echo ($editData && $editData['dekorejums2_id'] == $dek2_option['id_dekorejums2']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($dek2_option['nosaukums']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        <?php else: ?>
-                            <input type="number" id="dekorejums2_id" name="dekorejums2_id" min="1"
-                                   value="<?php echo $editData ? $editData['dekorejums2_id'] : ''; ?>" required>
-                            <small>Ievadiet dekorējuma 2 ID (skaitlis)</small>
-                        <?php endif; ?>
-                    </div>
                     
                     <!-- Price -->
                     <div class="form-group">

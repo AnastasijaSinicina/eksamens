@@ -152,7 +152,7 @@
             .then(data => {
                 if (data.status === 'success') {
                     showNotification('success', 'Veiksmīgi!', data.message);
-                    loadAudums();
+                    loadFormas();
                 } else {
                     showNotification('error', 'Kļūda!', data.message);
                 }
