@@ -59,9 +59,7 @@ require 'db/produkcija_admin.php';
         <!-- Product Form -->
         <div class="custom-form-container">
             <form class="custom-form" method="POST" enctype="multipart/form-data">
-                <?php if ($editData): ?>
-                    <input type="hidden" name="id" value="<?php echo $editData['id_bumba']; ?>">
-                <?php endif; ?>
+
                 
                 <div class="form-grid">
                     <!-- Form selection -->

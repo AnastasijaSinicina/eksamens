@@ -1,14 +1,6 @@
 <?php
-// users.php - Updated version with change tracking
-error_reporting(E_ALL);
-ini_set('display_errors', 0); // Don't display errors in JSON response
 
-// Set JSON response headers first
-header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-cache, must-revalidate');
 
-// Start output buffering to catch any unwanted output
-ob_start();
 
 try {
     // Include database connection

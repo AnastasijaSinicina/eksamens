@@ -4,9 +4,6 @@
 
 require 'header.php';
 
-// Handle product deletion via AJAX (we'll modify this approach)
-// Remove the GET delete handling since we'll use AJAX
-
 // Load product data
 require 'db/produkcija_admin.php';
 ?>
@@ -54,19 +51,29 @@ require 'db/produkcija_admin.php';
             </a>
         </div>
 
+        <!-- Filters Section -->
+        <div class="filters-container">
+            <form id="filters-form" class="filters-form">
+                <div class="filter-group">
+                    <label for="searchInput">Meklēt:</label>
+                    <input type="text" id="searchInput" name="search" placeholder="Produkta nosaukums vai ID" class="search-input">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterSelect">Filtrēt:</label>
+                    <select id="filterSelect" name="filter" class="filter-select">
+                        <option value="">Visi produkti</option>
+                        <option value="recent">Nesen pievienoti (7 dienas)</option>
+                        <option value="updated">Nesen atjaunināti (7 dienas)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
         
         <!-- Product Table -->
         <div class="product-table-container">
-            <div class="table-header">
-                <h2>Esošie produkti</h2>
-                <div class="table-actions">
-                    <input type="text" id="searchInput" placeholder="Meklēt produktus..." class="search-input">
-                    <select id="filterSelect" class="filter-select">
-                        <option value="">Visi produkti</option>
-                        <option value="recent">Nesen pievienoti</option>
-                        <option value="updated">Nesen atjaunināti</option>
-                    </select>
-                </div>
+            <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+                <i class="fas fa-spinner fa-spin"></i> Ielādē...
             </div>
             
             <div class="table-responsive">
@@ -86,7 +93,7 @@ require 'db/produkcija_admin.php';
                             <th>Darbības</th>
                         </tr>
                     </thead>
-                    <tbody>     
+                    <tbody id="products-tbody">     
                         <?php
                         if ($products_result && $products_result->num_rows > 0) {
                             while ($row = $products_result->fetch_assoc()) {
@@ -107,7 +114,7 @@ require 'db/produkcija_admin.php';
                                 echo "<td>" . htmlspecialchars($row['dekorejums1_name']) . "</td>";
                                 echo "<td class='price'>€" . number_format($row['cena'], 2) . "</td>";
                                 
-                                // Created info - UPDATED VERSION WITH USER NAMES
+                                // Created info
                                 $created_info = '';
                                 if (!empty($row['created_first_name']) && !empty($row['created_last_name'])) {
                                     $created_info .= htmlspecialchars($row['created_first_name'] . ' ' . $row['created_last_name']);
@@ -116,11 +123,11 @@ require 'db/produkcija_admin.php';
                                 }
                                 
                                 if (!empty($row['created_at'])) {
-                                    $created_info .= '<small>' . date('d.m.Y H:i', strtotime($row['created_at'])) . '</small>';
+                                    $created_info .= '<br><small>' . date('d.m.Y H:i', strtotime($row['created_at'])) . '</small>';
                                 }
                                 echo "<td class='metadata'>" . ($created_info) . "</td>";
                                 
-                                // Updated info - UPDATED VERSION WITH USER NAMES
+                                // Updated info
                                 $updated_info = '';
                                 if (!empty($row['updated_first_name']) && !empty($row['updated_last_name'])) {
                                     $updated_info .= htmlspecialchars($row['updated_first_name'] . ' ' . $row['updated_last_name']);
@@ -135,7 +142,7 @@ require 'db/produkcija_admin.php';
                                 }
                                 echo "<td class='metadata'>" . ($updated_info ?: 'Nav atjaunināts') . "</td>";
                                 
-                                // Action buttons - UPDATED TO USE NEW FUNCTION
+                                // Action buttons
                                 echo "<td class='action-buttons'>";
                                 echo "<a href='produkcija_form.php?edit={$row['id_bumba']}' class='btn edit-btn' title='Rediģēt produktu'>";
                                 echo "<i class='fas fa-edit'></i>";
@@ -147,7 +154,7 @@ require 'db/produkcija_admin.php';
                                 echo "</tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='12' class='no-records'>";
+                            echo "<tr><td colspan='11' class='no-records'>";
                             echo "<div class='empty-state'>";
                             echo "<i class='fas fa-box-open'></i>";
                             echo "<h3>Nav atrasts neviens produkts</h3>";
@@ -161,6 +168,16 @@ require 'db/produkcija_admin.php';
                         ?>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Pagination Container -->
+            <div class="pagination-container" id="pagination-container">
+                <div class="pagination-info">
+                    <span id="pagination-text">Rāda 1-10 no 0 ierakstiem</span>
+                </div>
+                <div class="pagination-controls" id="pagination-controls">
+                    <!-- Pagination buttons will be inserted here -->
+                </div>
             </div>
         </div>
     </section>
@@ -182,9 +199,63 @@ require 'db/produkcija_admin.php';
     </div>
 </div>
 
-
 <!-- JavaScript for enhanced functionality -->
 <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+    initializeProductsPagination();
+    setupImageClickHandlers();
+});
+
+// Setup image click handlers
+function setupImageClickHandlers() {
+    document.querySelectorAll('.product-thumbnail').forEach(img => {
+        img.addEventListener('click', function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 90%; max-height: 90%;">
+                    <div class="modal-header">
+                        <h2>Produkta attēls</h2>
+                        <span class="close">&times;</span>
+                    </div>
+                    <div class="modal-body" style="text-align: center;">
+                        <img src="${this.src}" alt="${this.alt}" style="max-width: 100%; max-height: 70vh;">
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+            
+            // Close modal events
+            modal.querySelector('.close').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            };
+        });
+    });
+}
+
+// Search input with debounce
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        loadProducts(1); // Reset to first page when searching
+    }, 500);
+});
+
+// Auto-filter on filter change
+document.getElementById('filterSelect').addEventListener('change', function() {
+    loadProducts(1); // Reset to first page when filtering
+});
+
 // ===== REUSABLE CONFIRMATION MODAL FUNCTIONS =====
 function showConfirmModal(message, onConfirm, onCancel = null) {
     const modal = document.getElementById('confirmModal');
@@ -243,13 +314,8 @@ function deleteProduct(productId, productName) {
             .then(data => {
                 if (data.status === 'success') {
                     showNotification('success', 'Veiksmīgi!', data.message);
-                    // Remove the row from table
-                    const row = document.querySelector(`tr[data-product-id="${productId}"]`);
-                    if (row) {
-                        row.remove();
-                    }
-                    // Check if table is empty
-                    checkEmptyTable();
+                    // Reload current page to maintain pagination
+                    loadProducts(currentPage);
                 } else {
                     showNotification('error', 'Kļūda!', data.message);
                 }
@@ -261,141 +327,6 @@ function deleteProduct(productId, productName) {
         }
     );
 }
-
-function checkEmptyTable() {
-    const tbody = document.querySelector('#productTable tbody');
-    const visibleRows = tbody.querySelectorAll('tr[data-product-id]');
-    
-    if (visibleRows.length === 0) {
-        tbody.innerHTML = `
-            <tr><td colspan='12' class='no-records'>
-                <div class='empty-state'>
-                    <i class='fas fa-box-open'></i>
-                    <h3>Nav atrasts neviens produkts</h3>
-                    <p>Sāciet, pievienojot savu pirmo produktu.</p>
-                    <a href='produkcija_form.php' class='btn add-btn'>
-                        <i class='fas fa-plus'></i> Pievienot produktu
-                    </a>
-                </div>
-            </td></tr>
-        `;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const filterSelect = document.getElementById('filterSelect');
-    const productTable = document.getElementById('productTable');
-    const tbody = productTable.querySelector('tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    
-    // Search function
-    function filterTable() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const filterValue = filterSelect.value;
-        
-        rows.forEach(row => {
-            if (row.querySelector('.no-records')) return;
-            
-            const productName = row.querySelector('.product-name')?.textContent.toLowerCase() || '';
-            const productId = row.querySelector('td:first-child')?.textContent || '';
-            const createdDate = row.getAttribute('data-created') || '';
-            const updatedDate = row.getAttribute('data-updated') || '';
-            
-            // Search filter
-            const matchesSearch = productName.includes(searchTerm) || 
-                                productId.includes(searchTerm);
-            
-            // Date filter
-            let matchesFilter = true;
-            if (filterValue === 'recent') {
-                const created = new Date(createdDate);
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                matchesFilter = created > weekAgo;
-            } else if (filterValue === 'updated') {
-                const updated = new Date(updatedDate);
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                matchesFilter = updated > weekAgo;
-            }
-            
-            // Show/hide row
-            if (matchesSearch && matchesFilter) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-        
-        // Check if any rows are visible
-        const visibleRows = rows.filter(row => 
-            row.style.display !== 'none' && !row.querySelector('.no-records')
-        );
-        
-        // Show/hide "no results" message
-        let noResultsRow = tbody.querySelector('.no-results');
-        if (visibleRows.length === 0 && rows.length > 0 && !rows[0].querySelector('.no-records')) {
-            if (!noResultsRow) {
-                noResultsRow = document.createElement('tr');
-                noResultsRow.className = 'no-results';
-                noResultsRow.innerHTML = `
-                    <td colspan="12" class="no-records">
-                        <div class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <h3>Nav atrasti rezultāti</h3>
-                            <p>Mēģiniet mainīt meklēšanas kritērijus.</p>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(noResultsRow);
-            }
-            noResultsRow.style.display = '';
-        } else if (noResultsRow) {
-            noResultsRow.style.display = 'none';
-        }
-    }
-    
-    // Event listeners for search and filter
-    searchInput.addEventListener('input', filterTable);
-    filterSelect.addEventListener('change', filterTable);
-    
-    // Image click to enlarge
-    document.querySelectorAll('.product-thumbnail').forEach(img => {
-        img.addEventListener('click', function() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 90%; max-height: 90%;">
-                    <div class="modal-header">
-                        <h2>Produkta attēls</h2>
-                        <span class="close">&times;</span>
-                    </div>
-                    <div class="modal-body" style="text-align: center;">
-                        <img src="${this.src}" alt="${this.alt}" style="max-width: 100%; max-height: 70vh;">
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            modal.style.display = 'flex';
-            
-            // Close modal events
-            modal.querySelector('.close').onclick = () => {
-                document.body.removeChild(modal);
-            };
-            
-            modal.onclick = (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal);
-                }
-            };
-        });
-    });
-});
 
 function viewProduct(productId) {
     // This would fetch product details via AJAX
@@ -437,8 +368,6 @@ function showNotification(type, title, message) {
             checkNotificationContainer();
         }
     }, 5000);
-    
-
 }
 
 // Helper function to check if container should be hidden
@@ -475,19 +404,6 @@ document.addEventListener('keydown', function(e) {
         document.getElementById('searchInput').focus();
     }
 });
-
-// Auto-refresh every 5 minutes to show updated data
-setInterval(() => {
-    // Only refresh if no modals are open and no active form interactions
-    const hasOpenModals = document.querySelector('.modal[style*="display: flex"], .modal[style*="display: block"]');
-    const hasActiveInputs = document.querySelector('input:focus, select:focus, textarea:focus');
-    
-    if (!hasOpenModals && !hasActiveInputs) {
-        // You could implement a subtle refresh here
-        // For now, just update the timestamp or show a subtle indicator
-        console.log('Auto-refresh check at:', new Date().toLocaleTimeString());
-    }
-}, 300000); // 5 minutes
 
 // Export table data (bonus feature)
 function exportTableData() {

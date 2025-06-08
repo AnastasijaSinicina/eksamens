@@ -1,6 +1,5 @@
 <?php
 
-
 // Include admin header
 require 'header.php';
 
@@ -111,22 +110,7 @@ require 'db/spec_pas_admin.php';
                             <span><?= htmlspecialchars($view_order['talrunis']) ?></span>
                         </div>
                     </div>
-                    
-                    <div class="order-info-card">
-                        <h3>Piegādes informācija</h3>
-                        <div class="info-row">
-                            <span>Adrese:</span>
-                            <span><?= htmlspecialchars($view_order['adrese']) ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span>Pilsēta:</span>
-                            <span><?= htmlspecialchars($view_order['pilseta']) ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span>Pasta indekss:</span>
-                            <span><?= htmlspecialchars($view_order['pasta_indekss']) ?></span>
-                        </div>
-                    </div>
+
                 </div>
                 
                <!-- Product Specifications -->
@@ -172,7 +156,7 @@ require 'db/spec_pas_admin.php';
                         <?php endif; ?>
                         <?php if ($view_order['dekorejums1']): ?>
                             <div class="info-row">
-                                <span>Dekorējums 1:</span>
+                                <span>Dekorējums:</span>
                                 <span>
                                     <?php if (isset($view_order['dekorejums1_name']) && $view_order['dekorejums1_name']): ?>
                                         <?= htmlspecialchars($view_order['dekorejums1_name']) ?>
@@ -207,7 +191,40 @@ require 'db/spec_pas_admin.php';
             
         <?php else: ?>
             <!-- Orders List View -->
+            <div class="filters-container">
+                <form id="filters-form" class="filters-form">
+                    <div class="filter-group">
+                        <label for="status">Statuss:</label>
+                        <select id="status" name="status">
+                            <option value="">Visi statusi</option>
+                            <option value="Iesniegts">Iesniegts</option>
+                            <option value="Apstiprināts">Apstiprināts</option>
+                            <option value="Nosūtīts">Nosūtīts</option>
+                            <option value="Saņemts">Saņemts</option>
+                            <option value="Atcelts">Atcelts</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="search">Meklēt:</label>
+                        <input type="text" id="search" name="search" placeholder="Pasūtījuma #, klienta vārds vai e-pasts">
+                    </div>
+                    
+                    <div class="filter-group date-range">
+                        <label>Datuma diapazons:</label>
+                        <div class="date-inputs">
+                            <input type="date" id="date_from" name="date_from">
+                            <span>līdz</span>
+                            <input type="date" id="date_to" name="date_to">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
             <div class="orders-table-container">
+                <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Ielādē...
+                </div>
                 <div class="table-responsive">
                     <table class="product-table orders-table">
                         <thead>
@@ -221,8 +238,8 @@ require 'db/spec_pas_admin.php';
                                 <th>Darbības</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php if ($orders_result && $orders_result->num_rows > 0): ?>
+                        <tbody id="orders-tbody">
+                            <?php if (isset($orders_result) && $orders_result->num_rows > 0): ?>
                                 <?php while ($order = $orders_result->fetch_assoc()): ?>
                                     <tr>
                                         <td>#C<?= $order['id_spec_pas'] ?></td>
@@ -263,7 +280,23 @@ require 'db/spec_pas_admin.php';
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Pagination Container -->
+                <div class="pagination-container" id="pagination-container">
+                    <div class="pagination-info">
+                        <span id="pagination-text">Rāda 1-6 no 0 ierakstiem</span>
+                    </div>
+                    <div class="pagination-controls" id="pagination-controls">
+                        <!-- Pagination buttons will be inserted here -->
+                    </div>
+                </div>
             </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                initializeCustomOrdersPagination();
+            });
+            </script>
         <?php endif; ?>
     </section>
 </main>

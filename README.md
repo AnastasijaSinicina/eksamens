@@ -6,7 +6,6 @@ Vietne piedāvā šādas iespējas:
 
 Lietotāju reģistrācija un autentifikācija: Drošs lietotāju kontu izveides un pieslēgšanās process.
 Produktu katalogs: Pārlūkojams produktu saraksts ar detalizētu informāciju.
-Produktu skatījums: Detalizēts atsevišķu produktu apskats ar attēliem un aprakstiem.
 Iepirkumu grozs: Iespēja pievienot, skatīt un mainīt produktu daudzumu grozā.
 Pasūtījumu process: Vienkāršs pasūtījuma noformēšanas process ar dažādām piegādes un apmaksas iespējām.
 Pasūtījumu vēsture: Lietotāji var apskatīt savus iepriekšējos pasūtījumus.

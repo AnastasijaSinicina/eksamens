@@ -1,24 +1,18 @@
 <?php
 // admin/db/update_grozs.php
-// Handle cart update operations
+// Apstrādā groza atjaunošanas operācijas
 
 session_start();
 require_once "con_db.php";
 
-// Check if user is logged in
-if (!isset($_SESSION['lietotajvardsSIN'])) {
-    $_SESSION['pazinojums'] = "Lūdzu ielogojieties!";
-    header("Location: ../../login.php");
-    exit();
-}
-
+// Iegūst lietotājvārdu no sesijas
 $username = $_SESSION['lietotajvardsSIN'];
 
-// Handle increase quantity
+// Apstrādā daudzuma palielināšanu
 if (isset($_POST['increase']) && isset($_POST['id'])) {
     $id = intval($_POST['id']);
     
-    // Update quantity (increase by 1)
+    // Atjaunina daudzumu (palielina par 1)
     $updateQuery = "UPDATE grozs_sparkly SET daudzums = daudzums + 1 WHERE id_grozs = ? AND lietotajvards = ? AND statuss = 'aktīvs'";
     $stmt = $savienojums->prepare($updateQuery);
     $stmt->bind_param("is", $id, $username);
@@ -31,11 +25,11 @@ if (isset($_POST['increase']) && isset($_POST['id'])) {
     $stmt->close();
 }
 
-// Handle decrease quantity
+// Apstrādā daudzuma samazināšanu
 elseif (isset($_POST['decrease']) && isset($_POST['id'])) {
     $id = intval($_POST['id']);
     
-    // Get current quantity
+    // Iegūst pašreizējo daudzumu
     $query = "SELECT daudzums FROM grozs_sparkly WHERE id_grozs = ? AND lietotajvards = ? AND statuss = 'aktīvs'";
     $stmt = $savienojums->prepare($query);
     $stmt->bind_param("is", $id, $username);
@@ -46,7 +40,7 @@ elseif (isset($_POST['decrease']) && isset($_POST['id'])) {
         $row = $result->fetch_assoc();
         
         if ($row['daudzums'] > 1) {
-            // Decrease quantity
+            // Samazina daudzumu
             $updateQuery = "UPDATE grozs_sparkly SET daudzums = daudzums - 1 WHERE id_grozs = ? AND lietotajvards = ? AND statuss = 'aktīvs'";
             $stmt2 = $savienojums->prepare($updateQuery);
             $stmt2->bind_param("is", $id, $username);
@@ -55,7 +49,7 @@ elseif (isset($_POST['decrease']) && isset($_POST['id'])) {
             
             $_SESSION['pazinojums'] = "Daudzums samazināts";
         } else {
-            // Remove item if quantity would be 0
+            // Izņem preci, ja daudzums būtu 0
             $deleteQuery = "UPDATE grozs_sparkly SET statuss = 'neaktīvs' WHERE id_grozs = ? AND lietotajvards = ? AND statuss = 'aktīvs'";
             $stmt2 = $savienojums->prepare($deleteQuery);
             $stmt2->bind_param("is", $id, $username);
@@ -68,11 +62,11 @@ elseif (isset($_POST['decrease']) && isset($_POST['id'])) {
     $stmt->close();
 }
 
-// Handle remove item
+// Apstrādā preces izņemšanu
 elseif (isset($_POST['remove']) && isset($_POST['id'])) {
     $id = intval($_POST['id']);
     
-    // Set item status to inactive instead of deleting
+    // Iestata preces statusu kā neaktīvu, nevis dzēš
     $deleteQuery = "UPDATE grozs_sparkly SET statuss = 'neaktīvs' WHERE id_grozs = ? AND lietotajvards = ? AND statuss = 'aktīvs'";
     $stmt = $savienojums->prepare($deleteQuery);
     $stmt->bind_param("is", $id, $username);
@@ -85,13 +79,13 @@ elseif (isset($_POST['remove']) && isset($_POST['id'])) {
     $stmt->close();
 }
 
-// Handle clear cart
+// Apstrādā groza iztīrīšanu
 elseif (isset($_POST['clear']) && isset($_POST['user'])) {
     $user = $_POST['user'];
     
-    // Check if the current user is the same as in the form
+    // Pārbauda, vai pašreizējais lietotājs ir tas pats, kas formā
     if ($user === $username) {
-        // Set all items status to inactive instead of deleting
+        // Iestata visu preču statusu kā neaktīvu, nevis dzēš
         $clearQuery = "UPDATE grozs_sparkly SET statuss = 'neaktīvs' WHERE lietotajvards = ? AND statuss = 'aktīvs'";
         $stmt = $savienojums->prepare($clearQuery);
         $stmt->bind_param("s", $username);
@@ -105,10 +99,10 @@ elseif (isset($_POST['clear']) && isset($_POST['user'])) {
     }
 }
 
-// Close the connection
+// Aizver savienojumu
 $savienojums->close();
 
-// Redirect back to cart page
+// Novirza atpakaļ uz groza lapu
 header("Location: ../../grozs.php");
 exit();
 ?>

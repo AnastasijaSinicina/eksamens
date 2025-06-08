@@ -1,63 +1,62 @@
 <?php
-
-/**
- * Get user data by username
- */
-function getUserData($connection, $username) {
-    $query = "SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?";
-    $stmt = $connection->prepare($query);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_assoc();
+// Pārbauda vai sesija ir sākta
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
 
-/**
- * Get cart count for user
- */
-function getCartCount($connection, $username) {
-    $query = "SELECT COUNT(*) as count FROM grozs_sparkly WHERE lietotajvards = ? AND statuss = 'aktīvs'";
-    $stmt = $connection->prepare($query);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_assoc()['count'];
+// Pievieno datubāzes savienojumu
+require "con_db.php";
+
+// Pārbauda vai lietotājs ir ielogojies
+if (!isset($_SESSION['lietotajvardsSIN'])) {
+    $_SESSION['pazinojums'] = "Lūdzu ielogojieties, lai pabeigtu pasūtījumu";
+    $_SESSION['redirect_after_login'] = "pasutisana.php";
+    header("Location: ../../login.php");
+    exit();
 }
 
-/**
- * Get cart items for user
- */
-function getCartItems($connection, $username) {
-    $query = "SELECT g.*, p.nosaukums, p.cena, p.attels1 
-              FROM grozs_sparkly g 
-              JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
-              WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
-    $stmt = $connection->prepare($query);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+$username = $_SESSION['lietotajvardsSIN'];
+
+// Iegūst lietotāja datus
+if (isset($username)) {
+    $user_query = "SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?";
+    $user_stmt = $savienojums->prepare($user_query);
+    $user_stmt->bind_param("s", $username);
+    $user_stmt->execute();
+    $user_result = $user_stmt->get_result();
+    $user = $user_result->fetch_assoc();
+}
+
+// Pārbauda groza saturu
+if (isset($username)) {
+    $cart_count_query = "SELECT COUNT(*) as count FROM grozs_sparkly WHERE lietotajvards = ? AND statuss = 'aktīvs'";
+    $cart_count_stmt = $savienojums->prepare($cart_count_query);
+    $cart_count_stmt->bind_param("s", $username);
+    $cart_count_stmt->execute();
+    $cart_count_result = $cart_count_stmt->get_result();
+    $cart_count = $cart_count_result->fetch_assoc()['count'];
     
-    $items = [];
-    while ($item = $result->fetch_assoc()) {
-        $items[] = $item;
+    // Ja grozs ir tukšs, pārvirza uz groza lapu
+    if ($cart_count == 0) {
+        $_SESSION['pazinojums'] = "Jūsu grozs ir tukšs";
+        header("Location: ../../grozs.php");
+        exit();
     }
-    return $items;
 }
 
-/**
- * Generate unique order number
- */
-function generateUniqueOrderNumber($connection) {
+// Ģenerē unikālu pasūtījuma numuru
+if (isset($_POST['generate_order_number'])) {
     $max_attempts = 12;
     $attempts = 0;
+    $unique_number_found = false;
     
     do {
-        // Generate 12-digit random number (100000000000 to 999999999999)
+        // Ģenerē 12 ciparu nejauša skaitļa (100000000000 līdz 999999999999)
         $order_number = rand(100000000000, 999999999999);
         
-        // Check if this number already exists
+        // Pārbauda vai šis numurs jau eksistē
         $check_query = "SELECT COUNT(*) as count FROM sparkly_pasutijumi WHERE pasutijuma_numurs = ?";
-        $check_stmt = $connection->prepare($check_query);
+        $check_stmt = $savienojums->prepare($check_query);
         $check_stmt->bind_param("i", $order_number);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
@@ -66,144 +65,208 @@ function generateUniqueOrderNumber($connection) {
         $attempts++;
         
         if (!$exists) {
-            return $order_number;
+            $unique_number_found = true;
+            $unique_order_number = $order_number;
         }
         
-    } while ($exists && $attempts < $max_attempts);
+    } while (!$unique_number_found && $attempts < $max_attempts);
     
-    // If we couldn't generate unique number after max attempts, throw error
-    throw new Exception("Unable to generate unique order number after $max_attempts attempts");
+    // Ja neizdevās ģenerēt unikālu numuru
+    if (!$unique_number_found) {
+        $error_message = "Neizdevās ģenerēt unikālu pasūtījuma numuru pēc $max_attempts mēģinājumiem";
+    }
 }
 
-/**
- * Insert order into database
- */
-function insertOrder($connection, $order_data) {
-    $query = "INSERT INTO sparkly_pasutijumi 
-              (lietotajs_id, pasutijuma_numurs, kopeja_cena, apmaksas_veids, piegades_veids, 
-               produktu_skaits, vards, uzvards, epasts, talrunis, pilseta, adrese, pasta_indeks, statuss) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+// Apstrādā pasūtījuma iesniegšanu
+if (isset($_POST['submit_order'])) {
+    error_log("Pasūtījuma iesniegšana sākta");
+    error_log("POST dati: " . print_r($_POST, true));
     
-    $stmt = $connection->prepare($query);
-    $stmt->bind_param("iidssissssssss", 
-        $order_data['lietotajs_id'],
-        $order_data['pasutijuma_numurs'],
-        $order_data['kopeja_cena'],
-        $order_data['apmaksas_veids'],
-        $order_data['piegades_veids'],
-        $order_data['produktu_skaits'],
-        $order_data['vards'],
-        $order_data['uzvards'],
-        $order_data['epasts'],
-        $order_data['telefons'],
-        $order_data['pilseta'],
-        $order_data['adrese'],
-        $order_data['pasta_indekss'],
-        $order_data['statuss']
-    );
+    // Sagatavo un attīra ievadītos datus
+    $vards = htmlspecialchars($_POST['vards']);
+    $uzvards = htmlspecialchars($_POST['uzvards']);
+    $epasts = htmlspecialchars($_POST['epasts']);
+    $telefons = htmlspecialchars($_POST['telefons']);
+    $piezimes = htmlspecialchars($_POST['piezimes']);
     
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to insert order: " . $stmt->error);
+
+
+    // Iegūst groza preces
+    if (isset($username)) {
+        $items_query = "SELECT g.*, p.nosaukums, p.cena 
+                      FROM grozs_sparkly g 
+                      JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
+                      WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
+        $items_stmt = $savienojums->prepare($items_query);
+        $items_stmt->bind_param("s", $username);
+        $items_stmt->execute();
+        $items_result = $items_stmt->get_result();
+        
+        $total = 0;
+        $product_count = 0;
+        $cart_items = [];
+        
+        // Aprēķina kopējo summu un produktu skaitu
+        while ($item = $items_result->fetch_assoc()) {
+            $cart_items[] = $item;
+            $total += $item['cena'] * $item['daudzums'];
+            $product_count += $item['daudzums'];
+        }
     }
     
-    return $connection->insert_id;
-}
-
-/**
- * Insert order items
- */
-function insertOrderItems($connection, $order_id, $cart_items) {
-    $query = "INSERT INTO sparkly_pasutijuma_vienumi 
-              (pasutijuma_id, produkta_id, daudzums_no_groza, cena) 
-              VALUES (?, ?, ?, ?)";
+    $status = 'Iesniegts';
     
-    $stmt = $connection->prepare($query);
-    
-    foreach ($cart_items as $item) {
-        $stmt->bind_param("iiid", 
-            $order_id, 
-            $item['bumba_id'], 
-            $item['daudzums'], 
-            $item['cena']
-        );
+    // Sāk transakiju, lai nodrošinātu datu integritāti
+    if (isset($savienojums)) {
+        $savienojums->autocommit(FALSE);
+        $transaction_success = true;
         
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to insert order item: " . $stmt->error);
+        // Ģenerē unikālu pasūtījuma numuru
+        $max_attempts = 12;
+        $attempts = 0;
+        $unique_number_found = false;
+        
+        do {
+            $order_number = rand(100000000000, 999999999999);
+            
+            $check_query = "SELECT COUNT(*) as count FROM sparkly_pasutijumi WHERE pasutijuma_numurs = ?";
+            $check_stmt = $savienojums->prepare($check_query);
+            $check_stmt->bind_param("i", $order_number);
+            $check_stmt->execute();
+            $check_result = $check_stmt->get_result();
+            $exists = $check_result->fetch_assoc()['count'] > 0;
+            
+            $attempts++;
+            
+            if (!$exists) {
+                $unique_number_found = true;
+                $unique_order_number = $order_number;
+            }
+            
+        } while (!$unique_number_found && $attempts < $max_attempts);
+        
+        if (isset($unique_order_number)) {
+            error_log("Ģenerēts unikāls pasūtījuma numurs: " . $unique_order_number);
+        }
+        
+        // Ievieto pasūtījumu datubāzē
+        if (isset($unique_order_number) && isset($user)) {
+            $insert_order_query = "INSERT INTO sparkly_pasutijumi 
+                                  (lietotajs_id, pasutijuma_numurs, kopeja_cena, produktu_skaits, vards, uzvards, epasts, talrunis, statuss) 
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            $insert_order_stmt = $savienojums->prepare($insert_order_query);
+            $insert_order_stmt->bind_param("iidisssss", 
+                $user['id_lietotajs'],
+                $unique_order_number,
+                $total,
+                $product_count,
+                $vards,
+                $uzvards,
+                $epasts,
+                $telefons,
+                $status
+            );
+            
+            if ($insert_order_stmt->execute()) {
+                $pasutijums_id = $savienojums->insert_id;
+                error_log("Pasūtījums izveidots ar ID: " . $pasutijums_id);
+            } else {
+                $transaction_success = false;
+                error_log("Kļūda ievietojot pasūtījumu: " . $insert_order_stmt->error);
+            }
+        }
+        
+        // Ievieto pasūtījuma preces
+        if (isset($pasutijums_id) && isset($cart_items) && $transaction_success) {
+            foreach ($cart_items as $item) {
+                $insert_items_query = "INSERT INTO sparkly_pasutijuma_vienumi 
+                                      (pasutijuma_id, produkta_id, daudzums_no_groza, cena) 
+                                      VALUES (?, ?, ?, ?)";
+                
+                $insert_items_stmt = $savienojums->prepare($insert_items_query);
+                $insert_items_stmt->bind_param("iiid", 
+                    $pasutijums_id, 
+                    $item['bumba_id'], 
+                    $item['daudzums'], 
+                    $item['cena']
+                );
+                
+                if (!$insert_items_stmt->execute()) {
+                    $transaction_success = false;
+                    error_log("Kļūda ievietojot pasūtījuma preci: " . $insert_items_stmt->error);
+                    break;
+                }
+            }
+        }
+        
+        // Atjaunina groza statusu
+        if (isset($username) && $transaction_success) {
+            $update_cart_query = "UPDATE grozs_sparkly SET statuss = 'pasūtīts' WHERE lietotajvards = ? AND statuss = 'aktīvs'";
+            $update_cart_stmt = $savienojums->prepare($update_cart_query);
+            $update_cart_stmt->bind_param("s", $username);
+            
+            if (!$update_cart_stmt->execute()) {
+                $transaction_success = false;
+                error_log("Kļūda atjauninot grozu: " . $update_cart_stmt->error);
+            }
+        }
+        
+        // Palielina lietotāja pasūtījumu skaitu
+        if (isset($user) && $transaction_success) {
+            $update_order_count_query = "UPDATE lietotaji_sparkly SET pas_skaits = pas_skaits + 1 WHERE id_lietotajs = ?";
+            $update_order_count_stmt = $savienojums->prepare($update_order_count_query);
+            $update_order_count_stmt->bind_param("i", $user['id_lietotajs']);
+            
+            if ($update_order_count_stmt->execute()) {
+                error_log("Lietotāja pasūtījumu skaits palielināts lietotāja ID: " . $user['id_lietotajs']);
+            } else {
+                $transaction_success = false;
+                error_log("Kļūda atjauninot lietotāja pasūtījumu skaitu: " . $update_order_count_stmt->error);
+            }
+        }
+        
+        // Apstiprina vai atsauc transakiju
+        if ($transaction_success) {
+            $savienojums->commit();
+            $savienojums->autocommit(TRUE);
+            
+            $_SESSION['pazinojums'] = "Pasūtījums veiksmīgi noformēts!";
+            error_log("Pārvirza uz apstiprinājuma lapu");
+            
+            if (isset($pasutijums_id)) {
+                header("Location: pasutijums_apstiprinats.php?id=" . $pasutijums_id);
+                exit();
+            }
+        } else {
+            // Atsauc transakiju kļūdas gadījumā
+            $savienojums->rollback();
+            $savienojums->autocommit(TRUE);
+            
+            error_log("Kļūda veidojot pasūtījumu");
+            $error_message = "Kļūda veidojot pasūtījumu. Lūdzu, mēģiniet vēlreiz.";
         }
     }
 }
 
-/**
- * Update cart status to 'ordered'
- */
-function updateCartStatus($connection, $username) {
-    $query = "UPDATE grozs_sparkly SET statuss = 'pasūtīts' WHERE lietotajvards = ? AND statuss = 'aktīvs'";
-    $stmt = $connection->prepare($query);
-    $stmt->bind_param("s", $username);
-    
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to update cart: " . $stmt->error);
+// Iegūst groza preces attēlošanai
+if (isset($username)) {
+    $display_items_query = "SELECT g.*, p.nosaukums, p.cena, p.attels1 
+                          FROM grozs_sparkly g 
+                          JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
+                          WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
+    $display_items_stmt = $savienojums->prepare($display_items_query);
+    $display_items_stmt->bind_param("s", $username);
+    $display_items_stmt->execute();
+    $display_items_result = $display_items_stmt->get_result();
+
+    $cart_items_display = [];
+    $subtotal = 0;
+
+    // Sagatavo datus attēlošanai
+    while ($item = $display_items_result->fetch_assoc()) {
+        $cart_items_display[] = $item;
+        $subtotal += $item['cena'] * $item['daudzums'];
     }
 }
-
-/**
- * Update user order count
- */
-function updateUserOrderCount($connection, $user_id) {
-    $query = "UPDATE lietotaji_sparkly SET pas_skaits = pas_skaits + 1 WHERE id_lietotajs = ?";
-    $stmt = $connection->prepare($query);
-    $stmt->bind_param("i", $user_id);
-    
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to update user order count: " . $stmt->error);
-    }
-}
-
-/**
- * Process complete order (transaction)
- */
-function processOrder($connection, $order_data, $cart_items, $username) {
-    try {
-        // Start transaction
-        $connection->autocommit(FALSE);
-        
-        // Generate unique order number
-        $order_data['pasutijuma_numurs'] = generateUniqueOrderNumber($connection);
-        error_log("Generated unique order number: " . $order_data['pasutijuma_numurs']);
-        
-        // Insert the order
-        $order_id = insertOrder($connection, $order_data);
-        error_log("Order created with ID: " . $order_id);
-        
-        // Insert order items
-        insertOrderItems($connection, $order_id, $cart_items);
-        
-        // Update cart status
-        updateCartStatus($connection, $username);
-        
-        // Update user order count
-        updateUserOrderCount($connection, $order_data['lietotajs_id']);
-        error_log("User order count incremented for user ID: " . $order_data['lietotajs_id']);
-        
-        // Commit transaction
-        $connection->commit();
-        $connection->autocommit(TRUE);
-        
-        return [
-            'success' => true,
-            'order_id' => $order_id
-        ];
-        
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $connection->rollback();
-        $connection->autocommit(TRUE);
-        
-        return [
-            'success' => false,
-            'error' => $e->getMessage()
-        ];
-    }
-}
-
 ?>

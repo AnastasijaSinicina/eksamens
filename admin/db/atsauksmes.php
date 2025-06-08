@@ -3,13 +3,13 @@
 require 'con_db.php';
 $_SESSION['redirect_after_login'] = "atstajatsauksmi.php";
 
-// Display session notification if exists
+// Parādīt sesijas paziņojumu, ja tāds pastāv
 if (isset($_SESSION['pazinojums'])) {
     echo '<div class="success-message">' . htmlspecialchars($_SESSION['pazinojums']) . '</div>';
     unset($_SESSION['pazinojums']);
 }
 
-// Check if user is logged in to determine feedback availability
+// Pārbaudīt, vai lietotājs ir ielogojies, lai noteiktu atsauksmju pieejamību
 $user_can_leave_feedback = false;
 $user_id = null;
 
@@ -33,7 +33,7 @@ if (isset($_SESSION['lietotajvardsSIN'])) {
     }
 }
 
-// Get approved feedback with improved query including user photos
+// Iegūt apstiprinātas atsauksmes ar uzlabotu vaicājumu, ieskaitot lietotāju fotogrāfijas
 $feedback_sql = "SELECT a.id_atsauksme, a.vards_uzvards, a.zvaigznes, a.atsauksme, a.datums,
                         l.lietotajvards, l.foto, a.apstiprinats
                  FROM sparkly_atsauksmes a
@@ -50,7 +50,7 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Calculate average rating
+// Aprēķināt vidējo vērtējumu
 $average_rating = 0;
 $total_ratings = 0;
 if (!empty($approved_feedback)) {

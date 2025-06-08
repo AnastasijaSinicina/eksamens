@@ -1,106 +1,23 @@
 <?php
 session_start();
-// Set redirect BEFORE checking login status
+// Iestatīta pāradresācija PIRMS pieteikšanās statusa pārbaudes
 $_SESSION['redirect_after_login'] = "materiali.php";
 
-// Check if user is logged in
+// Pārbauda vai lietotājs ir ielogojies
 if (!isset($_SESSION['lietotajvardsSIN'])) {
     $_SESSION['pazinojums'] = "Lūdzu ielogojieties, lai izveidotu pielāgotu produktu";
     header("Location: login.php");
     exit();
 }
 
-// Include database connection
+// Iekļauj datubāzes savienojumu
 require "admin/db/con_db.php";
 
-// Get current user info
-$username = $_SESSION['lietotajvardsSIN'];
-$user_query = "SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?";
-$user_stmt = $savienojums->prepare($user_query);
-$user_stmt->bind_param("s", $username);
-$user_stmt->execute();
-$user_result = $user_stmt->get_result();
-$user = $user_result->fetch_assoc();
+// Iekļauj pielāgotā pasūtījuma apstrādes failu (satur visus SQL vaicājumus)
+require "admin/db/spec_pas.php";
 
-// Rest of your code remains the same...
-if (isset($_POST['submit_custom_order'])) {
-    // Define required fields
-    $required_fields = [
-        'forma' => 'Forma',
-        'audums' => 'Audums',
-        'malu_figura' => 'Mālu figūra',
-        'dekorejums1' => 'Dekorējums 1',
-        'vards' => 'Vārds',
-        'uzvards' => 'Uzvārds',
-        'epasts' => 'E-pasts',
-        'talrunis' => 'Tālrunis',
-        'adrese' => 'Adrese',
-        'pilseta' => 'Pilsēta',
-        'pasta_indekss' => 'Pasta indekss',
-        'daudzums' => 'Daudzums'
-    ];
-    
-    $errors = [];
-    
-    // Validate required fields
-    foreach ($required_fields as $field => $label) {
-        if (empty($_POST[$field]) || $_POST[$field] === '') {
-            $errors[] = "Lauks '$label' ir obligāts";
-        }
-    }
-    
-    // Validate email format
-    if (!empty($_POST['epasts']) && !filter_var($_POST['epasts'], FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Nepareizs e-pasta formāts";
-    }
-    
-    // Validate quantity is positive number
-    if (!empty($_POST['daudzums']) && (int)$_POST['daudzums'] < 1) {
-        $errors[] = "Daudzums jābūt vismaz 1";
-    }
-    
-    // If there are validation errors, display them
-    if (!empty($errors)) {
-        $error_message = "Lūdzu izlabojiet šādas kļūdas:<br>• " . implode("<br>• ", $errors);
-    } else {
-        // Include the custom order insertion file
-        require "admin/db/spec_pas.php";
-        
-        // Prepare data for insertion
-        $order_data = [
-            'vards' => htmlspecialchars($_POST['vards']),
-            'uzvards' => htmlspecialchars($_POST['uzvards']),
-            'epasts' => htmlspecialchars($_POST['epasts']),
-            'talrunis' => htmlspecialchars($_POST['talrunis']),
-            'adrese' => htmlspecialchars($_POST['adrese']),
-            'pilseta' => htmlspecialchars($_POST['pilseta']),
-            'pasta_indekss' => htmlspecialchars($_POST['pasta_indekss']),
-            'forma' => htmlspecialchars($_POST['forma']),
-            'audums' => htmlspecialchars($_POST['audums']),
-            'malu_figura' => htmlspecialchars($_POST['malu_figura'] ?? ''),
-            'dekorejums1' => htmlspecialchars($_POST['dekorejums1'] ?? ''),
-            'daudzums' => intval($_POST['daudzums']),
-            'piezimes' => htmlspecialchars($_POST['piezimes'])
-        ];
-        
-        // Insert the order
-        $result = insertCustomOrder($user['id_lietotajs'], $order_data);
-        
-        // Replace this section in your materiali.php file:
-
-        if ($result['success']) {
-            $_SESSION['pazinojums'] = "Jūsu pielāgotā produkta pieprasījums ir veiksmīgi nosūtīts! Mēs sazināsimies ar jums drīzumā.";
-            
-            // Redirect to profile page with orders tab active
-            header("Location: profils.php?tab=orders&success=1");
-            exit();
-        } else {
-            $error_message = "Kļūda nosūtot pieprasījumu: " . $result['error'];
-        }
-    }
-}
-
-require_once 'admin/db/materiali_spec.php';
+// Iekļauj materiālu datus
+require 'admin/db/materiali_spec.php';
 include 'header.php';
 ?>
 <section id="materiali">
@@ -122,7 +39,7 @@ include 'header.php';
             
             <form id="custom-product-form" method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" enctype="multipart/form-data">
                 
-                <!-- Product Specifications -->
+                <!-- Produkta specifikācijas -->
                 <div class="form-group">
                     <label for="forma">Forma*:</label>
                     <select id="forma" name="forma">
@@ -143,7 +60,7 @@ include 'header.php';
                     </select>
                 </div>
                 
-                <!-- Malu figura with images -->
+                <!-- Malu figūra ar attēliem -->
                 <div class="form-group">
                     <label for="malu_figura">Malu figūra*:</label>
                     <select id="malu_figura" name="malu_figura" onchange="updateImageDisplay('malu_figura')">
@@ -160,7 +77,7 @@ include 'header.php';
                     </div>
                 </div>
                 
-                <!-- Dekorejums 1 with images -->
+                <!-- Dekorējums 1 ar attēliem -->
                 <div class="form-group">
                     <label for="dekorejums1">Dekorējums 1*:</label>
                     <select id="dekorejums1" name="dekorejums1" onchange="updateImageDisplay('dekorejums1')">
@@ -182,7 +99,7 @@ include 'header.php';
                     <input type="number" id="daudzums" name="daudzums" min="1" value="1" required>
                 </div>
                 
-                <!-- Contact Information -->
+                <!-- Kontaktinformācija -->
                 <h2>Kontaktinformācija</h2>
                 
                 <div class="form-group">
@@ -205,20 +122,6 @@ include 'header.php';
                     <input type="text" id="talrunis" name="talrunis" value="<?= htmlspecialchars($user['talrunis'] ?? '') ?>" required>
                 </div>
                 
-                <div class="form-group">
-                    <label for="adrese">Adrese*:</label>
-                    <input type="text" id="adrese" name="adrese" value="<?= htmlspecialchars($user['adrese'] ?? '') ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="pilseta">Pilsēta*:</label>
-                    <input type="text" id="pilseta" name="pilseta" value="<?= htmlspecialchars($user['pilseta'] ?? '') ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="pasta_indekss">Pasta indekss*:</label>
-                    <input type="text" id="pasta_indekss" name="pasta_indekss" value="<?= htmlspecialchars($user['pasta_indekss'] ?? '') ?>" required>
-                </div>
                 
                 <div class="form-group">
                     <label for="piezimes">Papildu piezīmes:</label>
@@ -287,7 +190,7 @@ include 'header.php';
 
 <script>
 
-// Function to update image display when material is selected
+// Funkcija lai atjauninātu attēla parādīšanu kad materiāls ir izvēlēts
 function updateImageDisplay(selectId) {
     const select = document.getElementById(selectId);
     const imageContainer = document.getElementById(selectId + '_image');
@@ -306,8 +209,8 @@ function updateImageDisplay(selectId) {
 </script>
 
 <?php
-// Close database connection
+// Aizvēr datubāzes savienojumu
 $savienojums->close();
-// Include footer
+// Iekļauj footer
 include 'footer.php';
 ?>

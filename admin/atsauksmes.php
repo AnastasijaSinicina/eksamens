@@ -74,7 +74,6 @@
         <div class="product-table-container">
             <div class="table-header">
                 <h2>Atsauksmes</h2>
-                <a href="atsauksmes.php?action=add" class="btn"><i class="fas fa-plus"></i></a>
             </div>
             
             <div class="table-responsive">
@@ -144,13 +143,13 @@
                                     <td class="action-buttons">
                                         <?php if (!$feedback['apstiprinats']): ?>
                                             <button onclick="approveFeedback(<?= $feedback['id_atsauksme'] ?>)" 
-                                               class="btn reject-btn">
-                                                <i class="fas fa-times"></i>
+                                               class="btn approve-btn">
+                                                <i class="fas fa-check"></i>
                                             </button>
                                         <?php else: ?>
                                             <button onclick="rejectFeedback(<?= $feedback['id_atsauksme'] ?>)" 
-                                               class="btn approve-btn">
-                                                <i class="fas fa-check"></i>
+                                               class="btn reject-btn">
+                                                <i class="fas fa-times"></i>
                                             </button>
                                         <?php endif; ?>
                                     </td>
@@ -213,26 +212,26 @@
     // Function to approve feedback with confirmation
     function approveFeedback(id) {
         showConfirmModal(
-            'Vai noraidīt šo atsauksmi?',
+            'Vai apstiprināt šo atsauksmi?',
             function() {
                 // Redirect to approve action
                 window.location.href = 'atsauksmes.php?approve=' + id;
             },
             'Apstiprināt',
-            'fas fa-check'
+            'fas fa-times'
         );
     }
     
     // Function to reject feedback with confirmation
     function rejectFeedback(id) {
         showConfirmModal(
-            'Vai apstiprināt šo atsauksmi?',
+            'Vai noraidīt šo atsauksmi?',
             function() {
                 // Redirect to reject action
                 window.location.href = 'atsauksmes.php?reject=' + id;
             },
             'Noraidīt',
-            'fas fa-times'
+            'fas fa-check'
         );
     }
     

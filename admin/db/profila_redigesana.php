@@ -22,70 +22,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
+    
+    if (!$user) {
+        $_SESSION['pazinojums'] = "Lietotājs nav atrasts!";
+        header("Location: ../../profils.php");
+        exit();
+    }
+    
     $user_id = $user['id_lietotajs'];
     
     try {
         if (isset($_POST['saglabat'])) {
             // Apstrādā parastu profila atjaunināšanu
-            $vards = $_POST['vards'];
-            $uzvards = $_POST['uzvards'];
-            $epasts = $_POST['epasts'];
+            $vards = trim($_POST['vards']);
+            $uzvards = trim($_POST['uzvards']);
+            $epasts = trim($_POST['epasts']);
+            
+            // Validate inputs
+            if (empty($vards) || empty($uzvards) || empty($epasts)) {
+                $_SESSION['pazinojums'] = "Visi lauki ir obligāti!";
+                header("Location: ../../profils.php");
+                exit();
+            }
+            
+            if (!filter_var($epasts, FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['pazinojums'] = "Nederīgs e-pasta formāts!";
+                header("Location: ../../profils.php");
+                exit();
+            }
             
             $update_query = "UPDATE lietotaji_sparkly SET vards = ?, uzvards = ?, epasts = ? WHERE id_lietotajs = ?";
             $update_stmt = $savienojums->prepare($update_query);
             $update_stmt->bind_param("sssi", $vards, $uzvards, $epasts, $user_id);
             
             if ($update_stmt->execute()) {
-                $_SESSION['pazinojums'] = "Profils veiksmīgi atjaunināts!";
+                $success_message = "Profils veiksmīgi atjaunināts!";
             } else {
-                $_SESSION['pazinojums'] = "Kļūda! Neizdevās atjaunināt profilu.";
-            }
-        }
-        
-        if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-            // Apstrādā profila attēla augšupielādi
-            $uploadedFile = $_FILES['profile_image'];
-            
-            // Pārbauda faila tipu
-            $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $uploadedFile['tmp_name']);
-            finfo_close($finfo);
-            
-            if (!in_array($mimeType, $allowedTypes)) {
-                $_SESSION['pazinojums'] = "Kļūda! Atļauti tikai JPEG, JPG, PNG un GIF formāta attēli.";
+                $_SESSION['pazinojums'] = "Kļūda! Neizdevās atjaunināt profilu: " . $savienojums->error;
                 header("Location: ../../profils.php");
                 exit();
             }
             
-            // Pārbauda faila izmēru (maks. 5MB)
-            if ($uploadedFile['size'] > 5 * 1024 * 1024) {
-                $_SESSION['pazinojums'] = "Kļūda! Attēla izmērs nedrīkst pārsniegt 5MB.";
-                header("Location: ../../profils.php");
-                exit();
+            // Process image upload if present
+            if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+                $uploadedFile = $_FILES['profile_image'];
+                
+                // Pārbauda faila tipu
+                $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_file($finfo, $uploadedFile['tmp_name']);
+                finfo_close($finfo);
+                
+                if (!in_array($mimeType, $allowedTypes)) {
+                    $_SESSION['pazinojums'] = "Kļūda! Atļauti tikai JPEG, JPG, PNG un GIF formāta attēli.";
+                    header("Location: ../../profils.php");
+                    exit();
+                }
+                
+                // Pārbauda faila izmēru (maks. 5MB)
+                if ($uploadedFile['size'] > 5 * 1024 * 1024) {
+                    $_SESSION['pazinojums'] = "Kļūda! Attēla izmērs nedrīkst pārsniegt 5MB.";
+                    header("Location: ../../profils.php");
+                    exit();
+                }
+                
+                // Apstrādā attēlu
+                $imageData = processImage($uploadedFile['tmp_name'], $mimeType);
+                
+                if ($imageData === false) {
+                    $_SESSION['pazinojums'] = "Kļūda! Neizdevās apstrādāt attēlu.";
+                    header("Location: ../../profils.php");
+                    exit();
+                }
+                
+                // Atjaunina datubāzi ar jauno attēlu
+                $image_query = "UPDATE lietotaji_sparkly SET foto = ? WHERE id_lietotajs = ?";
+                $image_stmt = $savienojums->prepare($image_query);
+                $image_stmt->bind_param("si", $imageData, $user_id);
+                
+                if ($image_stmt->execute()) {
+                    $success_message = "Profils un attēls veiksmīgi atjaunināti!";
+                } else {
+                    $_SESSION['pazinojums'] = "Profils atjaunināts, bet neizdevās saglabāt attēlu: " . $savienojums->error;
+                    header("Location: ../../profils.php");
+                    exit();
+                }
+                $image_stmt->close();
             }
             
-            // Apstrādā attēlu (maina izmēru, ja nepieciešams)
-            $imageData = processImage($uploadedFile['tmp_name'], $mimeType);
-            
-            if ($imageData === false) {
-                $_SESSION['pazinojums'] = "Kļūda! Neizdevās apstrādāt attēlu.";
-                header("Location: ../../profils.php");
-                exit();
-            }
-            
-            // Atjaunina datubāzi ar jauno attēlu
-            $image_query = "UPDATE lietotaji_sparkly SET foto = ? WHERE id_lietotajs = ?";
-            $image_stmt = $savienojums->prepare($image_query);
-            $null = null;
-            $image_stmt->bind_param("bi", $null, $user_id);
-            $image_stmt->send_long_data(0, $imageData);
-            
-            if ($image_stmt->execute()) {
-                $_SESSION['pazinojums'] = "Profila attēls veiksmīgi atjaunināts!";
-            } else {
-                $_SESSION['pazinojums'] = "Kļūda! Neizdevās atjaunināt profila attēlu.";
-            }
+            $_SESSION['pazinojums'] = $success_message ?? "Profils veiksmīgi atjaunināts!";
+            $update_stmt->close();
         }
         
         if (isset($_POST['delete_image'])) {
@@ -97,12 +123,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($delete_stmt->execute()) {
                 $_SESSION['pazinojums'] = "Profila attēls veiksmīgi dzēsts!";
             } else {
-                $_SESSION['pazinojums'] = "Kļūda! Neizdevās dzēst profila attēlu.";
+                $_SESSION['pazinojums'] = "Kļūda! Neizdevās dzēst profila attēlu: " . $savienojums->error;
             }
+            $delete_stmt->close();
         }
+        
     } catch (Exception $e) {
         $_SESSION['pazinojums'] = "Kļūda! " . $e->getMessage();
     }
+    
+    $stmt->close();
 }
 
 // Funkcija attēla apstrādei un izmēra maiņai
@@ -113,6 +143,7 @@ function processImage($imagePath, $mimeType) {
     // Izveido attēla resursu atkarībā no tipa
     switch ($mimeType) {
         case 'image/jpeg':
+        case 'image/jpg':
             $source = imagecreatefromjpeg($imagePath);
             break;
         case 'image/png':
@@ -141,9 +172,13 @@ function processImage($imagePath, $mimeType) {
     // Izveido jaunu attēlu
     $resized = imagecreatetruecolor($newWidth, $newHeight);
     
-    // Saglabā caurspīdīgumu
-    imagealphablending($resized, false);
-    imagesavealpha($resized, true);
+    // Saglabā caurspīdīgumu PNG failiem
+    if ($mimeType === 'image/png') {
+        imagealphablending($resized, false);
+        imagesavealpha($resized, true);
+        $transparent = imagecolorallocatealpha($resized, 255, 255, 255, 127);
+        imagefill($resized, 0, 0, $transparent);
+    }
     
     // Maina attēla izmēru
     imagecopyresampled($resized, $source, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
@@ -152,7 +187,7 @@ function processImage($imagePath, $mimeType) {
     ob_start();
     switch ($mimeType) {
         case 'image/png':
-            imagepng($resized);
+            imagepng($resized, null, 9);
             break;
         case 'image/gif':
             imagegif($resized);

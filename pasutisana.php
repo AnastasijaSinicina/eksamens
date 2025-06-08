@@ -1,223 +1,18 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+// Iekļauj datubāzes apstrādes failu
+include 'admin/db/pasutisana.php';
 
-if (!isset($_SESSION['lietotajvardsSIN'])) {
-    $_SESSION['pazinojums'] = "Lūdzu ielogojieties, lai pabeigtu pasūtījumu";
-    $_SESSION['redirect_after_login'] = "pasutisana.php";
-    header("Location: login.php");
-    exit();
-}
-require "admin/db/con_db.php";
-
-$username = $_SESSION['lietotajvardsSIN'];
-$query = "SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ?";
-$stmt = $savienojums->prepare($query);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$user_result = $stmt->get_result();
-$user = $user_result->fetch_assoc();
-
-$cart_query = "SELECT COUNT(*) as count FROM grozs_sparkly WHERE lietotajvards = ? AND statuss = 'aktīvs'";
-$cart_stmt = $savienojums->prepare($cart_query);
-$cart_stmt->bind_param("s", $username);
-$cart_stmt->execute();
-$cart_result = $cart_stmt->get_result();
-$cart_count = $cart_result->fetch_assoc()['count'];
-
-if ($cart_count == 0) {
-    $_SESSION['pazinojums'] = "Jūsu grozs ir tukšs";
-    header("Location: grozs.php");
-    exit();
-}
-
-// Function to generate unique order number
-function generateUniqueOrderNumber($connection) {
-    $max_attempts = 12;
-    $attempts = 0;
-    
-    do {
-        // Generate 8-digit random number (10000000000 to 99999999999)
-        $order_number = rand(100000000000, 999999999999);
-        
-        // Check if this number already exists
-        $check_query = "SELECT COUNT(*) as count FROM sparkly_pasutijumi WHERE pasutijuma_numurs = ?";
-        $check_stmt = $connection->prepare($check_query);
-        $check_stmt->bind_param("i", $order_number);
-        $check_stmt->execute();
-        $check_result = $check_stmt->get_result();
-        $exists = $check_result->fetch_assoc()['count'] > 0;
-        
-        $attempts++;
-        
-        if (!$exists) {
-            return $order_number;
-        }
-        
-    } while ($exists && $attempts < $max_attempts);
-    
-    // If we couldn't generate unique number after max attempts, throw error
-    throw new Exception("Unable to generate unique order number after $max_attempts attempts");
-}
-
-if (isset($_POST['submit_order'])) {
-    error_log("Order submission started");
-    error_log("POST data: " . print_r($_POST, true));
-    
-    $vards = htmlspecialchars($_POST['vards']);
-    $uzvards = htmlspecialchars($_POST['uzvards']);
-    $epasts = htmlspecialchars($_POST['epasts']);
-    $telefons = htmlspecialchars($_POST['telefons']);
-    $adrese = htmlspecialchars($_POST['adrese']);
-    $pilseta = htmlspecialchars($_POST['pilseta']);
-    $pasta_indekss = htmlspecialchars($_POST['pasta_indekss']);
-    $piegades_veids = htmlspecialchars($_POST['piegades_veids']); 
-    $piezimes = htmlspecialchars($_POST['piezimes']);
-    
-    // Set payment method based on delivery method
-    if ($piegades_veids == 'Pats') {
-        $apmaksas_veids = htmlspecialchars($_POST['apmaksas_veids']);
-    } else {
-        $apmaksas_veids = 'Bankas karte';
-    }
-    
-    error_log("Payment method set to: " . $apmaksas_veids);
-
-    $items_query = "SELECT g.*, p.nosaukums, p.cena 
-                  FROM grozs_sparkly g 
-                  JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
-                  WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
-    $items_stmt = $savienojums->prepare($items_query);
-    $items_stmt->bind_param("s", $username);
-    $items_stmt->execute();
-    $items_result = $items_stmt->get_result();
-    
-    $total = 0;
-    $product_count = 0;
-    $cart_items = [];
-    
-    while ($item = $items_result->fetch_assoc()) {
-        $cart_items[] = $item;
-        $total += $item['cena'] * $item['daudzums'];
-        $product_count += $item['daudzums'];
-    }
-    
-    $status = 'Iesniegts';
-    
-    try {
-        // Start transaction to ensure atomicity
-        $savienojums->autocommit(FALSE);
-        
-        // Generate unique order number
-        $unique_order_number = generateUniqueOrderNumber($savienojums);
-        error_log("Generated unique order number: " . $unique_order_number);
-        
-        // Insert the order
-        $insert_order = $savienojums->prepare("INSERT INTO sparkly_pasutijumi (lietotajs_id, pasutijuma_numurs, kopeja_cena, apmaksas_veids, piegades_veids, produktu_skaits, vards, uzvards, epasts, talrunis, pilseta, adrese, pasta_indeks, statuss) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $insert_order->bind_param("iidssissssssss", 
-            $user['id_lietotajs'],
-            $unique_order_number,
-            $total,
-            $apmaksas_veids,
-            $piegades_veids,
-            $product_count,
-            $vards,
-            $uzvards,
-            $epasts,
-            $telefons,
-            $pilseta,
-            $adrese,
-            $pasta_indekss,
-            $status
-        );
-        
-        if (!$insert_order->execute()) {
-            throw new Exception("Failed to insert order: " . $insert_order->error);
-        }
-        
-        $pasutijums_id = $savienojums->insert_id;
-        error_log("Order created with ID: " . $pasutijums_id);
-
-        // Insert order items
-        foreach ($cart_items as $item) {
-            $insert_items = $savienojums->prepare("INSERT INTO sparkly_pasutijuma_vienumi 
-                            (pasutijuma_id, produkta_id, daudzums_no_groza, cena) 
-                            VALUES (?, ?, ?, ?)");
-            
-            $insert_items->bind_param("iiid", 
-                $pasutijums_id, 
-                $item['bumba_id'], 
-                $item['daudzums'], 
-                $item['cena']
-            );
-            
-            if (!$insert_items->execute()) {
-                throw new Exception("Failed to insert order item: " . $insert_items->error);
-            }
-        }
-        
-        // Update cart status
-        $update_cart = $savienojums->prepare("UPDATE grozs_sparkly SET statuss = 'pasūtīts' WHERE lietotajvards = ? AND statuss = 'aktīvs'");
-        $update_cart->bind_param("s", $username);
-        
-        if (!$update_cart->execute()) {
-            throw new Exception("Failed to update cart: " . $update_cart->error);
-        }
-        
-        // INCREMENT USER ORDER COUNT - THIS IS THE NEW PART
-        $update_order_count = $savienojums->prepare("UPDATE lietotaji_sparkly SET pas_skaits = pas_skaits + 1 WHERE id_lietotajs = ?");
-        $update_order_count->bind_param("i", $user['id_lietotajs']);
-        
-        if (!$update_order_count->execute()) {
-            throw new Exception("Failed to update user order count: " . $update_order_count->error);
-        }
-        
-        error_log("User order count incremented for user ID: " . $user['id_lietotajs']);
-        
-        // Commit transaction
-        $savienojums->commit();
-        $savienojums->autocommit(TRUE);
-        
-        $_SESSION['pazinojums'] = "Pasūtījums veiksmīgi noformēts!";
-        error_log("Redirecting to confirmation page");
-        header("Location: pasutijums_apstiprinats.php?id=" . $pasutijums_id);
-        exit();
-        
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $savienojums->rollback();
-        $savienojums->autocommit(TRUE);
-        
-        error_log("Error creating order: " . $e->getMessage());
-        $error_message = "Kļūda veidojot pasūtījumu. Lūdzu, mēģiniet vēlreiz.";
-    }
-}
-
-$items_query = "SELECT g.*, p.nosaukums, p.cena, p.attels1 
-              FROM grozs_sparkly g 
-              JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
-              WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
-$items_stmt = $savienojums->prepare($items_query);
-$items_stmt->bind_param("s", $username);
-$items_stmt->execute();
-$items_result = $items_stmt->get_result();
-
-$cart_items = [];
-$subtotal = 0;
-
-while ($item = $items_result->fetch_assoc()) {
-    $cart_items[] = $item;
-    $subtotal += $item['cena'] * $item['daudzums'];
-}
-
+// Iekļauj galveni
 include 'header.php';
 ?>
 
 <section id="pasutisana">
     <h1>Pasūtījuma noformēšana</h1>
     
-    <?php if (isset($error_message)): ?>
+    <?php 
+    // Parāda kļūdas ziņojumu, ja tāds eksistē
+    if (isset($error_message)): 
+    ?>
         <div class="error-message">
             <p><?php echo $error_message; ?></p>
         </div>
@@ -228,7 +23,11 @@ include 'header.php';
             <h2>Pasūtījuma kopsavilkums</h2>
             
             <div class="summary-items">
-                <?php foreach ($cart_items as $item): ?>
+                <?php 
+                // Parāda groza preces, ja tās eksistē
+                if (isset($cart_items_display)):
+                    foreach ($cart_items_display as $item): 
+                ?>
                     <div class="summary-item">
                         <div class="item-image">
                             <img src="data:image/jpeg;base64,<?= base64_encode($item['attels1']) ?>" alt="<?= htmlspecialchars($item['nosaukums']) ?>">
@@ -239,13 +38,23 @@ include 'header.php';
                             <p class="item-price"><?= number_format($item['cena'], 2) ?>€</p>
                         </div>
                     </div>
-                <?php endforeach; ?>
+                <?php 
+                    endforeach;
+                endif; 
+                ?>
             </div>
             
             <div class="summary-totals">
                 <div class="total-row">
                     <span>Kopā:</span>
-                    <span><?= number_format($subtotal, 2) ?>€</span>
+                    <span>
+                        <?php 
+                        // Parāda kopējo summu, ja tā eksistē
+                        if (isset($subtotal)): 
+                            echo number_format($subtotal, 2) . '€';
+                        endif; 
+                        ?>
+                    </span>
                 </div>
             </div>
             
@@ -258,109 +67,69 @@ include 'header.php';
             <form id="checkout-form" method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">
                 <div class="form-group">
                     <label for="vards">Vārds*</label>
-                    <input type="text" id="vards" name="vards" value="<?= htmlspecialchars($user['vards'] ?? '') ?>" required>
+                    <input type="text" id="vards" name="vards" 
+                           value="<?php 
+                           // Ievieto lietotāja vārdu, ja tas eksistē
+                           if (isset($user['vards'])): 
+                               echo htmlspecialchars($user['vards']); 
+                           endif; 
+                           ?>" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="uzvards">Uzvārds*</label>
-                    <input type="text" id="uzvards" name="uzvards" value="<?= htmlspecialchars($user['uzvards'] ?? '') ?>" required>
+                    <input type="text" id="uzvards" name="uzvards" 
+                           value="<?php 
+                           // Ievieto lietotāja uzvārdu, ja tas eksistē
+                           if (isset($user['uzvards'])): 
+                               echo htmlspecialchars($user['uzvards']); 
+                           endif; 
+                           ?>" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="epasts">E-pasts*</label>
-                    <input type="email" id="epasts" name="epasts" value="<?= htmlspecialchars($user['epasts'] ?? '') ?>" required>
+                    <input type="email" id="epasts" name="epasts" 
+                           value="<?php 
+                           // Ievieto lietotāja e-pastu, ja tas eksistē
+                           if (isset($user['epasts'])): 
+                               echo htmlspecialchars($user['epasts']); 
+                           endif; 
+                           ?>" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="telefons">Telefons*</label>
-                    <input type="text" id="telefons" name="telefons" value="<?= htmlspecialchars($user['telefons'] ?? '') ?>" required>
-                </div>
-
-                <h2>Piegāde</h2>
-                <div class="form-group radio-group">
-                    <label class="radio-container">
-                        <input type="radio" name="piegades_veids" value="Kurjers" checked>
-                        <span class="radio-label">Kurjers</span>
-                    </label>
-                    
-                    <label class="radio-container">
-                        <input type="radio" name="piegades_veids" value="Pats">
-                        <span class="radio-label">Savākšu pats</span>
-                    </label>
+                    <input type="text" id="telefons" name="telefons" 
+                           value="<?php 
+                           // Ievieto lietotāja telefona numuru, ja tas eksistē
+                           if (isset($user['telefons'])): 
+                               echo htmlspecialchars($user['telefons']); 
+                           endif; 
+                           ?>" required>
                 </div>
                 
-                <div class="form-group" id="address-group">
-                    <label for="adrese">Adrese*</label>
-                    <input type="text" id="adrese" name="adrese" value="<?= htmlspecialchars($user['adrese'] ?? '') ?>" required>
-                </div>
-                
-                <div class="form-group" id="city-group">
-                    <label for="pilseta">Pilsēta*</label>
-                    <input type="text" id="pilseta" name="pilseta" value="<?= htmlspecialchars($user['pilseta'] ?? '') ?>" required>
-                </div>
-                
-                <div class="form-group" id="postal-group">
-                    <label for="pasta_indekss">Pasta indekss*</label>
-                    <input type="text" id="pasta_indekss" name="pasta_indekss" value="<?= htmlspecialchars($user['pasta_indeks'] ?? '') ?>" required>
-                </div>
                 
                 
                 <div class="form-group">
                     <label for="piezimes">Piezīmes par pasūtījumu</label>
                     <textarea id="piezimes" name="piezimes" rows="4"></textarea>
                 </div>
-
-                <div class="form-group" id="payment-method-display" style="display: none;">
-                    <label for="selected-payment-method">Izvēlētais maksājuma veids</label>
-                    <input type="text" id="selected-payment-method" value="" readonly class="readonly-field">
-                </div>
-
-                <input type="hidden" id="apmaksas-veids-input" name="apmaksas_veids" value="">
                 
-                <button type="button" id="payment-btn" class="btn full">Izvēlēties maksājuma veidu</button>
-                <button type="submit" name="submit_order" id="confirm-order-btn" class="btn full" style="display: none;">Apstiprināt pasūtījumu</button>
+                <!-- Pogas pasūtījuma noformēšanai -->    
+                <button type="submit" name="submit_order" id="confirm-order-btn" class="btn full">Apstiprināt pasūtījumu</button>
             </form>
         </div>
     </div>
 
-
-<!--Modālas logs maksājuma veidam-->
-<div id="payment-modal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Izvēlieties maksājuma veidu</h2>
-            <span class="modal-close">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div class="payment-options">
-                <label class="payment-option">
-                    <input type="radio" name="modal_payment" value="Bankas karte" checked>
-                    <span class="payment-label">
-                        <i class="fas fa-credit-card"></i>
-                        Bankas karte
-                    </span>
-                </label>
-                
-                <label class="payment-option">
-                    <input type="radio" name="modal_payment" value="Skaidra nauda">
-                    <span class="payment-label">
-                        <i class="fas fa-money-bill"></i>
-                        Skaidra nauda
-                    </span>
-                </label>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" id="cancel-payment" class="btn btn-secondary">Atcelt</button>
-            <button type="button" id="confirm-payment" class="btn">Apstiprināt</button>
-        </div>
-    </div>
-</div>
 </section>
-<script>
 
+<script>
+// JavaScript kods maksājuma veida izvēlei un formas validācijai
+// Šeit var pievienot nepieciešamo JavaScript funkcionalitāti
 </script>
 
 <?php
+// Iekļauj kājeni
 include 'footer.php';
 ?>

@@ -1,28 +1,28 @@
 <?php
 require_once "con_db.php";
 
-// Initialize variables that will be used in the client side
+// Inicializē mainīgos, kas tiks izmantoti klienta pusē
 $cart_items = [];
 $has_items = false;
 
-// Get cart items from database
+// Iegūst groza preces no datubāzes
 $query = "SELECT g.*, p.nosaukums, p.cena, p.attels1 
           FROM grozs_sparkly g 
           JOIN produkcija_sprarkly p ON g.bumba_id = p.id_bumba 
           WHERE g.lietotajvards = ? AND g.statuss = 'aktīvs'";
 
-// Execute query once
+// Izpilda vaicājumu vienu reizi
 $stmt = $savienojums->prepare($query);
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Store results in array
+// Saglabā rezultātus masīvā
 while ($row = $result->fetch_assoc()) {
     $cart_items[] = $row;
 }
 
-// Set flag for whether cart has items
+// Uzstāda karodziņu tam, vai grozā ir preces
 $has_items = (count($cart_items) > 0);
 
 $stmt->close();

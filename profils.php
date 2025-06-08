@@ -236,16 +236,7 @@ require 'header.php';
                                             
                                             <div class="order-address">
                                                 <h4>Piegādes informācija:</h4>
-                                                <p><?php echo htmlspecialchars($order['vards'] . ' ' . $order['uzvards']); ?></p>
-                                                <?php if ($order['order_type'] == 'regular' && $order['piegades_veids'] == 'Kurjers'): ?>
-                                                    <p><?php echo htmlspecialchars($order['adrese']); ?></p>
-                                                    <p><?php echo htmlspecialchars($order['pilseta'] . ', ' . $order['pasta_indeks']); ?></p>
-                                                <?php elseif ($order['order_type'] == 'custom'): ?>
-                                                    <p><?php echo htmlspecialchars($order['adrese']); ?></p>
-                                                    <p><?php echo htmlspecialchars($order['pilseta'] . ', ' . $order['pasta_indekss']); ?></p>
-                                                <?php else: ?>
                                                     <p><em>Izņemšana no veikala</em></p>
-                                                <?php endif; ?>
                                                 <p>Tel: <?php echo htmlspecialchars($order['talrunis']); ?></p>
                                                 <p>E-pasts: <?php echo htmlspecialchars($order['epasts']); ?></p>
                                             </div>
@@ -303,7 +294,7 @@ require 'header.php';
                                                 
                                                 <?php if (!empty($order['dekorejums1_name'])): ?>
                                                     <div class="spec-item">
-                                                        <span class="spec-label">Dekorējums 1:</span>
+                                                        <span class="spec-label">Dekorējums:</span>
                                                         <span class="spec-value"><?php echo htmlspecialchars($order['dekorejums1_name']); ?></span>
                                                     </div>
                                                 <?php endif; ?>
@@ -383,134 +374,7 @@ require 'header.php';
     </div>
 </div>
 <script>
-// Tab functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const targetTab = this.getAttribute('data-tab');
-            
-            // Remove active class from all buttons and panes
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanes.forEach(pane => pane.classList.remove('active'));
-            
-            // Add active class to clicked button and corresponding pane
-            this.classList.add('active');
-            document.getElementById(targetTab).classList.add('active');
-        });
-    });
-    
-    // Order filtering
-    const filterButtons = document.querySelectorAll('.filter-button');
-    const orderItems = document.querySelectorAll('.order-item');
-    
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const filterStatus = this.getAttribute('data-status');
-            const filterType = this.getAttribute('data-type');
-            
-            // Remove active class from all filter buttons
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Filter orders
-            orderItems.forEach(item => {
-                const itemStatus = item.getAttribute('data-status');
-                const itemType = item.getAttribute('data-type');
-                
-                let shouldShow = false;
-                
-                if (filterStatus === 'all') {
-                    shouldShow = true;
-                } else if (filterStatus) {
-                    shouldShow = itemStatus === filterStatus;
-                } else if (filterType) {
-                    shouldShow = itemType === filterType;
-                }
-                
-                item.style.display = shouldShow ? 'block' : 'none';
-            });
-        });
-    });
-    
-    // Order details expansion
-    const expandButtons = document.querySelectorAll('.expand-button');
-    expandButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const orderDetails = document.getElementById(this.getAttribute('data-order'));
-            const icon = this.querySelector('i');
-            
-            if (orderDetails.style.display === 'none' || orderDetails.style.display === '') {
-                orderDetails.style.display = 'block';
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-                this.innerHTML = '<i class="fas fa-chevron-up"></i> Paslēpt detaļas';
-            } else {
-                orderDetails.style.display = 'none';
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-                this.innerHTML = '<i class="fas fa-chevron-down"></i> Skatīt detaļas';
-            }
-        });
-    });
-    
-    // Account deletion modal
-    const deleteButton = document.getElementById('delete-account-btn');
-    const modal = document.getElementById('delete-confirmation');
-    const cancelButton = document.getElementById('cancel-delete');
-    
-    if (deleteButton) {
-        deleteButton.addEventListener('click', function() {
-            modal.style.display = 'flex';
-        });
-    }
-    
-    if (cancelButton) {
-        cancelButton.addEventListener('click', function() {
-            modal.style.display = 'none';
-        });
-    }
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-});
 
-// Image preview function
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            const currentImage = document.querySelector('.image-preview');
-            const placeholder = document.getElementById('image-placeholder');
-            
-            if (currentImage) {
-                currentImage.src = e.target.result;
-                currentImage.style.display = 'block';
-                placeholder.style.display = 'none';
-            } else {
-                // Create new image element if it doesn't exist
-                const newImg = document.createElement('img');
-                newImg.src = e.target.result;
-                newImg.className = 'image-preview';
-                newImg.alt = 'Profila attēls';
-                
-                const currentImageDiv = document.querySelector('.current-image');
-                currentImageDiv.insertBefore(newImg, placeholder);
-                placeholder.style.display = 'none';
-            }
-        };
-        
-        reader.readAsDataURL(input.files[0]);
-    }
-}
 </script>
 
 <?php

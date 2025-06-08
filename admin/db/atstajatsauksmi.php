@@ -1,14 +1,14 @@
 <?php
 require_once 'con_db.php';
 
-// Initialize variables
+// Inicializē mainīgos
 $user_id = null;
 $order_count = 0;
 $custom_order_count = 0;
 $error_message = '';
 $success_message = '';
 
-// Get user data including completed orders count
+// Iegūst lietotāja datus, ieskaitot pabeigto pasūtījumu skaitu
 if (isset($_SESSION['lietotajvardsSIN'])) {
     $username = $_SESSION['lietotajvardsSIN'];
     $user_query = "SELECT id_lietotajs, pas_skaits, spec_pas_skaits FROM lietotaji_sparkly WHERE lietotajvards = ?";
@@ -26,7 +26,7 @@ if (isset($_SESSION['lietotajvardsSIN'])) {
     $user_stmt->close();
     
     if (!$user) {
-        // If user not found, redirect to login
+        // Ja lietotājs nav atrasts, pārvirza uz pieteikšanās lapu
         session_destroy();
         header("Location: login.php");
         exit();
@@ -37,14 +37,14 @@ if (isset($_SESSION['lietotajvardsSIN'])) {
     $custom_order_count = $user['spec_pas_skaits'] ?? 0; 
 }
 
-// Handle feedback submission
+// Apstrādā atsauksmes iesniegšanu
 if (isset($_POST['submit_feedback']) && isset($user_id)) {
     $rating = intval($_POST['rating']);
     $feedback_text = htmlspecialchars($_POST['feedback']);
     $user_name = htmlspecialchars($_POST['user_name']);
     
     if ($rating >= 1 && $rating <= 5 && !empty($feedback_text) && !empty($user_name)) {
-        // Insert feedback into database
+        // Ievieto atsauksmi datubāzē
         $insert_feedback_sql = "INSERT INTO sparkly_atsauksmes (lietotajs_id, vards_uzvards, zvaigznes, atsauksme, datums, apstiprinats) 
                                VALUES (?, ?, ?, ?, NOW(), 0)";
         

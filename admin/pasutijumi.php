@@ -146,10 +146,6 @@ require 'db/pas_filtri.php';
                                             <span class="status ${order.statuss.toLowerCase()}">${order.statuss}</span>
                                         </div>
                                         <div class="info-row">
-                                            <span>Apmaksas veids:</span>
-                                            <span>${order.apmaksas_veids}</span>
-                                        </div>
-                                        <div class="info-row">
                                             <span>Kopējā summa:</span>
                                             <span class="total-price">${parseFloat(order.kopeja_cena).toFixed(2)}€</span>
                                         </div>
@@ -190,22 +186,7 @@ require 'db/pas_filtri.php';
                                             <span>${order.talrunis}</span>
                                         </div>
                                     </div>
-                                    
-                                    <div class="order-info-card">
-                                        <h3>Piegādes informācija</h3>
-                                        <div class="info-row">
-                                            <span>Adrese:</span>
-                                            <span>${order.adrese}</span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Pilsēta:</span>
-                                            <span>${order.pilseta}</span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Pasta indekss:</span>
-                                            <span>${order.pasta_indeks}</span>
-                                        </div>
-                                    </div>
+                                
                                 `;
                             }
                         })
@@ -400,66 +381,23 @@ require 'db/pas_filtri.php';
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Pagination Container -->
+                <div class="pagination-container" id="pagination-container">
+                    <div class="pagination-info">
+                        <span id="pagination-text">Rāda 1-6 no 0 ierakstiem</span>
+                    </div>
+                    <div class="pagination-controls" id="pagination-controls">
+                        <!-- Pagination buttons will be inserted here -->
+                    </div>
+                </div>
             </div>
 
             <script>
-                // Load orders on page load
-                document.addEventListener('DOMContentLoaded', function() {
-                    loadOrders();
-                });
 
-                // Function to load orders with AJAX
-                function loadOrders() {
-                    const formData = new FormData();
-                    formData.append('ajax', '1');
-                    formData.append('status', document.getElementById('status').value);
-                    formData.append('search', document.getElementById('search').value);
-                    formData.append('date_from', document.getElementById('date_from').value);
-                    formData.append('date_to', document.getElementById('date_to').value);
-
-                    // Show loading indicator
-                    document.getElementById('loading-indicator').style.display = 'block';
-                    document.getElementById('orders-tbody').style.opacity = '0.5';
-
-                    fetch('db/pasutijumi_admin.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('orders-tbody').innerHTML = html;
-                        document.getElementById('loading-indicator').style.display = 'none';
-                        document.getElementById('orders-tbody').style.opacity = '1';
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('loading-indicator').style.display = 'none';
-                        document.getElementById('orders-tbody').style.opacity = '1';
-                    });
-                }
-
-                // Search input with debounce
-                let searchTimeout;
-                document.getElementById('search').addEventListener('input', function() {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        loadOrders();
-                    }, 500);
-                });
-
-                // Auto-filter on status change
-                document.getElementById('status').addEventListener('change', function() {
-                    loadOrders();
-                });
-
-                // Auto-filter on date change
-                document.getElementById('date_from').addEventListener('change', function() {
-                    loadOrders();
-                });
-
-                document.getElementById('date_to').addEventListener('change', function() {
-                    loadOrders();
-                });
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeOrdersPagination();
+        });
             </script>
         <?php endif; ?>
     </section>

@@ -2,12 +2,24 @@
 require_once 'con_db.php';
 session_start();
 
+// Handle AJAX requests for orders list with pagination
 if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && $_POST['ajax'] == '1')) {
     $status_filter = $_POST['status'] ?? $_GET['status'] ?? '';
     $search = $_POST['search'] ?? $_GET['search'] ?? '';
     $date_from = $_POST['date_from'] ?? $_GET['date_from'] ?? '';
     $date_to = $_POST['date_to'] ?? $_GET['date_to'] ?? '';
+    $page = intval($_POST['page'] ?? $_GET['page'] ?? 1);
+    $limit = 6; // Orders per page
+    $offset = ($page - 1) * $limit;
     
+    // Base query for counting total records
+    $count_sql = "SELECT COUNT(*) as total
+                  FROM sparkly_pasutijumi p
+                  JOIN lietotaji_sparkly l ON p.lietotajs_id = l.id_lietotajs
+                  LEFT JOIN lietotaji_sparkly m ON p.red_liet = m.id_lietotajs
+                  WHERE 1=1";
+    
+    // Main query for fetching records
     $sql = "SELECT p.*, l.lietotajvards,
                    m.lietotajvards as red_liet_username,
                    m.vards as red_liet_first_name,
@@ -20,45 +32,106 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
     $params = [];
     $types = "";
     
-
+    // Add filters to both queries
     if (!empty($status_filter)) {
+        $count_sql .= " AND p.statuss = ?";
         $sql .= " AND p.statuss = ?";
         $params[] = $status_filter;
         $types .= "s";
     }
 
     if (!empty($search)) {
-        $sql .= " AND (p.id_pasutijums LIKE ? OR l.lietotajvards LIKE ? OR p.vards LIKE ? OR p.uzvards LIKE ? OR p.epasts LIKE ?)";
+        $search_condition = " AND (p.id_pasutijums LIKE ? OR l.lietotajvards LIKE ? OR p.vards LIKE ? OR p.uzvards LIKE ? OR p.epasts LIKE ?)";
+        $count_sql .= $search_condition;
+        $sql .= $search_condition;
         $search_param = "%$search%";
         $params = array_merge($params, [$search_param, $search_param, $search_param, $search_param, $search_param]);
         $types .= "sssss";
     }
-    
 
     if (!empty($date_from)) {
+        $count_sql .= " AND DATE(p.pas_datums) >= ?";
         $sql .= " AND DATE(p.pas_datums) >= ?";
         $params[] = $date_from;
         $types .= "s";
     }
     
     if (!empty($date_to)) {
+        $count_sql .= " AND DATE(p.pas_datums) <= ?";
         $sql .= " AND DATE(p.pas_datums) <= ?";
         $params[] = $date_to;
         $types .= "s";
     }
     
-    $sql .= " ORDER BY p.pas_datums DESC";
+    // Get total count
+    if (!empty($params)) {
+        $count_stmt = $savienojums->prepare($count_sql);
+        $count_stmt->bind_param($types, ...$params);
+        $count_stmt->execute();
+        $count_result = $count_stmt->get_result();
+        $total_records = $count_result->fetch_assoc()['total'];
+        $count_stmt->close();
+    } else {
+        $count_result = $savienojums->query($count_sql);
+        $total_records = $count_result->fetch_assoc()['total'];
+    }
     
+    $total_pages = ceil($total_records / $limit);
+    
+    // Add ordering and pagination to main query
+    $sql .= " ORDER BY p.pas_datums DESC LIMIT ? OFFSET ?";
+    $params[] = $limit;
+    $params[] = $offset;
+    $types .= "ii";
+    
+    // Execute main query
     if (!empty($params)) {
         $stmt = $savienojums->prepare($sql);
         $stmt->bind_param($types, ...$params);
         $stmt->execute();
         $result = $stmt->get_result();
     } else {
-        $result = $savienojums->query($sql);
+        $sql .= " LIMIT ? OFFSET ?";
+        $stmt = $savienojums->prepare($sql);
+        $stmt->bind_param("ii", $limit, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
     }
     
-
+    // Return JSON response with pagination info
+    if (isset($_POST['return_json']) || isset($_GET['return_json'])) {
+        $orders = [];
+        if ($result && $result->num_rows > 0) {
+            while ($order = $result->fetch_assoc()) {
+                if (!empty($order['red_liet_first_name']) && !empty($order['red_liet_last_name'])) {
+                    $red_liet_name = $order['red_liet_first_name'] . ' ' . $order['red_liet_last_name'];
+                } else if (!empty($order['red_liet_username'])) {
+                    $red_liet_name = $order['red_liet_username'];
+                } else {
+                    $red_liet_name = '';
+                }
+                $order['red_liet_name'] = $red_liet_name;
+                $orders[] = $order;
+            }
+        }
+        
+        echo json_encode([
+            'orders' => $orders,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => $total_pages,
+                'total_records' => $total_records,
+                'limit' => $limit
+            ]
+        ]);
+        
+        if (isset($stmt)) {
+            $stmt->close();
+        }
+        exit;
+    }
+    
+    // Return HTML for table rows
     if ($result && $result->num_rows > 0) {
         while ($order = $result->fetch_assoc()) {
             if (!empty($order['red_liet_first_name']) && !empty($order['red_liet_last_name'])) {
@@ -74,6 +147,7 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
             echo '<td>';
             echo '<div class="client-info">';
             echo '<div>' . htmlspecialchars($order['vards'] . ' ' . $order['uzvards']) . '</div>';
+            echo '<small>' . htmlspecialchars($order['lietotajvards']) . '</small>';
             echo '</div>';
             echo '</td>';
             echo '<td>' . date('d.m.Y H:i', strtotime($order['pas_datums'])) . '</td>';
@@ -84,14 +158,16 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
             echo '</td>';
             echo '<td>';
             if (!empty($red_liet_name)) {
-                echo '<small>' . htmlspecialchars($red_liet_name) . '</small><br>';
+                echo '<small>' . htmlspecialchars($red_liet_name) . '</small>';
                 if (!empty($order['red_dat'])) {
-                    echo '<small>' . date('d.m.Y H:i', strtotime($order['red_dat'])) . '</small>';
+                    echo '<br><small>' . date('d.m.Y H:i', strtotime($order['red_dat'])) . '</small>';
                 }
+            } else {
+                echo '<span class="text-muted">-</span>';
             }
             echo '</td>';
             echo '<td class="action-buttons">';
-            echo '<a href="pasutijumi.php?view=' . $order['id_pasutijums'] . '" class="btn edit-btn"><i class="fas fa-eye"></i> Skatīt</a>';
+            echo '<a href="pasutijumi.php?view=' . $order['id_pasutijums'] . '" class="btn"><i class="fas fa-eye"></i> Skatīt</a>';
             echo '</td>';
             echo '</tr>';
         }
@@ -101,13 +177,18 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
         echo '</tr>';
     }
     
+    // Add pagination info as data attributes to the last row
+    if ($result && $result->num_rows > 0) {
+        echo '<tr style="display:none;" data-current-page="' . $page . '" data-total-pages="' . $total_pages . '" data-total-records="' . $total_records . '"></tr>';
+    }
+    
     if (isset($stmt)) {
         $stmt->close();
     }
     exit;
 }
 
-
+// Handle status update
 if (isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
     $new_status = $_POST['new_status'];
@@ -144,6 +225,7 @@ if (isset($_POST['update_status'])) {
     exit;
 }
 
+// Handle fetch order details
 if (isset($_GET['fetch_order_details']) && isset($_GET['id'])) {
     $order_id = $_GET['id'];
     
@@ -181,6 +263,7 @@ if (isset($_GET['fetch_order_details']) && isset($_GET['id'])) {
     exit;
 }
 
+// Handle fetch order items
 if (isset($_GET['fetch_order_items']) && isset($_GET['id'])) {
     $order_id = $_GET['id'];
     
@@ -207,121 +290,5 @@ if (isset($_GET['fetch_order_items']) && isset($_GET['id'])) {
     echo json_encode($items);
     $stmt->close();
     exit;
-}
-
-if (isset($_GET['fetch_orders'])) {
-    $status_filter = $_GET['status'] ?? '';
-    $search = $_GET['search'] ?? '';
-    $date_from = $_GET['date_from'] ?? '';
-    $date_to = $_GET['date_to'] ?? '';
-    
-    $sql = "SELECT p.*, l.lietotajvards,
-                   m.lietotajvards as red_liet_username,
-                   m.vards as red_liet_first_name,
-                   m.uzvards as red_liet_last_name
-            FROM sparkly_pasutijumi p
-            JOIN lietotaji_sparkly l ON p.lietotajs_id = l.id_lietotajs
-            LEFT JOIN lietotaji_sparkly m ON p.red_liet = m.id_lietotajs
-            WHERE 1=1";
-    
-    $params = [];
-    $types = "";
-    
-    if (!empty($status_filter)) {
-        $sql .= " AND p.statuss = ?";
-        $params[] = $status_filter;
-        $types .= "s";
-    }
-    
-    if (!empty($search)) {
-        $sql .= " AND (p.id_pasutijums LIKE ? OR l.lietotajvards LIKE ? OR p.vards LIKE ? OR p.uzvards LIKE ? OR p.epasts LIKE ?)";
-        $search_param = "%$search%";
-        $params = array_merge($params, [$search_param, $search_param, $search_param, $search_param, $search_param]);
-        $types .= "sssss";
-    }
-
-    if (!empty($date_from)) {
-        $sql .= " AND DATE(p.pas_datums) >= ?";
-        $params[] = $date_from;
-        $types .= "s";
-    }
-    
-    if (!empty($date_to)) {
-        $sql .= " AND DATE(p.pas_datums) <= ?";
-        $params[] = $date_to;
-        $types .= "s";
-    }
-    
-    $sql .= " ORDER BY p.pas_datums DESC";
-    
-
-    if (!empty($params)) {
-        $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param($types, ...$params);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    } else {
-        $result = $savienojums->query($sql);
-    }
-    
-    $orders = [];
-    if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-
-            if (!empty($row['red_liet_first_name']) && !empty($row['red_liet_last_name'])) {
-                $row['red_liet_name'] = $row['red_liet_first_name'] . ' ' . $row['red_liet_last_name'];
-            } else if (!empty($row['red_liet_username'])) {
-                $row['red_liet_name'] = $row['red_liet_username'];
-            } else {
-                $row['red_liet_name'] = '';
-            }
-            
-            $orders[] = $row;
-        }
-    }
-    
-    echo json_encode($orders);
-    
-    if (isset($stmt)) {
-        $stmt->close();
-    }
-    exit;
-}
-
-// Update order status query
-if (isset($_GET['action']) && $_GET['action'] == 'update_status') {
-    $update_query = "UPDATE sparkly_pasutijumi SET statuss = ? WHERE id_pasutijums = ?";
-}
-
-// Get order details with customer information query
-if (isset($_GET['action']) && $_GET['action'] == 'get_order_details') {
-    $order_query = "SELECT p.*, l.lietotajvards
-                   FROM sparkly_pasutijumi p
-                   JOIN lietotaji_sparkly l ON p.lietotajs_id = l.id_lietotajs
-                   WHERE p.id_pasutijums = ?";
-}
-
-// Get order items with product information query
-if (isset($_GET['action']) && $_GET['action'] == 'get_order_items') {
-    $items_query = "SELECT i.*, p.attels1, p.nosaukums
-                   FROM sparkly_pasutijuma_vienumi i
-                   JOIN produkcija_sprarkly p ON i.produkta_id = p.id_bumba
-                   WHERE i.pasutijuma_id = ?";
-}
-
-// Get orders with filters query builder
-if (isset($_GET['action']) && $_GET['action'] == 'get_orders_filtered') {
-    $base_query = "SELECT p.*, l.lietotajvards
-                  FROM sparkly_pasutijumi p
-                  JOIN lietotaji_sparkly l ON p.lietotajs_id = l.id_lietotajs";
-    
-    // Filter conditions
-    $where_conditions = [];
-    $status_filter_condition = "p.statuss = ?";
-    $search_condition = "(p.id_pasutijums LIKE ? OR l.lietotajvards LIKE ? OR p.vards LIKE ? OR p.uzvards LIKE ? OR p.epasts LIKE ?)";
-    $date_from_condition = "p.pas_datums >= ?";
-    $date_to_condition = "p.pas_datums <= ?";
-    
-    $order_by_clause = " ORDER BY p.pas_datums DESC";
 }
 ?>

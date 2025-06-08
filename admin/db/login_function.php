@@ -1,14 +1,14 @@
 <?php
-require "con_db.php"; // Ensure database connection
+require "con_db.php"; // Nodrošina datubāzes savienojumu
 
 if (isset($_POST['ielogoties'])) {
     session_start();
 
-    // Get form data safely
+    // Iegūst formas datus droši
     $lietotajvards = htmlspecialchars($_POST['lietotajvards']);
     $parole = $_POST['parole'];
 
-    // Prepare query to find the user
+    // Sagatavo vaicājumu lietotāja atrašanai
     $vaicajums = $savienojums->prepare("SELECT * FROM lietotaji_sparkly WHERE lietotajvards = ? AND dzests = 0");
     $vaicajums->bind_param("s", $lietotajvards);
     $vaicajums->execute();
@@ -16,14 +16,14 @@ if (isset($_POST['ielogoties'])) {
     $lietotajs = $rezultats->fetch_assoc();
 
     if ($lietotajs) {
-        // Check if password matches
+        // Pārbauda, vai parole atbilst
         if (password_verify($parole, $lietotajs['parole'])) {
-            // Login success, store session
+            // Ielogošanās veiksmīga, saglabā sesiju
             $_SESSION['lietotajvardsSIN'] = $lietotajs['lietotajvards'];
-            $_SESSION['loma'] = $lietotajs['loma']; // Store role in session
-            // Check if there's a pending product to add to cart
+            $_SESSION['loma'] = $lietotajs['loma']; // Saglabā lomu sesijā
+            // Pārbauda, vai ir gaidāma prece, ko pievienot grozam
 if (isset($_SESSION['pending_product'])) {
-    // Initialize cart if it doesn't exist
+    // Inicializē groza, ja tas neeksistē
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = array();
     }
@@ -31,12 +31,12 @@ if (isset($_SESSION['pending_product'])) {
     $product = $_SESSION['pending_product'];
     $id = $product['id'];
     
-    // Check if product is already in cart
+    // Pārbauda, vai prece jau ir grozā
     if (isset($_SESSION['cart'][$id])) {
-        // Increment quantity
+        // Palielina daudzumu
         $_SESSION['cart'][$id]['quantity']++;
     } else {
-        // Add product to cart
+        // Pievieno preci grozam
         $_SESSION['cart'][$id] = array(
             'nosaukums' => $product['nosaukums'],
             'cena' => $product['cena'],
@@ -45,10 +45,10 @@ if (isset($_SESSION['pending_product'])) {
         );
     }
     
-    // Clean up
+    // Notīra
     unset($_SESSION['pending_product']);
     
-    // Set success message
+    // Uzstāda veiksmīgo ziņojumu
     $_SESSION['pazinojums'] = "Prece pievienota grozam!";
 }
             if (isset($_SESSION['redirect_after_login'])) {
@@ -56,28 +56,28 @@ if (isset($_SESSION['pending_product'])) {
                 unset($_SESSION['redirect_after_login']);
                 header("Location: ../../" . $redirect); 
             } else {
-                // Default redirects based on role
+                // Noklusējuma novirzīšana atkarībā no lomas
                 if ($lietotajs['loma'] === "admin" || $lietotajs['loma'] === "moder") {
                     header("Location: ../index.php"); 
                 } elseif ($lietotajs['loma'] === "klients") {
-                    header("Location: ../../index.php"); // Redirect to client dashboard
+                    header("Location: ../../index.php"); // Novirza uz klienta paneļa lapu
                 }
             }
             exit();
         } else {
-            // Invalid password
+            // Nepareiza parole
             $_SESSION['pazinojums'] = "Nepareiza parole!";
             header("Location: ../../login.php");
             exit();
         }
     } else {
-        // User does not exist
+        // Lietotājs neeksistē
         $_SESSION['pazinojums'] = "Jūsu konts neeksistē vai ir dzēsts!";
         header("Location: ../../login.php");
         exit();
     }
 
-    // Close the statement and database connection
+    // Aizver vaicājumu un datubāzes savienojumu
     $vaicajums->close();
     $savienojums->close();
 }

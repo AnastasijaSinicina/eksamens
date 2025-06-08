@@ -1,10 +1,10 @@
 <?php
+require 'con_db.php';
 
-require_once 'con_db.php';
-
-
+// Iegūst visus auduma ierakstus ar lietotāju informāciju
 if (isset($_GET['fetch_audums'])) {
 
+    // SQL vaicājums, lai iegūtu audumus ar redaktoru un izveidotāju informāciju
     $sql = "SELECT a.*, 
                    m.lietotajvards as red_liet_username,
                    m.vards as red_liet_first_name,
@@ -20,15 +20,18 @@ if (isset($_GET['fetch_audums'])) {
             ORDER BY a.id_audums";
     $result = $savienojums->query($sql);
 
+    // Sagatavo audumu masīvu rezultātiem
     $audums = [];
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            // Formatē redaktora vārdu - prioritāte vārds/uzvārds, pēc tam lietotājvārds
             if (!empty($row['red_liet_first_name']) && !empty($row['red_liet_last_name'])) {
                 $row['red_liet_name'] = $row['red_liet_first_name'] . ' ' . $row['red_liet_last_name'];
             } else if (!empty($row['red_liet_username'])) {
                 $row['red_liet_name'] = $row['red_liet_username'];
             }
 
+            // Formatē izveidotāja vārdu - prioritāte vārds/uzvārds, pēc tam lietotājvārds
             if (!empty($row['izveidots_liet_first_name']) && !empty($row['izveidots_liet_last_name'])) {
                 $row['izveidots_liet_name'] = $row['izveidots_liet_first_name'] . ' ' . $row['izveidots_liet_last_name'];
             } else if (!empty($row['izveidots_liet_username'])) {
@@ -39,13 +42,15 @@ if (isset($_GET['fetch_audums'])) {
         }
     }
 
+    // Atgriež JSON formātā un beidz skriptu
     echo json_encode($audums); 
     exit;
 }
 
-
+// Iegūst vienu konkrētu auduma ierakstu pēc ID
 if (isset($_GET['fetch_audums_single']) && isset($_GET['id'])) {
     $id = $_GET['id'];
+    // Drošs SQL vaicājums ar parametru saistīšanu
     $sql = "SELECT * FROM sparkly_audums WHERE id_audums = ?";
     $stmt = $savienojums->prepare($sql);
     $stmt->bind_param("i", $id);
@@ -62,7 +67,9 @@ if (isset($_GET['fetch_audums_single']) && isset($_GET['id'])) {
     exit;
 }
 
+// Iegūst visus dekorējuma ierakstus ar lietotāju informāciju un attēliem
 if (isset($_GET['fetch_dekorejums1'])) {
+    // SQL vaicājums dekorējumiem ar lietotāju informāciju
     $sql = "SELECT d.*, 
                    m.lietotajvards as red_liet_username,
                    m.vards as red_liet_first_name,
@@ -78,20 +85,23 @@ if (isset($_GET['fetch_dekorejums1'])) {
             ORDER BY d.id_dekorejums1";
     $result = $savienojums->query($sql);
 
+    // Sagatavo dekorējumu masīvu rezultātiem
     $dekorejums = [];
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            // Konvertē binārās attēla datus uz base64 formātu priekš JSON
             if (!empty($row['attels'])) {
                 $row['attels'] = base64_encode($row['attels']);
             }
             
+            // Formatē redaktora vārdu
             if (!empty($row['red_liet_first_name']) && !empty($row['red_liet_last_name'])) {
                 $row['red_liet_name'] = $row['red_liet_first_name'] . ' ' . $row['red_liet_last_name'];
             } else if (!empty($row['red_liet_username'])) {
                 $row['red_liet_name'] = $row['red_liet_username'];
             }
 
-        
+            // Formatē izveidotāja vārdu
             if (!empty($row['izveidots_liet_first_name']) && !empty($row['izveidots_liet_last_name'])) {
                 $row['izveidots_liet_name'] = $row['izveidots_liet_first_name'] . ' ' . $row['izveidots_liet_last_name'];
             } else if (!empty($row['izveidots_liet_username'])) {
@@ -106,9 +116,10 @@ if (isset($_GET['fetch_dekorejums1'])) {
     exit;
 }
 
-
+// Iegūst vienu konkrētu dekorējuma ierakstu pēc ID
 if (isset($_GET['fetch_dekorejums1_single']) && isset($_GET['id'])) {
     $id = $_GET['id'];
+    // Drošs SQL vaicājums vienam dekorējumam
     $sql = "SELECT * FROM sparkly_dekorejums1 WHERE id_dekorejums1 = ?";
     $stmt = $savienojums->prepare($sql);
     $stmt->bind_param("i", $id);
@@ -117,6 +128,7 @@ if (isset($_GET['fetch_dekorejums1_single']) && isset($_GET['id'])) {
 
     if ($result->num_rows > 0) {
         $dekorejums = $result->fetch_assoc();
+        // Konvertē attēlu uz base64, ja tas eksistē
         if (!empty($dekorejums['attels'])) {
             $dekorejums['attels'] = base64_encode($dekorejums['attels']);
         }
@@ -128,10 +140,9 @@ if (isset($_GET['fetch_dekorejums1_single']) && isset($_GET['id'])) {
     exit;
 }
 
-
-
-
+// Iegūst visas malu figūras ar lietotāju informāciju un attēliem
 if (isset($_GET['fetch_figuras'])) {
+    // SQL vaicājums malu figūrām ar lietotāju informāciju
     $sql = "SELECT f.*, 
                    m.lietotajvards as red_liet_username,
                    m.vards as red_liet_first_name,
@@ -147,17 +158,23 @@ if (isset($_GET['fetch_figuras'])) {
             ORDER BY f.id_malu_figura";
     $result = $savienojums->query($sql);
 
+    // Sagatavo figūru masīvu rezultātiem
     $figuras = [];
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            // Konvertē attēlu uz base64 formātu
             if (!empty($row['attels'])) {
                 $row['attels'] = base64_encode($row['attels']);
             }
+            
+            // Formatē redaktora vārdu
             if (!empty($row['red_liet_first_name']) && !empty($row['red_liet_last_name'])) {
                 $row['red_liet_name'] = $row['red_liet_first_name'] . ' ' . $row['red_liet_last_name'];
             } else if (!empty($row['red_liet_username'])) {
                 $row['red_liet_name'] = $row['red_liet_username'];
             }
+            
+            // Formatē izveidotāja vārdu
             if (!empty($row['izveidots_liet_first_name']) && !empty($row['izveidots_liet_last_name'])) {
                 $row['izveidots_liet_name'] = $row['izveidots_liet_first_name'] . ' ' . $row['izveidots_liet_last_name'];
             } else if (!empty($row['izveidots_liet_username'])) {
@@ -171,8 +188,10 @@ if (isset($_GET['fetch_figuras'])) {
     exit;
 }
 
+// Iegūst vienu konkrētu malu figūru pēc ID
 if (isset($_GET['fetch_figuras_single']) && isset($_GET['id'])) {
     $id = $_GET['id'];
+    // Drošs SQL vaicājums vienai figūrai
     $sql = "SELECT * FROM sparkly_malu_figura WHERE id_malu_figura = ?";
     $stmt = $savienojums->prepare($sql);
     $stmt->bind_param("i", $id);
@@ -181,6 +200,7 @@ if (isset($_GET['fetch_figuras_single']) && isset($_GET['id'])) {
 
     if ($result->num_rows > 0) {
         $figura = $result->fetch_assoc();
+        // Konvertē attēlu uz base64, ja tas eksistē
         if (!empty($figura['attels'])) {
             $figura['attels'] = base64_encode($figura['attels']);
         }
@@ -192,7 +212,9 @@ if (isset($_GET['fetch_figuras_single']) && isset($_GET['id'])) {
     exit;
 }
 
+// Iegūst visas formas ar lietotāju informāciju
 if (isset($_GET['fetch_formas'])) {
+    // SQL vaicājums formām ar lietotāju informāciju
     $sql = "SELECT f.*, 
                    m.lietotajvards as red_liet_username,
                    m.vards as red_liet_first_name,
@@ -208,14 +230,18 @@ if (isset($_GET['fetch_formas'])) {
             ORDER BY f.id_forma";
     $result = $savienojums->query($sql);
 
+    // Sagatavo formu masīvu rezultātiem
     $formas = [];
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            // Formatē redaktora vārdu
             if (!empty($row['red_liet_first_name']) && !empty($row['red_liet_last_name'])) {
                 $row['red_liet_name'] = $row['red_liet_first_name'] . ' ' . $row['red_liet_last_name'];
             } else if (!empty($row['red_liet_username'])) {
                 $row['red_liet_name'] = $row['red_liet_username'];
             }
+            
+            // Formatē izveidotāja vārdu
             if (!empty($row['izveidots_liet_first_name']) && !empty($row['izveidots_liet_last_name'])) {
                 $row['izveidots_liet_name'] = $row['izveidots_liet_first_name'] . ' ' . $row['izveidots_liet_last_name'];
             } else if (!empty($row['izveidots_liet_username'])) {
@@ -229,8 +255,10 @@ if (isset($_GET['fetch_formas'])) {
     exit;
 }
 
+// Iegūst vienu konkrētu formu pēc ID
 if (isset($_GET['fetch_formas_single']) && isset($_GET['id'])) {
     $id = $_GET['id'];
+    // Drošs SQL vaicājums vienai formai
     $sql = "SELECT * FROM sparkly_formas WHERE id_forma = ?";
     $stmt = $savienojums->prepare($sql);
     $stmt->bind_param("i", $id);
