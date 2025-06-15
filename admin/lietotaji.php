@@ -1,6 +1,12 @@
 <?php
-    // Include admin header
-    require 'header.php';
+    session_start();
+
+       if (!isset($_SESSION['lietotajvardsSIN']) || $_SESSION['loma'] !== 'admin') {
+        header("Location: ../login.php");
+        exit();
+    }
+
+        require 'header.php';
 ?>
 
 <main>

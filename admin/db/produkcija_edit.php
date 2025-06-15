@@ -3,23 +3,18 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 require_once 'con_db.php';
-
 
 if (!isset($savienojums)) {
     die("Database connection variable \$savienojums not found");
 }
-
 
 if ($savienojums->connect_error) {
     die("Database connection failed: " . $savienojums->connect_error);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-
     $id = (int)$_POST['id'];
     $forma = isset($_POST['forma']) ? (int)$_POST['forma'] : 0;
     $nosaukums = isset($_POST['nosaukums']) ? trim($_POST['nosaukums']) : '';
@@ -31,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $red_liet = $_SESSION['user_id'] ?? 1;
     $red_dat = date('Y-m-d H:i:s');
     
-
     if (empty($nosaukums)) {
         $error_message = "Produkta nosaukums ir obligāts lauks.";
     } elseif ($forma <= 0) {
@@ -39,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     } elseif ($cena <= 0) {
         $error_message = "Cena jābūt lielākai par 0.";
     } else {
-
         $check_sql = "SELECT * FROM produkcija_sprarkly WHERE id_bumba = ?";
         $check_stmt = $savienojums->prepare($check_sql);
         
@@ -80,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                 if (!$stmt) {
                     $error_message = "Kļūda sagatavošanas atjaunināšanas vaicājumā: " . $savienojums->error;
                 } else {
-                    $stmt->bind_param("isiiiidisi", 
+                    $stmt->bind_param("isiiiidsi", 
                         $forma, 
                         $nosaukums, 
                         $audums_id, 
@@ -112,7 +105,19 @@ $editData = null;
 if (isset($_GET['id'])) {
     $id = (int)$_GET['id'];
     
-    $sql = "SELECT * FROM produkcija_sprarkly WHERE id_bumba = ?";
+    // Updated query to include creator and editor usernames
+    $sql = "SELECT p.*, 
+                   creator.lietotajvards as created_username,
+                   creator.vards as created_first_name,
+                   creator.uzvards as created_last_name,
+                   editor.lietotajvards as updated_username,
+                   editor.vards as updated_first_name,
+                   editor.uzvards as updated_last_name
+            FROM produkcija_sprarkly p
+            LEFT JOIN lietotaji_sparkly creator ON p.izveidots_liet = creator.id_lietotajs
+            LEFT JOIN lietotaji_sparkly editor ON p.red_liet = editor.id_lietotajs
+            WHERE p.id_bumba = ?";
+    
     $stmt = $savienojums->prepare($sql);
     
     if (!$stmt) {

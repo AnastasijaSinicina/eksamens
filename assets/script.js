@@ -45,12 +45,78 @@ function showNotification(message, type = 'success') {
     }, 4000);
 }
 
-// Usage example:
-// showNotification('Veiksmīgi! Daudzums samazināts', 'success');
-// showNotification('Kļūda! Neizdevās veikt darbību', 'error');
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + '_icon');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function validatePasswords() {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    const currentPassword = document.getElementById('current_password').value;
+    const messageDiv = document.getElementById('password-match-message');
+    const submitBtn = document.getElementById('change-password-btn');
+    
+    // Check if all fields are filled
+    if (currentPassword.length === 0 || newPassword.length === 0 || confirmPassword.length === 0) {
+        messageDiv.textContent = '';
+        submitBtn.disabled = true;
+        return;
+    }
+    
+    // Check password length
+    if (newPassword.length < 8) {
+        messageDiv.textContent = 'Parolei jābūt vismaz 8 simbolus garai';
+        messageDiv.className = 'password-match-message error';
+        submitBtn.disabled = true;
+        return;
+    }
+    
+    // Check if passwords match
+    if (newPassword === confirmPassword) {
+        messageDiv.textContent = 'Paroles sakrīt ✓';
+        messageDiv.className = 'password-match-message success';
+        submitBtn.disabled = false;
+    } else {
+        messageDiv.textContent = 'Paroles nesakrīt';
+        messageDiv.className = 'password-match-message error';
+        submitBtn.disabled = true;
+    }
+}
+
+
 
 // Check if there's a notification in URL parameters when page loads
 document.addEventListener('DOMContentLoaded', function() {
+
+        const newPassword = document.getElementById('new_password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const currentPassword = document.getElementById('current_password');
+    
+    if (newPassword) newPassword.addEventListener('input', validatePasswords);
+    if (confirmPassword) confirmPassword.addEventListener('input', validatePasswords);
+    if (currentPassword) currentPassword.addEventListener('input', validatePasswords);
+
+const profileNotification = document.querySelector('#profils .profile-notification');
+    if (profileNotification) {
+        setTimeout(function() {
+            profileNotification.classList.add('fade-out');
+            setTimeout(function() {
+                profileNotification.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const notification = urlParams.get('notification');
     const notificationType = urlParams.get('type') || 'success';

@@ -63,7 +63,7 @@ if (!empty($user_data['foto'])) {
         </div>
 
         <?php if (isset($_SESSION['pazinojums'])): ?>
-            <div class="notification-message">
+            <div class="notification-message <?php echo (strpos($_SESSION['pazinojums'], 'KĻŪDA') !== false || strpos($_SESSION['pazinojums'], 'kļūda') !== false) ? 'error' : 'success'; ?>" id="admin-notification">
                 <?php 
                 echo $_SESSION['pazinojums']; 
                 unset($_SESSION['pazinojums']);

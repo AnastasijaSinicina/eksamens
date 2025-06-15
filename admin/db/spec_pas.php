@@ -43,11 +43,14 @@ if (isset($_POST['submit_custom_order'])) {
         $errors[] = "Nepareizs e-pasta formāts";
     }
     
-    // Validē daudzumu - jābūt pozitīvam skaitlim
-    if (!empty($_POST['daudzums']) && (int)$_POST['daudzums'] < 1) {
-        $errors[] = "Daudzums jābūt vismaz 1";
-    }
-    
+        if (!empty($_POST['daudzums'])) {
+            $quantity = (int)$_POST['daudzums'];
+            if ($quantity < 1) {
+                $errors[] = "Daudzums jābūt vismaz 1";
+            } elseif ($quantity > 20) {
+                $errors[] = "Daudzums nevar būt lielāks par 20";
+            }
+        }
     // Ja nav validācijas kļūdu, turpina ar datu saglabāšanu
     if (empty($errors)) {
         try {

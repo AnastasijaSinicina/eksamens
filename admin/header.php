@@ -117,6 +117,7 @@
                     </a>
                     <span class="nav-tooltip">Atsauksmes</span>
                 </li>
+                <?php if (isset($_SESSION['loma']) && $_SESSION['loma'] === 'admin'): ?>
                 <li class="nav-item">
                     <a href="lietotaji.php" class="nav-link">
                         <span class="nav-icon">
@@ -126,6 +127,7 @@
                     </a>
                     <span class="nav-tooltip">Lietotāji</span>
                 </li>
+                <?php endif; ?>
             </ul>
             <ul class="nav-list secondary-nav">
                 <li class="nav-item">

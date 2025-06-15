@@ -14,6 +14,10 @@ try {
     $order_count = $savienojums->query("SELECT COUNT(*) as count FROM sparkly_pasutijumi")->fetch_assoc()['count'];
     $stats['orders'] = $order_count;
     
+    // Klientu skaits
+    $clients_count = $savienojums->query("SELECT COUNT(*) as count FROM lietotaji_sparkly WHERE loma = 'klients' AND dzests = 0")->fetch_assoc()['count'];
+    $stats['clients'] = $clients_count;
+    
     // Pielāgoto pasūtījumu skaits
     $custom_count = $savienojums->query("SELECT COUNT(*) as count FROM sparkly_spec_pas")->fetch_assoc()['count'];
     $stats['spec_pas'] = $custom_count;
@@ -42,7 +46,7 @@ try {
     
 } catch (Exception $e) {
     error_log("Dashboard error: " . $e->getMessage());
-    $stats = ['products' => 0, 'orders' => 0, 'spec_pas' => 0];
+    $stats = ['products' => 0, 'orders' => 0, 'clients' => 0, 'spec_pas' => 0];
     $order_statuses = [];
     $recent_orders = null;
     $today_revenue = $month_revenue = $total_revenue = 0;

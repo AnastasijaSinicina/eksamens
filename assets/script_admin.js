@@ -3,6 +3,8 @@ const sidebarToggler = document.querySelector(".sidebar-toggler");
 const menuToggler = document.querySelector(".menu-toggler");
 const mainContent = document.querySelector("main");
 
+
+
 const collapsedSidebarHeight = "56px";
 
 sidebarToggler.addEventListener("click", () => {
@@ -61,12 +63,7 @@ menuToggler.addEventListener("click", () => {
         }
     });
 
-    // lapaspusses
-    /**
- * script_admin.js
- * Centralized JavaScript for admin panel functionality
- * Handles pagination, filtering, AJAX loading, and common UI interactions
- */
+
 
 // Global pagination state
 let currentPage = 1;
@@ -475,14 +472,23 @@ function setupImageClickHandlers() {
 /**
  * Global event listeners
  */
-document.addEventListener('DOMContentLoaded', function() {
-    // Close confirmation modal when clicking outside
-    window.addEventListener('click', function(event) {
+ window.addEventListener('click', function(event) {
         const confirmModal = document.getElementById('confirmModal');
         if (event.target === confirmModal) {
             hideConfirmModal();
         }
     });
+    
+    // Add the notification auto-hide code here:
+    const adminNotification = document.getElementById('admin-notification');
+    if (adminNotification) {
+        setTimeout(function() {
+            adminNotification.classList.add('fade-out');
+            setTimeout(function() {
+                adminNotification.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
     
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
@@ -504,12 +510,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput') || document.getElementById('search');
             if (searchInput) searchInput.focus();
         }
-    });
+    
 });
 
-/**
- * Export functions for global access
- */
+
 window.loadData = loadData;
 window.showNotification = showNotification;
 window.showConfirmModal = showConfirmModal;

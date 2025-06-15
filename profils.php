@@ -45,12 +45,12 @@ require 'header.php';
     <div class="profile-container">
         <h1>Mans profils</h1>
         
-        <?php if(isset($_SESSION['pazinojums'])): ?>
-            <div class="profile-notification">
-                <p><?php echo $_SESSION['pazinojums']; ?></p>
-            </div>
-            <?php unset($_SESSION['pazinojums']); ?>
-        <?php endif; ?>
+    <?php if(isset($_SESSION['pazinojums'])): ?>
+        <div class="profile-notification <?php echo (strpos($_SESSION['pazinojums'], 'KĻŪDA') !== false || strpos($_SESSION['pazinojums'], 'kļūda') !== false) ? 'error' : 'success'; ?>">
+            <p><?php echo $_SESSION['pazinojums']; ?></p>
+        </div>
+        <?php unset($_SESSION['pazinojums']); ?>
+    <?php endif; ?>
         
         <div class="profile-card">
             <div class="profile-header">
@@ -335,20 +335,37 @@ require 'header.php';
                         <form action="admin/db/paroles_maina.php" method="post" class="password-form">
                             <div class="form-group">
                                 <label for="current_password">Pašreizējā parole:</label>
-                                <input type="password" id="current_password" name="current_password" required>
+                                <div class="password-input-container">
+                                    <input type="password" id="current_password" name="current_password" required>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('current_password')">
+                                        <i class="fas fa-eye" id="current_password_icon"></i>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="form-group">
                                 <label for="new_password">Jauna parole:</label>
-                                <input type="password" id="new_password" name="new_password" required>
+                                <div class="password-input-container">
+                                    <input type="password" id="new_password" name="new_password" required minlength="8">
+                                    <button type="button" class="password-toggle" onclick="togglePassword('new_password')">
+                                        <i class="fas fa-eye" id="new_password_icon"></i>
+                                    </button>
+                                </div>
+                                <small class="password-help">Parolei jābūt vismaz 8 simbolus garai</small>
                             </div>
                             
                             <div class="form-group">
                                 <label for="confirm_password">Apstiprināt paroli:</label>
-                                <input type="password" id="confirm_password" name="confirm_password" required>
+                                <div class="password-input-container">
+                                    <input type="password" id="confirm_password" name="confirm_password" required minlength="8">
+                                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                                        <i class="fas fa-eye" id="confirm_password_icon"></i>
+                                    </button>
+                                </div>
+                                <div id="password-match-message" class="password-match-message"></div>
                             </div>
                             
-                            <button type="submit" name="change_password" class="btn">Mainīt paroli</button>
+                            <button type="submit" name="change_password" class="btn" disabled id="change-password-btn">Mainīt paroli</button>
                         </form>
                         
                         <div class="delete-account">
@@ -373,9 +390,10 @@ require 'header.php';
         </div>
     </div>
 </div>
-<script>
 
-</script>
+
+
+
 
 <?php
 // Include footer

@@ -17,8 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['change_password'])) {
     $confirm_password = $_POST['confirm_password'];
     $lietotajvards = $_SESSION['lietotajvardsSIN'];
     
-    // Pārbauda pašreizējo paroli
-    $vaicajums = $savienojums->prepare("SELECT parole FROM lietotaji_sparkly WHERE lietotajvards = ?");
+    // Pārbauda pašreizējo paroli un iegūst lietotāja lomu
+    $vaicajums = $savienojums->prepare("SELECT parole, loma FROM lietotaji_sparkly WHERE lietotajvards = ?");
     $vaicajums->bind_param("s", $lietotajvards);
     $vaicajums->execute();
     $rezultats = $vaicajums->get_result();
@@ -26,35 +26,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['change_password'])) {
     
     if (!$lietotajs) {
         $_SESSION['pazinojums'] = "Lietotājs nav atrasts!";
-        header("Location: ../../profils.php");
+        // Novirza atkarībā no sesijas lomas, ja lietotājs nav atrasts
+        $redirect_url = ($_SESSION['loma'] === 'admin' || $_SESSION['loma'] === 'moder') ? "../profils.php" : "../../profils.php";
+        header("Location: " . $redirect_url);
         exit();
     }
     
     // Verificē pašreizējo paroli
     if (!password_verify($current_password, $lietotajs['parole'])) {
         $_SESSION['pazinojums'] = "KĻŪDA! Pašreizējā parole ir nepareiza!";
-        header("Location: ../../profils.php");
+        // Novirza atkarībā no lietotāja lomas
+        $redirect_url = ($lietotajs['loma'] === 'admin' || $lietotajs['loma'] === 'moder') ? "../profils.php" : "../../profils.php";
+        header("Location: " . $redirect_url);
         exit();
     }
 
     // Validē ievades datus
     if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
         $_SESSION['pazinojums'] = "Visi lauki ir obligāti!";
-        header("Location: ../../profils.php");
+        // Novirza atkarībā no lietotāja lomas
+        $redirect_url = ($lietotajs['loma'] === 'admin' || $lietotajs['loma'] === 'moder') ? "../profils.php" : "../../profils.php";
+        header("Location: " . $redirect_url);
         exit();
     }
     
     // Pārbauda, vai jaunās paroles sakrīt
     if ($new_password !== $confirm_password) {
         $_SESSION['pazinojums'] = "KĻŪDA! Jaunās paroles nesakrīt!";
-        header("Location: ../../profils.php");
+        // Novirza atkarībā no lietotāja lomas
+        $redirect_url = ($lietotajs['loma'] === 'admin' || $lietotajs['loma'] === 'moder') ? "../profils.php" : "../../profils.php";
+        header("Location: " . $redirect_url);
         exit();
     }
     
     // Pārbauda paroles garumu
     if (strlen($new_password) < 8) {
         $_SESSION['pazinojums'] = "Parolei jābūt vismaz 8 simbolus garai!";
-        header("Location: ../../profils.php");
+        // Novirza atkarībā no lietotāja lomas
+        $redirect_url = ($lietotajs['loma'] === 'admin' || $lietotajs['loma'] === 'moder') ? "../profils.php" : "../../profils.php";
+        header("Location: " . $redirect_url);
         exit();
     }
     
@@ -75,12 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['change_password'])) {
     $vaicajums->close();
     $savienojums->close();
     
-    header("Location: ../../profils.php");
+    // Nosaka pareizo novirzīšanas URL atkarībā no lietotāja lomas
+    $redirect_url = ($lietotajs['loma'] === 'admin' || $lietotajs['loma'] === 'moder') ? "../profils.php" : "../../profils.php";
+    header("Location: " . $redirect_url);
     exit();
 } else {
     // Ja tiek piekļūts tieši bez POST pieprasījuma
     $_SESSION['pazinojums'] = "Nederīgs pieprasījums!";
-    header("Location: ../../profils.php");
+    // Novirza atkarībā no sesijas lomas
+    $redirect_url = ($_SESSION['loma'] === 'admin' || $_SESSION['loma'] === 'moder') ? "../profils.php" : "../../profils.php";
+    header("Location: " . $redirect_url);
     exit();
 }
 ?>

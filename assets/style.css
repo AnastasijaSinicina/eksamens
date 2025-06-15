@@ -2156,12 +2156,31 @@ footer img{
     margin-bottom: 2rem;
 }
 #profils .profile-notification {
-    background-color: var(--light1);
+    background-color: white;
+    border-left: 5px solid #4caf50;
+    box-shadow: var(--box-shadow);
     color: var(--tumsa);
     padding: 1rem;
     border-radius: 0.5rem;
     margin-bottom: 2rem;
     text-align: center;
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+#profils .profile-notification.error {
+    border-left-color: #f44336;
+    background-color: #fef2f2;
+}
+
+#profils .profile-notification.success {
+    border-left-color: #4caf50;
+    background-color: #f0f9f0;
+}
+
+#profils .profile-notification.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
 }
 #profils .profile-card {
     background-color: white;
@@ -2810,6 +2829,7 @@ footer img{
     max-width: 600px;
     margin: 0 auto;
 }
+/* Profile password form styling */
 #profils .password-form {
     box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
     padding: 2rem;
@@ -2817,16 +2837,66 @@ footer img{
     margin-bottom: 3rem;
     margin-top: 1rem;
 }
+
 #profils .password-form h3 {
     color: var(--tumsa);
     margin-bottom: 1.5rem;
 }
+
 #parolesmaina .form-group {
     position: relative;
 }
+
 #parolesmaina .form-group input {
     padding-right: 50px;
 }
+
+/* Password input container */
+.password-input-container {
+    position: relative;
+}
+
+.password-input-container input {
+    width: 100%;
+    padding-right: 50px;
+}
+
+/* Eye toggle button styling */
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    border-color: var(--maincolor);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.password-toggle i {
+    color: #666;
+    font-size: 14px;
+}
+
+.password-toggle:hover i {
+    color: var(--maincolor);
+}
+
+/* Icon containers for validation */
 #parolesmaina .icon-container {
     position: absolute;
     right: 15px;
@@ -2844,44 +2914,83 @@ footer img{
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
 }
+
 #parolesmaina .match-container {
     background: rgba(0, 204, 0, 0.1);
     border-color: #00cc00;
 }
+
 #parolesmaina .mismatch-container {
     background: rgba(255, 51, 51, 0.1);
     border-color: #ff3333;
 }
+
 #parolesmaina .password-match-icon {
     color: #00cc00;
     font-size: 16px;
     text-shadow: 0 0 5px rgba(0, 204, 0, 0.5);
 }
+
 #parolesmaina .password-mismatch-icon {
     color: #ff3333;
     font-size: 16px;
     text-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
 }
+
 #parolesmaina .match-container.visible {
     margin-top: 0.7rem;
     display: flex !important;
     animation: pulse 1.5s infinite;
 }
+
 #parolesmaina .mismatch-container.visible {
     margin-top: 0.7rem;
     display: flex !important;
     animation: shake 0.5s;
 }
+
+/* Password help text */
+.password-help {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Password match message */
+.password-match-message {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.password-match-message.success {
+    color: #28a745;
+}
+
+.password-match-message.error {
+    color: #dc3545;
+}
+
+/* Button disabled state */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Animations */
 @keyframes pulse {
     0% { transform: translateY(-50%) scale(1); }
-    50% { transform: translateY(-50%) scale(1.2); }
+    50% { transform: translateY(-50%) scale(1.1); }
     100% { transform: translateY(-50%) scale(1); }
 }
+
 @keyframes shake {
     0%, 100% { transform: translateY(-50%) translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-2px); }
-    20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(2px); }
+    25% { transform: translateY(-50%) translateX(-5px); }
+    75% { transform: translateY(-50%) translateX(5px); }
 }
+
 #profils .delete-account {
     background-color: #ffebee;
     padding: 2rem;

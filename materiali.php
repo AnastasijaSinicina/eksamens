@@ -79,7 +79,7 @@ include 'header.php';
                 
                 <!-- Dekorējums 1 ar attēliem -->
                 <div class="form-group">
-                    <label for="dekorejums1">Dekorējums 1*:</label>
+                    <label for="dekorejums1">Dekorējums*:</label>
                     <select id="dekorejums1" name="dekorejums1" onchange="updateImageDisplay('dekorejums1')">
                         <option value="">Izvēlieties dekorējumu</option>
                         <?php foreach ($dekorejumi1 as $dekorejums): ?>
@@ -95,8 +95,8 @@ include 'header.php';
                 </div>
                 
                 <div class="form-group">
-                    <label for="daudzums">Daudzums*:</label>
-                    <input type="number" id="daudzums" name="daudzums" min="1" value="1" required>
+                    <label for="daudzums">Daudzums*(Ne vairāk ka 20 vienumus!): </label>
+                    <input type="number" id="daudzums" name="daudzums" min="1" max="20" value="1" required>
                 </div>
                 
                 <!-- Kontaktinformācija -->
