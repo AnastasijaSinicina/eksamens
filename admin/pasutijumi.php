@@ -52,7 +52,7 @@ require 'db/pas_filtri.php';
                             <select name="new_status" id="new_status" class="status-select">
                                 <option value="Iesniegts" <?= ($view_order['statuss'] ?? '') == 'Iesniegts' ? 'selected' : '' ?>>Iesniegts</option>
                                 <option value="Apstiprināts" <?= ($view_order['statuss'] ?? '') == 'Apstiprināts' ? 'selected' : '' ?>>Apstiprināts</option>
-                                <option value="Nosūtīts" <?= ($view_order['statuss'] ?? '') == 'Nosūtīts' ? 'selected' : '' ?>>Nosūtīts</option>
+                                <option value="Izgatavo" <?= ($view_order['statuss'] ?? '') == 'Izgatavo' ? 'selected' : '' ?>>Izgatavo</option>
                                 <option value="Saņemts" <?= ($view_order['statuss'] ?? '') == 'Saņemts' ? 'selected' : '' ?>>Saņemts</option>
                             </select>
                             <button type="submit" name="update_status" class="btn">Atjaunināt statusu</button>
@@ -302,7 +302,7 @@ require 'db/pas_filtri.php';
                             <option value="">Visi statusi</option>
                             <option value="Iesniegts" <?= ($status_filter ?? '') == 'Iesniegts' ? 'selected' : '' ?>>Iesniegts</option>
                             <option value="Apstiprināts" <?= ($status_filter ?? '') == 'Apstiprināts' ? 'selected' : '' ?>>Apstiprināts</option>
-                            <option value="Nosūtīts" <?= ($status_filter ?? '') == 'Nosūtīts' ? 'selected' : '' ?>>Nosūtīts</option>
+                            <option value="Izgatavo" <?= ($status_filter ?? '') == 'Izgatavo' ? 'selected' : '' ?>>Izgatavo</option>
                             <option value="Saņemts" <?= ($status_filter ?? '') == 'Saņemts' ? 'selected' : '' ?>>Saņemts</option>
                         </select>
                     </div>

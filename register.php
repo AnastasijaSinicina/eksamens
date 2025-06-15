@@ -8,61 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/style_login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <style>
-        .password-box {
-            position: relative;
-        }
-        .icon-container {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: transparent;
-            border: 2px solid white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 5px rgba(255,255,255,0.5);
-            transition: all 0.3s ease;
-        }
-        .match-container {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-        .mismatch-container {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-        .password-match-icon {
-            color: #00cc00;
-            font-size: 16px;
-            text-shadow: 0 0 5px rgba(0,204,0,0.5);
-        }
-        .password-mismatch-icon {
-            color: #ff3333;
-            font-size: 16px;
-            text-shadow: 0 0 5px rgba(255,51,51,0.5);
-        }
-        .match-container.visible {
-            display: flex !important;
-            animation: pulse 1.5s infinite;
-        }
-        .mismatch-container.visible {
-            display: flex !important;
-            animation: shake 0.5s;
-        }
-        @keyframes pulse {
-            0% { transform: translateY(-50%) scale(1); }
-            50% { transform: translateY(-50%) scale(1.2); }
-            100% { transform: translateY(-50%) scale(1); }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateY(-50%) translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-2px); }
-            20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(2px); }
-        }
-    </style>
+
     <title>Reģistrācija</title>
 </head>
 <body>

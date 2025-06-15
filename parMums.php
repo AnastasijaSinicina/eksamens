@@ -24,7 +24,7 @@
         </div>
     </div>
 </div>
-<h2><p>&#10053</p>Komanda<p>&#10053</p></h2>
+<h2><p>&#10053</p>Dibinātaji<p>&#10053</p></h2>
 <div class="box-darbinieki">
    
 <div class="darbinieks">

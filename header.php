@@ -2,7 +2,6 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-// Inside header.php
 $cartCount = 0;
 if (isset($_SESSION['lietotajvardsSIN'])) {
     // Include database connection
@@ -24,7 +23,6 @@ if (isset($_SESSION['lietotajvardsSIN'])) {
     $stmt->close();
 }
 
-// Make sure $cartCount is a valid number
 $cartCount = $cartCount ?: 0;
 
 ?>

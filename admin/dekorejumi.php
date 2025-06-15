@@ -37,12 +37,12 @@
     </div>
 
     <section class="admin-content">
-        <h1>Dekorējumu pārvaldība (1)</h1>
+        <h1>Dekorējumu pārvaldība</h1>
         
         <!-- Decorations 1 Table -->
         <div class="product-table-container">
             <div class="table-header">
-                <h2>Dekorējumi (1)</h2>
+                <h2>Dekorējumi</h2>
                 <button onclick="openAddModal()" class="btn "><i class="fas fa-plus"></i></button>
             </div>
             

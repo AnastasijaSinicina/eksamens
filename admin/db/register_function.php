@@ -11,6 +11,13 @@ if (isset($_POST['registreties'])) {
     $parole = $_POST['parole'];
     $parole_atkartoti = $_POST['parole_atkartoti'];
     
+    // Validate password length
+    if (strlen($parole) < 8) {
+        $_SESSION['pazinojums'] = "Parolei jābūt vismaz 8 simbolus garai!";
+        header("Location: ../../register.php");
+        exit();
+    }
+    
     // Validate if passwords match
     if ($parole !== $parole_atkartoti) {
         $_SESSION['pazinojums'] = "Paroles nesakrīt!";

@@ -21,10 +21,7 @@ function showNotification(message, type = 'success') {
 
     // Force center positioning with JavaScript
     function centerNotification() {
-        const rect = notification.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
+
         notification.style.position = 'fixed';
         notification.style.transform = 'none'; // Remove any transform conflicts
     }
@@ -166,8 +163,6 @@ $(document).ready(function() {
     
 });
 
-
-//-----------------------------------------------------------------------------------------PASŪTĪJUMA VEIDOŠANA-------------------------------------------------------
 
 
 /*------------------------------------------------------------------PROFILS----------------------------------------------------------------------------------*/

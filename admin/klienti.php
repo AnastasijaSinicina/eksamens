@@ -168,7 +168,7 @@
         document.getElementById('clients-modal').style.display = 'none';
     }
 
-    function deleteClient(id) {
+   function deleteClient(id) {
     showConfirmModal(
         'Vai tiešām vēlaties dzēst šo klientu? Šī darbība ir neatgriezeniska.',
         function() {
@@ -177,21 +177,26 @@
             formData.append('delete_client', '1');
             formData.append('id', id);
             
-            fetch('db/materiali_delete.php', {
+            fetch('db/users_delete.php', {  // Changed from 'db/materiali_delete.php'
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.status === 'success') {
                     showNotification('success', 'Veiksmīgi!', data.message);
-                    loadAudums();
+                    loadClients();  // Changed from loadAudums()
                 } else {
                     showNotification('error', 'Kļūda!', data.message);
                 }
             })
             .catch(error => {
-                console.error('Error deleting klientu:', error);
+                console.error('Error deleting client:', error);
                 showNotification('error', 'Kļūda!', 'Neizdevās dzēst klientu.');
             });
         }

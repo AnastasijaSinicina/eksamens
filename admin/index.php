@@ -95,7 +95,7 @@ require 'db/kopsavilkums.php';
             <div class="dashboard-card">
                 <h2><i class="fas fa-chart-pie"></i> Pasūtījumu statusu sadalījums</h2>
                 <div class="status-overview">
-                    <?php foreach (['Iesniegts', 'Apstiprināts', 'Nosūtīts', 'Saņemts', 'Atcelts'] as $status): ?>
+                    <?php foreach (['Iesniegts', 'Apstiprināts', 'Izgatavo', 'Saņemts', 'Atcelts'] as $status): ?>
 
                     <div class="status-item">
                         <span class="status-badge <?php echo strtolower($status); ?>">

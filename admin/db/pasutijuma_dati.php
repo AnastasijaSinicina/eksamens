@@ -1,8 +1,5 @@
 <?php
-/**
- * Pasūtījuma datu iegūšanas vaicājumi
- * Šis fails satur visus vaicājumus pasūtījuma lapas attēlošanai
- */
+
 
 // Pārbaudām vai ir savienojums ar datu bāzi
 if (!isset($savienojums)) {

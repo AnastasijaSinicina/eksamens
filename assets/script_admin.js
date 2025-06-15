@@ -3,81 +3,82 @@ const sidebarToggler = document.querySelector(".sidebar-toggler");
 const menuToggler = document.querySelector(".menu-toggler");
 const mainContent = document.querySelector("main");
 
-
-
 const collapsedSidebarHeight = "56px";
 
+// Sānjoslas pārslēgšanas funkcionalitāte
 sidebarToggler.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
-    // Force DOM reflow to ensure styles are applied correctly
+    // Piespiedīt DOM pārzīmēšanu, lai stili tiktu pareizi piemēroti
     void mainContent.offsetWidth;
 });
 
+// Izvēlnes pārslēgšanas funkcija
 const toggleMenu = (isMenuActive) => {
     sidebar.style.height = isMenuActive ? `${sidebar.scrollHeight}px` : collapsedSidebarHeight;
 }
 
+// Mobilās izvēlnes pārslēgšana
 menuToggler.addEventListener("click", () => {
     const isActive = sidebar.classList.toggle("menu-active");
     toggleMenu(isActive);
-    // Force DOM reflow for mobile view as well
+    // Piespiedīt DOM pārzīmēšanu arī mobilajā skatā
     void mainContent.offsetWidth;
 });
 
- function showConfirmModal(message, onConfirm, onCancel = null) {
-        const modal = document.getElementById('confirmModal');
-        const messageElement = document.getElementById('confirmMessage');
-        const yesButton = document.getElementById('confirmYes');
-        const noButton = document.getElementById('confirmNo');
-        
-        messageElement.textContent = message;
-        modal.style.display = 'block';
-        
-        // Remove any existing event listeners
-        const newYesButton = yesButton.cloneNode(true);
-        const newNoButton = noButton.cloneNode(true);
-        yesButton.parentNode.replaceChild(newYesButton, yesButton);
-        noButton.parentNode.replaceChild(newNoButton, noButton);
-        
-        // Add new event listeners
-        document.getElementById('confirmYes').addEventListener('click', function() {
-            hideConfirmModal();
-            if (onConfirm) onConfirm();
-        });
-        
-        document.getElementById('confirmNo').addEventListener('click', function() {
-            hideConfirmModal();
-            if (onCancel) onCancel();
-        });
-    }
-
-    function hideConfirmModal() {
-        document.getElementById('confirmModal').style.display = 'none';
-    }
-
-    // Close confirmation modal when clicking outside
-    window.addEventListener('click', function(event) {
-        const confirmModal = document.getElementById('confirmModal');
-        if (event.target === confirmModal) {
-            hideConfirmModal();
-        }
+// Apstiprināšanas modāla rādīšana
+function showConfirmModal(message, onConfirm, onCancel = null) {
+    const modal = document.getElementById('confirmModal');
+    const messageElement = document.getElementById('confirmMessage');
+    const yesButton = document.getElementById('confirmYes');
+    const noButton = document.getElementById('confirmNo');
+    
+    messageElement.textContent = message;
+    modal.style.display = 'block';
+    
+    // Noņemt esošos notikumu klausītājus
+    const newYesButton = yesButton.cloneNode(true);
+    const newNoButton = noButton.cloneNode(true);
+    yesButton.parentNode.replaceChild(newYesButton, yesButton);
+    noButton.parentNode.replaceChild(newNoButton, noButton);
+    
+    // Pievienot jaunus notikumu klausītājus
+    document.getElementById('confirmYes').addEventListener('click', function() {
+        hideConfirmModal();
+        if (onConfirm) onConfirm();
     });
+    
+    document.getElementById('confirmNo').addEventListener('click', function() {
+        hideConfirmModal();
+        if (onCancel) onCancel();
+    });
+}
 
+// Apstiprināšanas modāla paslēpšana
+function hideConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+}
 
+// Aizvērt apstiprināšanas modāli, ja noklikšķina ārpus tā
+window.addEventListener('click', function(event) {
+    const confirmModal = document.getElementById('confirmModal');
+    if (event.target === confirmModal) {
+        hideConfirmModal();
+    }
+});
 
-// Global pagination state
+// Globālais lapošanas stāvoklis
 let currentPage = 1;
 let totalPages = 1;
 let totalRecords = 0;
-const itemsPerPage = 6; // Fixed for all pages
+const itemsPerPage = 6; // Fiksēts visām lapām
 
-// Current page configuration
+// Pašreizējās lapas konfigurācija
 let currentLoadFunction = '';
 let currentTableBodyId = '';
 let currentFilters = [];
 
 /**
- * Initialize pagination system for a specific page
+ * Inicializēt lapošanas sistēmu produktu lapai
  */
 function initializeProductsPagination() {
     currentLoadFunction = 'db/produkcija_admin.php';
@@ -88,6 +89,9 @@ function initializeProductsPagination() {
     setupFilterListeners();
 }
 
+/**
+ * Inicializēt lapošanas sistēmu pasūtījumu lapai
+ */
 function initializeOrdersPagination() {
     currentLoadFunction = 'db/pasutijumi_admin.php';
     currentTableBodyId = 'orders-tbody';
@@ -97,6 +101,9 @@ function initializeOrdersPagination() {
     setupFilterListeners();
 }
 
+/**
+ * Inicializēt lapošanas sistēmu individuālo pasūtījumu lapai
+ */
 function initializeCustomOrdersPagination() {
     currentLoadFunction = 'db/spec_pas_admin.php';
     currentTableBodyId = 'orders-tbody';
@@ -107,11 +114,11 @@ function initializeCustomOrdersPagination() {
 }
 
 /**
- * Generic data loading function
+ * Universāla datu ielādēšanas funkcija
  */
 function loadData(page = 1) {
     if (!currentLoadFunction) {
-        console.error('Pagination not initialized');
+        console.error('Lapošana nav inicializēta');
         return;
     }
     
@@ -120,7 +127,7 @@ function loadData(page = 1) {
     formData.append('ajax', '1');
     formData.append('page', page);
     
-    // Add filter values
+    // Pievienot filtru vērtības
     currentFilters.forEach(filterId => {
         const element = document.getElementById(filterId);
         if (element) {
@@ -129,7 +136,7 @@ function loadData(page = 1) {
         }
     });
     
-    // Show loading indicator
+    // Rādīt ielādēšanas indikatoru
     showLoadingIndicator(true);
     
     fetch(currentLoadFunction, {
@@ -144,14 +151,14 @@ function loadData(page = 1) {
         updatePagination();
     })
     .catch(error => {
-        console.error('Error loading data:', error);
+        console.error('Kļūda ielādējot datus:', error);
         showLoadingIndicator(false);
         showNotification('error', 'Kļūda!', 'Neizdevās ielādēt datus.');
     });
 }
 
 /**
- * Update table content with new HTML
+ * Atjaunināt tabulas saturu ar jauno HTML
  */
 function updateTableContent(html) {
     const tbody = document.getElementById(currentTableBodyId);
@@ -162,7 +169,7 @@ function updateTableContent(html) {
 }
 
 /**
- * Show/hide loading indicator
+ * Rādīt/paslēpt ielādēšanas indikatoru
  */
 function showLoadingIndicator(show) {
     const indicator = document.getElementById('loading-indicator');
@@ -178,7 +185,7 @@ function showLoadingIndicator(show) {
 }
 
 /**
- * Extract pagination info from hidden data attributes
+ * Izgūt lapošanas informāciju no slēptajiem datu atribūtiem
  */
 function extractPaginationInfo() {
     const hiddenRow = document.querySelector('[data-current-page]');
@@ -191,7 +198,7 @@ function extractPaginationInfo() {
 }
 
 /**
- * Update pagination controls and info
+ * Atjaunināt lapošanas vadību un informāciju
  */
 function updatePagination() {
     const paginationContainer = document.getElementById('pagination-container');
@@ -209,39 +216,39 @@ function updatePagination() {
     
     paginationContainer.style.display = 'flex';
     
-    // Update pagination text
+    // Atjaunināt lapošanas tekstu
     const startRecord = ((currentPage - 1) * itemsPerPage) + 1;
     const endRecord = Math.min(currentPage * itemsPerPage, totalRecords);
     paginationText.textContent = `Rāda ${startRecord}-${endRecord} no ${totalRecords} ierakstiem`;
     
-    // Generate pagination buttons
+    // Ģenerēt lapošanas pogas
     paginationControls.innerHTML = generatePaginationButtons();
 }
 
 /**
- * Generate pagination buttons HTML
+ * Ģenerēt lapošanas pogu HTML
  */
 function generatePaginationButtons() {
     let html = '';
     
-    // Previous button
+    // Iepriekšējā poga
     if (currentPage > 1) {
         html += `<button class="pagination-btn" onclick="loadData(${currentPage - 1})">
             <i class="fas fa-chevron-left"></i> Iepriekšējā
         </button>`;
     }
     
-    // Page numbers
+    // Lapu numuri
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
     
-    // Adjust start if we're near the end
+    // Pielāgot sākumu, ja esam tuvu beigām
     if (endPage - startPage + 1 < maxVisiblePages) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
     
-    // First page
+    // Pirmā lapa
     if (startPage > 1) {
         html += `<button class="pagination-btn page-number" onclick="loadData(1)">1</button>`;
         if (startPage > 2) {
@@ -249,13 +256,13 @@ function generatePaginationButtons() {
         }
     }
     
-    // Page numbers
+    // Lapu numuri
     for (let i = startPage; i <= endPage; i++) {
         const activeClass = i === currentPage ? 'active' : '';
         html += `<button class="pagination-btn page-number ${activeClass}" onclick="loadData(${i})">${i}</button>`;
     }
     
-    // Last page
+    // Pēdējā lapa
     if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
             html += `<span class="pagination-dots">...</span>`;
@@ -263,7 +270,7 @@ function generatePaginationButtons() {
         html += `<button class="pagination-btn page-number" onclick="loadData(${totalPages})">${totalPages}</button>`;
     }
     
-    // Next button
+    // Nākamā poga
     if (currentPage < totalPages) {
         html += `<button class="pagination-btn" onclick="loadData(${currentPage + 1})">
             Nākamā <i class="fas fa-chevron-right"></i>
@@ -274,10 +281,10 @@ function generatePaginationButtons() {
 }
 
 /**
- * Setup filter event listeners
+ * Iestatīt filtru notikumu klausītājus
  */
 function setupFilterListeners() {
-    // Search input with debounce
+    // Meklēšanas ievade ar aizkavi
     let searchTimeout;
     const searchElements = ['searchInput', 'search'];
     
@@ -287,62 +294,66 @@ function setupFilterListeners() {
             element.addEventListener('input', function() {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    loadData(1); // Reset to first page when searching
+                    loadData(1); // Atiestatīt uz pirmo lapu, meklējot
                 }, 500);
             });
         }
     });
     
-    // Auto-filter on select changes
+    // Automātiskā filtrēšana, mainoties izvēles laukos
     const selectElements = ['status', 'filterSelect'];
     selectElements.forEach(elementId => {
         const element = document.getElementById(elementId);
         if (element) {
             element.addEventListener('change', function() {
-                loadData(1); // Reset to first page when filtering
+                loadData(1); // Atiestatīt uz pirmo lapu, filtrējot
             });
         }
     });
     
-    // Auto-filter on date changes
+    // Automātiskā filtrēšana, mainoties datumiem
     const dateElements = ['date_from', 'date_to'];
     dateElements.forEach(elementId => {
         const element = document.getElementById(elementId);
         if (element) {
             element.addEventListener('change', function() {
-                loadData(1); // Reset to first page when filtering
+                loadData(1); // Atiestatīt uz pirmo lapu, filtrējot
             });
         }
     });
 }
 
 /**
- * Show notification message
+ * Rādīt paziņojuma ziņojumu
  */
 function showNotification(type, title, message) {
     const container = document.querySelector('.notification-container');
     if (!container) return;
     
-    // Clear any existing notifications first to prevent stacking
+    // Vispirms notīrīt esošos paziņojumus, lai novērstu uzkrāšanos
     container.innerHTML = '';
     
-    // Create notification element
+    // FIX: Pārbaudīt un nodrošināt, ka ziņojums nav undefined
+    const displayMessage = message || 'Darbība pabeigta.';
+    const displayTitle = title || (type === 'success' ? 'Veiksmīgi!' : 'Kļūda!');
+    
+    // Izveidot paziņojuma elementu
     const notification = document.createElement('div');
     notification.className = 'notification ' + type;
     notification.innerHTML = `
         <i class="${type === 'success' ? 'fas fa-check-circle success' : 'fas fa-exclamation-circle error'}"></i>
         <div>
-            <h3>${title}</h3>
-            <p>${message}</p>
+            <h3>${displayTitle}</h3>
+            <p>${displayMessage}</p>
         </div>
         <button class="notification-close" onclick="this.parentElement.remove(); checkNotificationContainer();">×</button>
     `;
     
-    // Add to container and show
+    // Pievienot konteineram un rādīt
     container.appendChild(notification);
     container.style.display = 'block';
     
-    // Auto-hide after 5 seconds
+    // Automātiski paslēpt pēc 5 sekundēm
     setTimeout(() => {
         if (notification.parentNode) {
             notification.remove();
@@ -352,7 +363,7 @@ function showNotification(type, title, message) {
 }
 
 /**
- * Check if notification container should be hidden
+ * Pārbaudīt, vai paziņojumu konteiners jāpaslēpj
  */
 function checkNotificationContainer() {
     const container = document.querySelector('.notification-container');
@@ -362,50 +373,13 @@ function checkNotificationContainer() {
 }
 
 /**
- * Reusable confirmation modal functions
- */
-function showConfirmModal(message, onConfirm, onCancel = null) {
-    const modal = document.getElementById('confirmModal');
-    if (!modal) return;
-    
-    const messageElement = document.getElementById('confirmMessage');
-    const yesButton = document.getElementById('confirmYes');
-    const noButton = document.getElementById('confirmNo');
-    
-    if (messageElement) messageElement.textContent = message;
-    modal.style.display = 'block';
-    
-    // Remove any existing event listeners
-    const newYesButton = yesButton.cloneNode(true);
-    const newNoButton = noButton.cloneNode(true);
-    yesButton.parentNode.replaceChild(newYesButton, yesButton);
-    noButton.parentNode.replaceChild(newNoButton, noButton);
-    
-    // Add new event listeners
-    document.getElementById('confirmYes').addEventListener('click', function() {
-        hideConfirmModal();
-        if (onConfirm) onConfirm();
-    });
-    
-    document.getElementById('confirmNo').addEventListener('click', function() {
-        hideConfirmModal();
-        if (onCancel) onCancel();
-    });
-}
-
-function hideConfirmModal() {
-    const modal = document.getElementById('confirmModal');
-    if (modal) modal.style.display = 'none';
-}
-
-/**
- * Product deletion function (for products page)
+ * Produkta dzēšanas funkcija (produktu lapai)
  */
 function deleteProduct(productId, productName) {
     showConfirmModal(
         `Vai tiešām vēlaties dzēst produktu "${productName}"? Šī darbība ir neatgriezeniska.`,
         function() {
-            // Confirmed - proceed with deletion via AJAX
+            // Apstiprināts - turpināt ar dzēšanu caur AJAX
             const formData = new FormData();
             formData.append('delete_product', '1');
             formData.append('id', productId);
@@ -418,14 +392,14 @@ function deleteProduct(productId, productName) {
             .then(data => {
                 if (data.status === 'success') {
                     showNotification('success', 'Veiksmīgi!', data.message);
-                    // Reload current page to maintain pagination
+                    // Pārlādēt pašreizējo lapu, lai saglabātu lapošanu
                     loadData(currentPage);
                 } else {
                     showNotification('error', 'Kļūda!', data.message);
                 }
             })
             .catch(error => {
-                console.error('Error deleting product:', error);
+                console.error('Kļūda dzēšot produktu:', error);
                 showNotification('error', 'Kļūda!', 'Neizdevās dzēst produktu.');
             });
         }
@@ -433,7 +407,7 @@ function deleteProduct(productId, productName) {
 }
 
 /**
- * Setup image click handlers (for products page)
+ * Iestatīt attēlu klikšķu apstrādātājus (produktu lapai)
  */
 function setupImageClickHandlers() {
     document.querySelectorAll('.product-thumbnail').forEach(img => {
@@ -455,7 +429,7 @@ function setupImageClickHandlers() {
             document.body.appendChild(modal);
             modal.style.display = 'flex';
             
-            // Close modal events
+            // Modāla aizvēršanas notikumi
             modal.querySelector('.close').onclick = () => {
                 document.body.removeChild(modal);
             };
@@ -468,56 +442,162 @@ function setupImageClickHandlers() {
         });
     });
 }
-
 /**
- * Global event listeners
+ * Atjaunināt pasūtījuma statusu
  */
- window.addEventListener('click', function(event) {
-        const confirmModal = document.getElementById('confirmModal');
-        if (event.target === confirmModal) {
-            hideConfirmModal();
-        }
-    });
-    
-    // Add the notification auto-hide code here:
-    const adminNotification = document.getElementById('admin-notification');
-    if (adminNotification) {
-        setTimeout(function() {
-            adminNotification.classList.add('fade-out');
-            setTimeout(function() {
-                adminNotification.style.display = 'none';
-            }, 300);
-        }, 3000);
+function updateOrderStatus(orderId, newStatus, orderElement = null) {
+    // Pārbaudīt, vai ir nepieciešamie dati
+    if (!orderId || !newStatus) {
+        console.error('Trūkst dati:', { orderId, newStatus });
+        showNotification('error', 'Kļūda!', 'Trūkst nepieciešamie dati');
+        return;
     }
     
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Escape to close modals
-        if (e.key === 'Escape') {
-            const modals = document.querySelectorAll('.modal[style*="display: flex"], .modal[style*="display: block"]');
-            modals.forEach(modal => {
-                modal.style.display = 'none';
-                if (modal.parentNode && !modal.id) {
-                    modal.parentNode.removeChild(modal);
+    // Pārveidot orderId uz skaitli, ja nepieciešams
+    const orderIdNum = parseInt(orderId);
+    if (isNaN(orderIdNum)) {
+        console.error('Nederīgs pasūtījuma ID:', orderId);
+        showNotification('error', 'Kļūda!', 'Nederīgs pasūtījuma ID');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('update_status', '1');
+    formData.append('order_id', orderIdNum.toString());
+    formData.append('new_status', newStatus.toString());
+    
+    // Izmantot pareizo PHP failu atkarībā no pašreizējās lapas
+    let phpFile = 'db/pasutijumi_admin.php'; // noklusējuma fails
+    if (currentLoadFunction && currentLoadFunction.includes('spec_pas_admin.php')) {
+        phpFile = 'db/spec_pas_admin.php';
+    }
+    
+    console.log('Sūtu datus:', {
+        order_id: orderIdNum,
+        new_status: newStatus,
+        file: phpFile
+    });
+    
+    // Rādīt ielādēšanas stāvokli, ja elements norādīts
+    if (orderElement) {
+        orderElement.style.opacity = '0.5';
+        orderElement.style.pointerEvents = 'none';
+    }
+    
+    fetch(phpFile, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Atbilde saņemta:', response.status);
+        return response.text();
+    })
+    .then(text => {
+        console.log('Atbildes teksts:', text);
+        try {
+            const data = JSON.parse(text);
+            if (data.status === 'success') {
+                // FIX: Pievienot noklusējuma ziņojumu, ja nav definēts
+                const successMessage = data.message || 'Pasūtījuma statuss ir veiksmīgi atjaunināts.';
+                showNotification('success', 'Veiksmīgi!', successMessage);
+                // Pārlādēt pašreizējo lapu, lai rādītu atjaunināto statusu
+                if (typeof loadData === 'function') {
+                    loadData(currentPage);
+                } else {
+                    location.reload();
                 }
-            });
-            hideConfirmModal();
+            } else {
+                // FIX: Pievienot noklusējuma kļūdas ziņojumu
+                const errorMessage = data.message || 'Neizdevās atjaunināt pasūtījuma statusu.';
+                showNotification('error', 'Kļūda!', errorMessage);
+            }
+        } catch (e) {
+            console.error('JSON parsēšanas kļūda:', e);
+            console.error('Saņemtais teksts:', text);
+            showNotification('error', 'Kļūda!', 'Serveris atgrieza nederīgu atbildi');
         }
         
-        // Focus search with Ctrl/Cmd + F
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-            e.preventDefault();
-            const searchInput = document.getElementById('searchInput') || document.getElementById('search');
-            if (searchInput) searchInput.focus();
+        // Atiestatīt elementa stāvokli
+        if (orderElement) {
+            orderElement.style.opacity = '1';
+            orderElement.style.pointerEvents = 'auto';
         }
+    })
+    .catch(error => {
+        console.error('Fetch kļūda:', error);
+        showNotification('error', 'Kļūda!', 'Neizdevās sazināties ar serveri.');
+        // Atiestatīt elementa stāvokli kļūdas gadījumā
+        if (orderElement) {
+            orderElement.style.opacity = '1';
+            orderElement.style.pointerEvents = 'auto';
+        }
+    });
+}
+/**
+ * Atjaunināt pasūtījuma statusu ar apstiprināšanu
+ */
+function updateOrderStatusWithConfirm(orderId, newStatus, orderElement = null) {
+    const statusLabels = {
+        'Jauns': 'Jauns',
+        'Apstrādē': 'Apstrādē', 
+        'Nosūtīts': 'Nosūtīts',
+        'Pabeigts': 'Pabeigts',
+        'Atcelts': 'Atcelts'
+    };
     
+    const statusLabel = statusLabels[newStatus] || newStatus;
+    
+    showConfirmModal(
+        `Vai tiešām vēlaties mainīt pasūtījuma statusu uz "${statusLabel}"?`,
+        function() {
+            updateOrderStatus(orderId, newStatus, orderElement);
+        }
+    );
+}
+
+/**
+ * Globālie notikumu klausītāji
+ */
+window.addEventListener('click', function(event) {
+    const confirmModal = document.getElementById('confirmModal');
+    if (event.target === confirmModal) {
+        hideConfirmModal();
+    }
 });
 
+// Pievienot paziņojuma automātiskās paslēpšanas kodu
+const adminNotification = document.getElementById('admin-notification');
+if (adminNotification) {
+    setTimeout(function() {
+        adminNotification.classList.add('fade-out');
+        setTimeout(function() {
+            adminNotification.style.display = 'none';
+        }, 300);
+    }, 3000);
+}
 
+// Tastatūras saīsnes
+document.addEventListener('keydown', function(e) {
+    // Escape, lai aizvērtu modāļus
+    if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal[style*="display: flex"], .modal[style*="display: block"]');
+        modals.forEach(modal => {
+            modal.style.display = 'none';
+            if (modal.parentNode && !modal.id) {
+                modal.parentNode.removeChild(modal);
+            }
+        });
+        hideConfirmModal();
+    }
+});
+
+// Padarīt funkcijas globāli pieejamas
 window.loadData = loadData;
 window.showNotification = showNotification;
 window.showConfirmModal = showConfirmModal;
 window.hideConfirmModal = hideConfirmModal;
+window.updateOrderStatus = updateOrderStatus;
+window.updateOrderStatusWithConfirm = updateOrderStatusWithConfirm;
 window.deleteProduct = deleteProduct;
 window.setupImageClickHandlers = setupImageClickHandlers;
 window.initializeProductsPagination = initializeProductsPagination;

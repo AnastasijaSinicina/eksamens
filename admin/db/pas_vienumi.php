@@ -2,8 +2,6 @@
 
 $order_id = $_GET['view'];
 
-// Get order details
-$order_id = $_GET['view'];
 
 // Get order information
 $order_query = "SELECT p.*, l.lietotajvards

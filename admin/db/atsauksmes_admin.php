@@ -14,7 +14,7 @@
             // Parāda veiksmīgu ziņojumu
             echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Atsauksme ir noraidīta.');
+                        showNotification('success', 'Veiksmīgi!', 'Atsauksme ir apstiprināta.');
                     });
                   </script>";
         } else {
@@ -40,7 +40,7 @@
             // Parāda veiksmīgu ziņojumu
             echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        showNotification('success', 'Veiksmīgi!', 'Atsauksme ir apstiprināta.');
+                        showNotification('success', 'Veiksmīgi!', 'Atsauksme ir noraidīta.');
                     });
                   </script>";
         } else {

@@ -167,7 +167,7 @@ require 'header.php';
                         <button class="filter-button" data-type="custom">Pielāgotie (<?php echo count(array_filter($all_orders, function($o) { return $o['order_type'] == 'custom'; })); ?>)</button>
                         <button class="filter-button order-status iesniegts" data-status="Iesniegts">Iesniegts</button>
                         <button class="filter-button order-status apstiprināts" data-status="Apstiprināts">Apstiprināts</button>
-                        <button class="filter-button order-status nosūtīts" data-status="Nosūtīts">Nosūtīts</button>
+                        <button class="filter-button order-status izgatavo" data-status="Izgatavo">Izgatavo</button>
                         <button class="filter-button order-status saņemts" data-status="Saņemts">Saņemts</button>
                         <button class="filter-button order-status atcelts" data-status="Atcelts">Atcelts</button>
                     </div>
@@ -209,14 +209,6 @@ require 'header.php';
                                                     <div class="summary-item">
                                                         <span class="label">Produktu skaits:</span>
                                                         <span class="value"><?php echo $order['produktu_skaits']; ?></span>
-                                                    </div>
-                                                    <div class="summary-item">
-                                                        <span class="label">Apmaksas veids:</span>
-                                                        <span class="value"><?php echo $order['apmaksas_veids']; ?></span>
-                                                    </div>
-                                                    <div class="summary-item">
-                                                        <span class="label">Piegādes veids:</span>
-                                                        <span class="value"><?php echo $order['piegades_veids']; ?></span>
                                                     </div>
                                                 <?php else: ?>
                                                     <div class="summary-item">

@@ -12,13 +12,10 @@ if (!isset($_SESSION['lietotajvardsSIN'])) {
     exit();
 }
 
-// Get current user's username
 $username = $_SESSION['lietotajvardsSIN'];
 
-// Include cart items query from admin/db
 require "admin/db/grozs.php";
 
-// Include header
 include 'header.php';
 ?>
 
@@ -99,6 +96,7 @@ include 'header.php';
                     <button type="submit" name="clear" class="btn clear-btn">Iztīrīt grozu</button>
                 </form>
             </div>
+            
         </div>
     <?php endif; ?>
 </section>

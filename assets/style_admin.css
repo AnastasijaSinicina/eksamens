@@ -731,8 +731,8 @@ small {
     box-shadow: var(--box-shadow);
 }
 
-.status.nosūtīts,
-.status-badge.nosūtīts {
+.status.izgatavo,
+.status-badge.izgatavo {
     background-color: #e8f5e9;
     color: #388e3c;
     box-shadow: var(--box-shadow);

@@ -66,14 +66,18 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
     // Get total count
     if (!empty($params)) {
         $count_stmt = $savienojums->prepare($count_sql);
-        $count_stmt->bind_param($types, ...$params);
-        $count_stmt->execute();
-        $count_result = $count_stmt->get_result();
-        $total_records = $count_result->fetch_assoc()['total'];
-        $count_stmt->close();
+        if ($count_stmt) {
+            $count_stmt->bind_param($types, ...$params);
+            $count_stmt->execute();
+            $count_result = $count_stmt->get_result();
+            $total_records = $count_result->fetch_assoc()['total'];
+            $count_stmt->close();
+        } else {
+            $total_records = 0;
+        }
     } else {
         $count_result = $savienojums->query($count_sql);
-        $total_records = $count_result->fetch_assoc()['total'];
+        $total_records = $count_result ? $count_result->fetch_assoc()['total'] : 0;
     }
     
     $total_pages = ceil($total_records / $limit);
@@ -87,15 +91,23 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
     // Execute main query
     if (!empty($params)) {
         $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param($types, ...$params);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if ($stmt) {
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $result = false;
+        }
     } else {
         $sql .= " LIMIT ? OFFSET ?";
         $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("ii", $limit, $offset);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if ($stmt) {
+            $stmt->bind_param("ii", $limit, $offset);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $result = false;
+        }
     }
     
     // Return JSON response with pagination info
@@ -115,6 +127,7 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
             }
         }
         
+        header('Content-Type: application/json');
         echo json_encode([
             'orders' => $orders,
             'pagination' => [
@@ -143,7 +156,7 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
             }
             
             echo '<tr>';
-            echo '<td>' . $order['id_pasutijums'] . '</td>';
+            echo '<td>' . htmlspecialchars($order['id_pasutijums']) . '</td>';
             echo '<td>';
             echo '<div class="client-info">';
             echo '<div>' . htmlspecialchars($order['vards'] . ' ' . $order['uzvards']) . '</div>';
@@ -152,9 +165,9 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
             echo '</td>';
             echo '<td>' . date('d.m.Y H:i', strtotime($order['pas_datums'])) . '</td>';
             echo '<td>' . number_format($order['kopeja_cena'], 2) . '€</td>';
-            echo '<td>' . $order['produktu_skaits'] . '</td>';
+            echo '<td>' . htmlspecialchars($order['produktu_skaits']) . '</td>';
             echo '<td>';
-            echo '<span class="status ' . strtolower($order['statuss']) . '">' . $order['statuss'] . '</span>';
+            echo '<span class="status ' . strtolower($order['statuss']) . '">' . htmlspecialchars($order['statuss']) . '</span>';
             echo '</td>';
             echo '<td>';
             if (!empty($red_liet_name)) {
@@ -167,7 +180,7 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
             }
             echo '</td>';
             echo '<td class="action-buttons">';
-            echo '<a href="pasutijumi.php?view=' . $order['id_pasutijums'] . '" class="btn"><i class="fas fa-eye"></i> Skatīt</a>';
+            echo '<a href="pasutijumi.php?view=' . htmlspecialchars($order['id_pasutijums']) . '" class="btn"><i class="fas fa-eye"></i> Skatīt</a>';
             echo '</td>';
             echo '</tr>';
         }
@@ -190,8 +203,39 @@ if ((isset($_GET['ajax']) && $_GET['ajax'] == '1') || (isset($_POST['ajax']) && 
 
 // Handle status update
 if (isset($_POST['update_status'])) {
-    $order_id = $_POST['order_id'];
-    $new_status = $_POST['new_status'];
+    // Set proper content type for JSON response
+    header('Content-Type: application/json');
+    
+    // Validate required fields
+    if (empty($_POST['order_id']) || empty($_POST['new_status'])) {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Trūkst nepieciešamie dati - pasūtījuma ID vai statuss nav norādīts'
+        ]);
+        exit;
+    }
+    
+    $order_id = intval($_POST['order_id']);
+    $new_status = trim($_POST['new_status']);
+    
+    // Validate order ID
+    if ($order_id <= 0) {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Nederīgs pasūtījuma ID'
+        ]);
+        exit;
+    }
+    
+    // Validate status
+    $allowed_statuses = ['Iesniegts', 'Apstiprināts', 'Izgatavo', 'Saņemts'];
+    if (!in_array($new_status, $allowed_statuses)) {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Nederīgs pasūtījuma statuss'
+        ]);
+        exit;
+    }
     
     $lietotajvards = $_SESSION['lietotajvardsSIN'] ?? null;
     $user_id = null;
@@ -199,25 +243,86 @@ if (isset($_POST['update_status'])) {
     if ($lietotajvards) {
         $sql = "SELECT id_lietotajs FROM lietotaji_sparkly WHERE lietotajvards = ?";
         $stmt = $savienojums->prepare($sql);
-        $stmt->bind_param("s", $lietotajvards);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $user_id = $row['id_lietotajs'];
+        if ($stmt) {
+            $stmt->bind_param("s", $lietotajvards);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $user_id = $row['id_lietotajs'];
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
     
+    // Check if order exists
+    $check_sql = "SELECT id_pasutijums, statuss FROM sparkly_pasutijumi WHERE id_pasutijums = ?";
+    $check_stmt = $savienojums->prepare($check_sql);
+    if (!$check_stmt) {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Datubāzes kļūda: neizdevās sagatavot vaicājumu'
+        ]);
+        exit;
+    }
+    
+    $check_stmt->bind_param("i", $order_id);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+    
+    if ($check_result->num_rows === 0) {
+        $check_stmt->close();
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Pasūtījums ar ID #' . $order_id . ' nav atrasts'
+        ]);
+        exit;
+    }
+    
+    $current_order = $check_result->fetch_assoc();
+    $check_stmt->close();
+    
+    // Check if status is actually changing
+    if ($current_order['statuss'] === $new_status) {
+        echo json_encode([
+            'status' => 'success', 
+            'message' => 'Pasūtījuma statuss jau ir "' . $new_status . '"'
+        ]);
+        exit;
+    }
+    
+    // Update the order status
     $sql = "UPDATE sparkly_pasutijumi SET statuss = ?, red_liet = ?, red_dat = NOW() WHERE id_pasutijums = ?";
     $stmt = $savienojums->prepare($sql);
+    
+    if (!$stmt) {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Datubāzes kļūda: neizdevās sagatavot atjaunināšanas vaicājumu'
+        ]);
+        exit;
+    }
+    
     $stmt->bind_param("sii", $new_status, $user_id, $order_id);
     
     if ($stmt->execute()) {
-        $response = ['status' => 'success', 'message' => 'Pasūtījuma statuss ir atjaunināts.'];
+        if ($stmt->affected_rows > 0) {
+            $response = [
+                'status' => 'success', 
+                'message' => 'Pasūtījuma #' . $order_id . ' statuss ir veiksmīgi mainīts uz "' . $new_status . '"'
+            ];
+        } else {
+            $response = [
+                'status' => 'warning', 
+                'message' => 'Pasūtījuma statuss netika mainīts - iespējams, nav izmaiņu'
+            ];
+        }
     } else {
-        $response = ['status' => 'error', 'message' => 'Neizdevās atjaunināt statusu: ' . $stmt->error];
+        $response = [
+            'status' => 'error', 
+            'message' => 'Neizdevās atjaunināt statusu datubāzē: ' . $stmt->error
+        ];
     }
     
     $stmt->close();
@@ -227,7 +332,14 @@ if (isset($_POST['update_status'])) {
 
 // Handle fetch order details
 if (isset($_GET['fetch_order_details']) && isset($_GET['id'])) {
-    $order_id = $_GET['id'];
+    header('Content-Type: application/json');
+    
+    $order_id = intval($_GET['id']);
+    
+    if ($order_id <= 0) {
+        echo json_encode(['error' => 'Nederīgs pasūtījuma ID']);
+        exit;
+    }
     
     $sql = "SELECT p.*, l.lietotajvards,
                    m.lietotajvards as red_liet_username,
@@ -239,6 +351,11 @@ if (isset($_GET['fetch_order_details']) && isset($_GET['id'])) {
             WHERE p.id_pasutijums = ?";
     
     $stmt = $savienojums->prepare($sql);
+    if (!$stmt) {
+        echo json_encode(['error' => 'Datubāzes kļūda']);
+        exit;
+    }
+    
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -256,7 +373,7 @@ if (isset($_GET['fetch_order_details']) && isset($_GET['id'])) {
         
         echo json_encode($order);
     } else {
-        echo json_encode(null);
+        echo json_encode(['error' => 'Pasūtījums nav atrasts']);
     }
     
     $stmt->close();
@@ -265,7 +382,14 @@ if (isset($_GET['fetch_order_details']) && isset($_GET['id'])) {
 
 // Handle fetch order items
 if (isset($_GET['fetch_order_items']) && isset($_GET['id'])) {
-    $order_id = $_GET['id'];
+    header('Content-Type: application/json');
+    
+    $order_id = intval($_GET['id']);
+    
+    if ($order_id <= 0) {
+        echo json_encode(['error' => 'Nederīgs pasūtījuma ID']);
+        exit;
+    }
     
     $sql = "SELECT i.*, p.attels1, p.nosaukums
             FROM sparkly_pasutijuma_vienumi i
@@ -273,6 +397,11 @@ if (isset($_GET['fetch_order_items']) && isset($_GET['id'])) {
             WHERE i.pasutijuma_id = ?";
     
     $stmt = $savienojums->prepare($sql);
+    if (!$stmt) {
+        echo json_encode(['error' => 'Datubāzes kļūda']);
+        exit;
+    }
+    
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();

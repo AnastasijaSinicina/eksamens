@@ -59,14 +59,6 @@ require 'db/produkcija_admin.php';
                     <input type="text" id="searchInput" name="search" placeholder="Produkta nosaukums vai ID" class="search-input">
                 </div>
                 
-                <div class="filter-group">
-                    <label for="filterSelect">Filtrēt:</label>
-                    <select id="filterSelect" name="filter" class="filter-select">
-                        <option value="">Visi produkti</option>
-                        <option value="recent">Nesen pievienoti (7 dienas)</option>
-                        <option value="updated">Nesen atjaunināti (7 dienas)</option>
-                    </select>
-                </div>
             </form>
         </div>
         
@@ -251,10 +243,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
     }, 500);
 });
 
-// Auto-filter on filter change
-document.getElementById('filterSelect').addEventListener('change', function() {
-    loadProducts(1); // Reset to first page when filtering
-});
+
 
 // ===== REUSABLE CONFIRMATION MODAL FUNCTIONS =====
 function showConfirmModal(message, onConfirm, onCancel = null) {

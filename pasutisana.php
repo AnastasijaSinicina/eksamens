@@ -20,6 +20,8 @@ include 'header.php';
     
     <div class="checkout-container">
         <div class="order-summary">
+            <h2>Svarīgi!</h2>
+            <p class="svarigi">Mūsu izstrādājumus ir iespēja savākt tikai veikalā! <br>Ja ir nepieciešama piegāde, sazinies ar mums e-pastā, norādot adresi un pasūtījuma numuru!</p>
             <h2>Pasūtījuma kopsavilkums</h2>
             
             <div class="summary-items">
